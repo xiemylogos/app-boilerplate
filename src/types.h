@@ -48,7 +48,7 @@ typedef struct {
 typedef struct {
     uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
     size_t raw_tx_len;                    /// length of raw transaction
-    transaction_t transaction;            /// structured transaction
+    ont_transaction_t transaction;        /// structured transaction
     uint8_t m_hash[32];                   /// message hash digest
     uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
     uint8_t signature_len;                /// length of transaction signature
