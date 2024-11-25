@@ -19,3 +19,6 @@ void validate_pubkey(bool choice);
  *
  */
 void validate_transaction(bool choice);
+
+
+void validate_person_msg(bool choice);

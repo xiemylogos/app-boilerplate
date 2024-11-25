@@ -149,11 +149,16 @@ int ui_display_transaction() {
     char amount[30] = {0};
     if (!format_fpu64(amount,
                       sizeof(amount),
-                      G_context.tx_info.transaction.value,
+                      G_context.tx_info.transaction.payload.value,
                       EXPONENT_SMALLEST_UNIT)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
-    snprintf(g_amount, sizeof(g_amount), "BOL %.*s", sizeof(amount), amount);
+    if (memcpy(G_context.tx_info.transaction.payload->contract_addr,ONT_CONTRACT_ADDRESS,20) ==0) {
+       snprintf(g_amount, sizeof(g_amount), "ONT %.*s", sizeof(amount), amount);
+    } else if (memcpy(G_context.tx_info.transaction.payload->contract_addr,ONG_CONTRACT_ADDRESS,20) ==0 ) {
+       snprintf(g_amount, sizeof(g_amount), "ONG %.*s", sizeof(amount), amount);
+    }
+    //snprintf(g_amount, sizeof(g_amount), "BOL %.*s", sizeof(amount), amount);
     PRINTF("Amount: %s\n", g_amount);
 
     memset(g_address, 0, sizeof(g_address));

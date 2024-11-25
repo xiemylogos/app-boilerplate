@@ -60,8 +60,7 @@ static void review_choice(bool confirm) {
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
-// - Display a warning if the transaction is blind-signed
-int ui_display_transaction_bs_choice(bool is_blind_signed) {
+int ui_display_transaction_bs_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
@@ -101,40 +100,29 @@ int ui_display_transaction_bs_choice(bool is_blind_signed) {
     pairList.nbPairs = 2;
     pairList.pairs = pairs;
 
-    if (is_blind_signed) {
-        // Start blind-signing review flow
-        //todo by xiemylogos
-        nbgl_useCaseReviewBlindSigning(TYPE_TRANSACTION,
-                                       &pairList,
-                                       &C_app_boilerplate_64px,
-                                       "Review transaction\nto send BOL",
-                                       NULL,
-                                       "Sign transaction\nto send BOL",
-                                       NULL,
-                                       review_choice);
-    } else {
-        // Start review flow
-        //todo by xiemylogos
+   if (memcpy(G_context.tx_info.transaction.payload->contract_addr,ONT_CONTRACT_ADDRESS,20) ==0) {
         nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairList,
                            &C_app_boilerplate_64px,
-                           "Review transaction\nto send BOL",
+                           "Review transaction\nto send ONT",
                            NULL,
-                           "Sign transaction\nto send BOL",
+                           "Sign transaction\nto send ONT",
                            review_choice);
-    }
-
+   } else if (memcpy(G_context.tx_info.transaction.payload->contract_addr,ONG_CONTRACT_ADDRESS,20) ==0 ) {
+         nbgl_useCaseReview(TYPE_TRANSACTION,
+                           &pairList,
+                           &C_app_boilerplate_64px,
+                           "Review transaction\nto send ONG",
+                           NULL,
+                           "Sign transaction\nto send ONG",
+                           review_choice);
+   }
     return 0;
-}
-
-// Flow used to display a blind-signed transaction
-int ui_display_blind_signed_transaction(void) {
-    return ui_display_transaction_bs_choice(true);
 }
 
 // Flow used to display a clear-signed transaction
 int ui_display_transaction() {
-    return ui_display_transaction_bs_choice(false);
+    return ui_display_transaction_bs_choice();
 }
 
 #endif
