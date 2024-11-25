@@ -57,7 +57,7 @@ typedef enum {
     CONFIRM_ADDRESS,          /// confirm address derived from public key
     CONFIRM_TRANSACTION,      /// confirm transaction information
     CONFIRM_MESSAGE,          /// confirm message information
-    CONFIRM_OEP4_TRANSACTION  /// confirm transaction information
+    CONFIRM_OEP4_TRANSACTION  /// confirm oep4 transaction information
 } request_type_e;
 
 /**
@@ -107,12 +107,12 @@ typedef struct {
 typedef struct {
     state_e state;  /// state of the context
     union {
-        pubkey_ctx_t pk_info;       /// public key context
-        transaction_ctx_t tx_info;  /// transaction context
-        person_msg_ctx_t person_msg_info;
-        oep4_transaction_ctx_t oep4_tx_info;
+        pubkey_ctx_t pk_info;                 /// public key context
+        transaction_ctx_t tx_info;            /// transaction context
+        person_msg_ctx_t person_msg_info;     /// person msg context
+        oep4_transaction_ctx_t oep4_tx_info;  ///oep4 transaction context
     };
-    request_type_e req_type;              /// user request
-    uint32_t bip32_path[MAX_BIP32_PATH];  /// BIP32 path
-    uint8_t bip32_path_len;               /// length of BIP32 path
+    request_type_e req_type;                  /// user request
+    uint32_t bip32_path[MAX_BIP32_PATH];      /// BIP32 path
+    uint8_t bip32_path_len;                   /// length of BIP32 path
 } global_ctx_t;

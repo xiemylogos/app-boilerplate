@@ -76,9 +76,9 @@ int ui_display_transaction_bs_choice() {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
 
-    if (memcpy(G_context.tx_info.transaction.payload->contract_addr,ONT_CONTRACT_ADDRESS,20) ==0) {
-            snprintf(g_amount, sizeof(g_amount), "ont %.*s", sizeof(amount), amount);
-    } else if (memcpy(G_context.tx_info.transaction.payload->contract_addr,ONG_CONTRACT_ADDRESS,20) ==0 ) {
+    if (memcmp(G_context.tx_info.transaction.payload->contract_addr,ONT_CONTRACT_ADDRESS,20) ==0) {
+        snprintf(g_amount, sizeof(g_amount), "ont %.*s", sizeof(amount), amount);
+    } else if (memcmp(G_context.tx_info.transaction.payload->contract_addr,ONG_CONTRACT_ADDRESS,20) ==0 ) {
         snprintf(g_amount, sizeof(g_amount), "ong %.*s", sizeof(amount), amount);
     }
    // snprintf(g_amount, sizeof(g_amount), "bal %.*s", sizeof(amount), amount);
@@ -100,7 +100,7 @@ int ui_display_transaction_bs_choice() {
     pairList.nbPairs = 2;
     pairList.pairs = pairs;
 
-   if (memcpy(G_context.tx_info.transaction.payload->contract_addr,ONT_CONTRACT_ADDRESS,20) ==0) {
+   if (memcmp(G_context.tx_info.transaction.payload->contract_addr,ONT_CONTRACT_ADDRESS,20) ==0) {
         nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairList,
                            &C_app_boilerplate_64px,
@@ -108,7 +108,7 @@ int ui_display_transaction_bs_choice() {
                            NULL,
                            "Sign transaction\nto send ONT",
                            review_choice);
-   } else if (memcpy(G_context.tx_info.transaction.payload->contract_addr,ONG_CONTRACT_ADDRESS,20) ==0 ) {
+   } else if (memcmp(G_context.tx_info.transaction.payload->contract_addr,ONG_CONTRACT_ADDRESS,20) ==0 ) {
          nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairList,
                            &C_app_boilerplate_64px,

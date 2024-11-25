@@ -25,6 +25,9 @@
  */
 #define MAX_TRANSACTION_LEN 1024
 
+/**
+ * Maximum person msg length (bytes).
+ */
 #define MAX_PERSON_MSG_LEN  1024
 
 /**
