@@ -31,3 +31,13 @@ int ui_display_transaction(void);
  */
 int ui_display_person_msg(void);
 
+
+/**
+ * Display transaction information on the device and ask confirmation to sign.
+ *
+ * @return 0 if success, negative integer otherwise.
+ *
+ */
+int ui_display_oep4_transaction(void);
+
+

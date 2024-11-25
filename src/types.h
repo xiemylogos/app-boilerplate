@@ -34,11 +34,12 @@ typedef enum {
  * Enumeration with expected INS of APDU commands.
  */
 typedef enum {
-    GET_VERSION = 0x03,     /// version of the application
-    GET_APP_NAME = 0x04,    /// name of the application
-    GET_PUBLIC_KEY = 0x05,  /// public key of corresponding BIP32 path
-    SIGN_TX = 0x06,         /// sign transaction with BIP32 path
-    SIGN_PERSONAL_MESSAGE = 0x07 ///sign person message
+    GET_VERSION = 0x03,              /// version of the application
+    GET_APP_NAME = 0x04,             /// name of the application
+    GET_PUBLIC_KEY = 0x05,           /// public key of corresponding BIP32 path
+    SIGN_TX = 0x06,                  /// sign transaction with BIP32 path
+    SIGN_PERSONAL_MESSAGE = 0x07,    /// sign person message
+    SIGN_OEP4_TX = 0x08              /// sign OEP4 transaction with BIP32 path
 } command_e;
 /**
  * Enumeration with parsing state.
@@ -53,9 +54,10 @@ typedef enum {
  * Enumeration with user request type.
  */
 typedef enum {
-    CONFIRM_ADDRESS,     /// confirm address derived from public key
-    CONFIRM_TRANSACTION,  /// confirm transaction information
-    CONFIRM_MESSAGE      /// confirm message information
+    CONFIRM_ADDRESS,          /// confirm address derived from public key
+    CONFIRM_TRANSACTION,      /// confirm transaction information
+    CONFIRM_MESSAGE,          /// confirm message information
+    CONFIRM_OEP4_TRANSACTION  /// confirm transaction information
 } request_type_e;
 
 /**
@@ -89,6 +91,16 @@ typedef struct {
     uint8_t v;
 } person_msg_ctx_t;
 
+typedef struct {
+    uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
+    size_t raw_tx_len;                    /// length of raw transaction
+    ont_transaction_t transaction;        /// structured transaction
+    uint8_t m_hash[32];                   /// message hash digest
+    uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
+    uint8_t signature_len;                /// length of transaction signature
+    uint8_t v;                            /// parity of y-coordinate of R in ECDSA signature
+} oep4_transaction_ctx_t;
+
 /**
  * Structure for global context.
  */
@@ -98,6 +110,7 @@ typedef struct {
         pubkey_ctx_t pk_info;       /// public key context
         transaction_ctx_t tx_info;  /// transaction context
         person_msg_ctx_t person_msg_info;
+        oep4_transaction_ctx_t oep4_tx_info;
     };
     request_type_e req_type;              /// user request
     uint32_t bip32_path[MAX_BIP32_PATH];  /// BIP32 path
