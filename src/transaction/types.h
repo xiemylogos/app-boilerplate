@@ -15,26 +15,6 @@
 
 #define ONG_CONTRACT_ADDRESS  "0200000000000000000000000000000000000000"
 
-typedef enum {
-    PARSING_OK = 1,
-    NONCE_PARSING_ERROR = -1,
-    TO_PARSING_ERROR = -2,
-    VALUE_PARSING_ERROR = -3,
-    MEMO_LENGTH_ERROR = -4,
-    MEMO_PARSING_ERROR = -5,
-    MEMO_ENCODING_ERROR = -6,
-    WRONG_LENGTH_ERROR = -7,
-    VERSION_PARSING_ERROR = -8,
-    TXTYPE_PARSING_ERROR = -9,
-    GASPRICE_PARSING_ERROR = -10,
-    GASLIMIT_PARSING_ERROR = -11, 
-    PAYER_PARSING_ERROR = -12,
-    PAYLOAD_LEN_PARSING_ERROR = -13,
-    PAYLOAD_PARSING_ERROR = -14,
-    PARSE_STRING_MATCH_ERROR = -15
-
-} parser_status_e;
-
 typedef struct {
     uint64_t nonce;     /// nonce (8 bytes)
     uint64_t value;     /// amount value (8 bytes)

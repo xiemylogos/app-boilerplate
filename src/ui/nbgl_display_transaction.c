@@ -103,6 +103,7 @@ int ui_display_transaction_bs_choice(bool is_blind_signed) {
 
     if (is_blind_signed) {
         // Start blind-signing review flow
+        //todo by xiemylogos
         nbgl_useCaseReviewBlindSigning(TYPE_TRANSACTION,
                                        &pairList,
                                        &C_app_boilerplate_64px,
@@ -113,6 +114,7 @@ int ui_display_transaction_bs_choice(bool is_blind_signed) {
                                        review_choice);
     } else {
         // Start review flow
+        //todo by xiemylogos
         nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairList,
                            &C_app_boilerplate_64px,

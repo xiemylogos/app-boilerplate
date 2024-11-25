@@ -60,3 +60,9 @@
  * Status word for signature fail.
  */
 #define SW_SIGNATURE_FAIL 0xB008
+
+#define SW_PERSON_MSG_PARSING_FAIL 0xB009
+
+#define SW_PERSON_MSG_HASH_FAIL 0xB00A
+
+#define SW_WRONG_PERSON_MSG_LENGTH 0xB00B

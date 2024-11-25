@@ -25,6 +25,8 @@
  */
 #define MAX_TRANSACTION_LEN 1024
 
+#define MAX_PERSON_MSG_LEN  1024
+
 /**
  * Maximum signature length (bytes).
  */

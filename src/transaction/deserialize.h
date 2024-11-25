@@ -3,6 +3,7 @@
 #include "buffer.h"
 
 #include "types.h"
+#include "../types.h"
 
 /**
  * Deserialize raw transaction in structure.
