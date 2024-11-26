@@ -44,15 +44,15 @@ parser_status_e transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
         return TXTYPE_PARSING_ERROR;
     }
     //nonce
-    if(!buffer_read_u32(buf,&tx->nonce,BE)) {
+    if(!buffer_read_u32(buf,&tx->nonce,LE)) {
         return NONCE_PARSING_ERROR;
     }
     //gasPrice
-    if(!buffer_read_u64(buf,&tx->gas_price,BE)) {
+    if(!buffer_read_u64(buf,&tx->gas_price,LE)) {
         return GASPRICE_PARSING_ERROR;
     }
     //gasLimit
-    if(!buffer_read_u64(buf,&tx->gas_limit,BE)) {
+    if(!buffer_read_u64(buf,&tx->gas_limit,LE)) {
         return GASLIMIT_PARSING_ERROR;
     }
     //payer

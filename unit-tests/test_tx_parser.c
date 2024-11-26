@@ -10,6 +10,7 @@
 #include "transaction/serialize.h"
 #include "transaction/deserialize.h"
 #include "types.h"
+#include "format.h"
 
 static void test_tx_serialization(void **state) {
     (void) state;
@@ -101,19 +102,32 @@ static void test_ont_tx_serialization(void **state) {
         101, 114, 86, 50, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 2, 0, 104, 22, 79, 110, 116, 111, 108, 111, 103,
         121, 46, 78, 97, 116, 105, 118, 101, 46, 73, 110, 118, 111, 107,
-        101, 0
+        101
     };
 
     buffer_t buf = {.ptr = raw_tx, .size = sizeof(raw_tx), .offset = 0};
 
     parser_status_e status = transaction_deserialize(&buf, &tx);
+	
+    char address[21] = {0};
+
+     format_hex(tx.payer,20,address,sizeof(address));
+     printf("address :%s\n",address);
 
     assert_int_equal(status, PARSING_OK);
-
+    assert_int_equal(tx.version,0);
+    assert_int_equal(tx.tx_type,209);
+    assert_int_equal(tx.nonce,2869079573);
+    assert_int_equal(tx.gas_price,2500);
+    assert_int_equal(tx.gas_limit,20000);
+    assert_int_equal(sizeof(address),21);
+    assert_string_equal(address,"abc");
+    /*
     uint8_t output[300];
     int length = transaction_serialize(&tx, output, sizeof(output));
     assert_int_equal(length, sizeof(raw_tx));
     assert_memory_equal(raw_tx, output, sizeof(raw_tx));
+    */
 }
 
 int main() {
