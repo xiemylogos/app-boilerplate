@@ -124,6 +124,8 @@ static void test_ont_tx_serialization(void **state) {
     assert_string_equal(address,"abc");
 }
 
+
+
 static void test_state_info_serialization(void **state) {
     (void) state;
 
@@ -145,6 +147,18 @@ static void test_state_info_serialization(void **state) {
 
     parser_status_e status = state_info_deserialize(&buf, &info);
     assert_int_equal(tx.value,1000000000000000000);
+}
+
+static void test_state_info_serialization(void **state) {
+    (void) state;
+
+    uint8_t payer[] = {
+        5, 129, 93, 52, 224, 233, 171, 115,
+        161, 117, 236, 134, 255, 178, 74, 173,
+        91, 238, 32, 241
+    };
+    char address[21] = {0};
+    assert_int_equal(format_hex(payer, 20, address, sizeof(address)),1)
 }
 
 int main() {
