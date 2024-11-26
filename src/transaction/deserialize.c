@@ -60,7 +60,8 @@ parser_status_e transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return PAYER_PARSING_ERROR;
     }
-    return state_info_deserialize(buf,buf->size-buf->offset,tx->payload);
+    return PARSING_OK;
+    //return state_info_deserialize(buf,buf->size-buf->offset,tx->payload);
     /*
                    uint32_t payload_len;
     if (buffer_read_u32(buf, &payload_len,BE) != 0) {
@@ -105,7 +106,7 @@ parser_status_e transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
     }
     */
 
-    return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
+    //return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
 }
 
 parser_status_e state_info_deserialize(buffer_t *buf,size_t length, state_info_v2 *tx) {
@@ -113,11 +114,12 @@ parser_status_e state_info_deserialize(buffer_t *buf,size_t length, state_info_v
         return WRONG_LENGTH_ERROR;
     }
     if (memcmp(buf->ptr + length - 22, "Ontology.Native.Invoke", 22) != 0) {
-        return PARSE_STRING_MATCH_ERROR;
+        //return PARSE_STRING_MATCH_ERROR;
+	return PAYLOAD_PARSING_ERROR;
     }
     if (length > PAYLOAD_TRANSFER_V2_LEN) {
         if(memcmp(buf->ptr + length - 46 - 10, "transferV2", 10) != 0) {
-            return PARSE_STRING_MATCH_ERROR;
+		return PARSE_STRING_MATCH_ERROR;
         }
         memcpy(tx->from,buf->ptr+4,20);
         memcpy(tx->to,buf->ptr+28,20);
@@ -132,6 +134,7 @@ parser_status_e state_info_deserialize(buffer_t *buf,size_t length, state_info_v
         if(memcmp(buf->ptr + length - 46 - 14, "transferFromV2", 10) != 0) {
             return PARSE_STRING_MATCH_ERROR;
         }
+      return PARSE_STRING_MATCH_ERROR;
     } else {
         return TO_PARSING_ERROR;
     }

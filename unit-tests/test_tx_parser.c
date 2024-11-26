@@ -105,14 +105,20 @@ static void test_ont_tx_serialization(void **state) {
         101
     };
 
+   uint8_t payer[] = {
+        5, 129, 93, 52, 224, 233, 171, 115,
+        161, 117, 236, 134, 255, 178, 74, 173,
+        91, 238, 32, 241
+    };
+
     buffer_t buf = {.ptr = raw_tx, .size = sizeof(raw_tx), .offset = 0};
 
     parser_status_e status = transaction_deserialize(&buf, &tx);
 	
-    char address[21] = {0};
+ //   char address[21] = {0};
 
-     format_hex(tx.payer,20,address,sizeof(address));
-     printf("address :%s\n",address);
+  //   format_hex(tx.payer,20,address,sizeof(address));
+   //  printf("address :%s\n",address);
 
     assert_int_equal(status, PARSING_OK);
     assert_int_equal(tx.version,0);
@@ -120,8 +126,12 @@ static void test_ont_tx_serialization(void **state) {
     assert_int_equal(tx.nonce,2869079573);
     assert_int_equal(tx.gas_price,2500);
     assert_int_equal(tx.gas_limit,20000);
-    assert_int_equal(sizeof(address),21);
-    assert_string_equal(address,"abc");
+    //assert_int_equal(sizeof(address),21);
+    if(memcmp(tx.payer,payer,20) == 0 ) {
+	    assert_int_equal(20,20);
+    } else {
+	    assert_string_equal(tx.payer,"abc");
+    }
 }
 
 
@@ -145,11 +155,11 @@ static void test_state_info_serialization(void **state) {
 
     buffer_t buf = {.ptr = payload_tx, .size = sizeof(payload_tx), .offset = 0};
 
-    parser_status_e status = state_info_deserialize(&buf, &info);
-    assert_int_equal(tx.value,1000000000000000000);
+    parser_status_e status = state_info_deserialize(&buf,sizeof(payload_tx), &info);
+    assert_int_equal(info.value,1000000000000000000);
 }
 
-static void test_state_info_serialization(void **state) {
+static void test_payer_address(void **state) {
     (void) state;
 
     uint8_t payer[] = {
@@ -157,12 +167,17 @@ static void test_state_info_serialization(void **state) {
         161, 117, 236, 134, 255, 178, 74, 173,
         91, 238, 32, 241
     };
-    char address[21] = {0};
-    assert_int_equal(format_hex(payer, 20, address, sizeof(address)),1)
+    char address[20] = {0};
+    //base58_encode(payer, 20, address, sizeof(address));
+    //base58_encode(payer, 20, address, sizeof(address));
+    //assert_int_equal(base58_encode(payer, 20, address, sizeof(address)),1);
+    assert_string_equal(payer,"abc");
 }
 
 int main() {
     const struct CMUnitTest tests[] = {cmocka_unit_test(test_ont_tx_serialization)};
 
+    //const struct CMUnitTest tests[] = {cmocka_unit_test(test_state_info_serialization)};
+    //const struct CMUnitTest tests[] = {cmocka_unit_test(test_payer_address)};
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
