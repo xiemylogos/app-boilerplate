@@ -122,12 +122,29 @@ static void test_ont_tx_serialization(void **state) {
     assert_int_equal(tx.gas_limit,20000);
     assert_int_equal(sizeof(address),21);
     assert_string_equal(address,"abc");
-    /*
-    uint8_t output[300];
-    int length = transaction_serialize(&tx, output, sizeof(output));
-    assert_int_equal(length, sizeof(raw_tx));
-    assert_memory_equal(raw_tx, output, sizeof(raw_tx));
-    */
+}
+
+static void test_state_info_serialization(void **state) {
+    (void) state;
+
+    state_info_v2 info;
+    // clang-format off
+    uint8_t payload_tx[] = {
+        0, 198, 107, 20, 5, 129, 93, 52, 224, 233, 171, 115, 161, 117, 236, 134,
+        255, 178, 74, 173, 91, 238, 32, 241, 106, 124, 200, 20, 20, 81, 16, 132,
+        137, 51, 124, 128, 85, 169, 193, 237, 145, 88, 201, 71, 210, 32, 112, 215,
+        106, 124, 200, 8, 0, 0, 100, 167, 179, 182, 224, 13, 106, 124, 200, 108,
+        81, 193, 10, 116, 114, 97, 110, 115, 102, 101, 114, 86, 50, 20, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 104, 22, 79, 110,
+        116, 111, 108, 111, 103, 121, 46, 78, 97, 116, 105, 118, 101, 46, 73,
+        110, 118, 111, 107, 101
+    };
+
+
+    buffer_t buf = {.ptr = payload_tx, .size = sizeof(payload_tx), .offset = 0};
+
+    parser_status_e status = state_info_deserialize(&buf, &info);
+    assert_int_equal(tx.value,1000000000000000000);
 }
 
 int main() {
