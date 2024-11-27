@@ -126,11 +126,10 @@ static void test_ont_tx_serialization(void **state) {
     assert_int_equal(tx.nonce,2869079573);
     assert_int_equal(tx.gas_price,2500);
     assert_int_equal(tx.gas_limit,20000);
-    //assert_int_equal(sizeof(address),21);
     if(memcmp(tx.payer,payer,20) == 0 ) {
-	    assert_int_equal(20,20);
+        assert_int_equal(20,20);
     } else {
-	    assert_string_equal(tx.payer,"abc");
+        assert_string_equal(tx.payer,"abc");
     }
 }
 
@@ -152,8 +151,10 @@ static void test_state_info_serialization(void **state) {
         110, 118, 111, 107, 101
     };
 
-
     buffer_t buf = {.ptr = payload_tx, .size = sizeof(payload_tx), .offset = 0};
+    if (memcmp(buf->ptr+sizeof(payload_tx)-46-10,"transferV2",22) != 0) {
+        assert_int_equal(sizeof(payload_tx)-46-10,67)
+    }
 
     parser_status_e status = state_info_deserialize(&buf,sizeof(payload_tx), &info);
     assert_int_equal(info.value,1000000000000000000);
@@ -167,6 +168,7 @@ static void test_payer_address(void **state) {
         161, 117, 236, 134, 255, 178, 74, 173,
         91, 238, 32, 241
     };
+
     char address[20] = {0};
     //base58_encode(payer, 20, address, sizeof(address));
     //base58_encode(payer, 20, address, sizeof(address));
