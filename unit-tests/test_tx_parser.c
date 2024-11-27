@@ -150,13 +150,20 @@ static void test_state_info_serialization(void **state) {
         116, 111, 108, 111, 103, 121, 46, 78, 97, 116, 105, 118, 101, 46, 73,
         110, 118, 111, 107, 101
     };
-
+    uint8_t ONG_ADDR[] = {
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2
+    };
+    uint8_t ONT_ADDR[] = {
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
+    };
     buffer_t buf = {.ptr = payload_tx, .size = sizeof(payload_tx), .offset = 0};
     assert_int_equal(sizeof(payload_tx),123);
     if (memcmp(buf.ptr+sizeof(payload_tx)-46-10,"transferV2",22) != 0) {
         assert_int_equal(sizeof(payload_tx)-46-10,67);
-    } 
-    buffer_seek_cur(&buf,4); 
+    }
+
+   /*
+    buffer_seek_cur(&buf,4);
     info.from = (uint8_t*)(buf.ptr+buf.offset);
     if (!buffer_seek_cur(&buf, 20)) {
 	    assert_int_equal(1,2);
@@ -174,11 +181,15 @@ static void test_state_info_serialization(void **state) {
     }
     assert_int_equal(buf.offset,60);
     assert_int_equal(info.value,1000000000000000000);
-/*
+    */
     parser_status_e status = state_info_deserialize(&buf,sizeof(payload_tx), &info);
     assert_int_equal(status, PARSING_OK);
     assert_int_equal(info.value,1000000000000000000);
-    */
+    if(memcmp(info.contract_addr,ONG_ADDR,20) == 0 ) {
+        assert_int_equal(sizeof(ONG_ADDR),20);
+    } else {
+        assert_string_equal(tinfo.contract_addr,"abc");
+    }
 }
 
 static void test_payer_address(void **state) {
