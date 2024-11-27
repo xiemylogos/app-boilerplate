@@ -37,5 +37,5 @@ typedef struct{
     uint64_t gas_price;
     uint64_t gas_limit;
     uint8_t *payer;
-    state_info_v2 *payload;
+    state_info_v2 payload;
 }ont_transaction_t;
