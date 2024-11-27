@@ -209,25 +209,23 @@ static void test_state_info_serialization(void **state) {
     }
 }
 
-static void test_payer_address(void **state) {
+static void test_person_msg(void **state) {
     (void) state;
 
-    uint8_t payer[] = {
-        5, 129, 93, 52, 224, 233, 171, 115,
-        161, 117, 236, 134, 255, 178, 74, 173,
-        91, 238, 32, 241
+    uint8_t person_msg[] = {
+        116,101,115,116,32,109,115,103,32,104,97,115,104
     };
-
-    char address[20] = {0};
-    //base58_encode(payer, 20, address, sizeof(address));
-    //base58_encode(payer, 20, address, sizeof(address));
-    //assert_int_equal(base58_encode(payer, 20, address, sizeof(address)),1);
-    assert_string_equal(payer,"abc");
+    buffer_t buf = {.ptr = payload_tx, .size = sizeof(person_msg), .offset = 0};
+    assert_int_equal(buf.size,13);
+    person_msg_info info
+    parser_status_e status = person_msg_deserialize(&buf, &info);
+    assert_int_equal(status, PARSING_OK);
 }
 
 int main() {
 	const struct CMUnitTest tests[] = {cmocka_unit_test(test_ont_tx_serialization),
-		cmocka_unit_test(test_state_info_serialization)
+		cmocka_unit_test(test_state_info_serialization),
+                cmocka_unit_test(test_person_msg)
 		/*cmocka_unit_test(test_payer_address)*/
 	};
     return cmocka_run_group_tests(tests, NULL, NULL);

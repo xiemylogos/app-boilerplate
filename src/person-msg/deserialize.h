@@ -11,7 +11,7 @@
  *
  * @param[in, out] buf
  *   Pointer to buffer with serialized person msg.
- * @param[out]     tx
+ * @param[out]     person msg info
  *   Pointer to person structure.
  *
  * @return PARSING_OK if success, error status otherwise.
