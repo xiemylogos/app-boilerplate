@@ -103,7 +103,6 @@ static void test_ont_tx_serialization(void **state) {
         116, 111, 108, 111, 103, 121, 46, 78, 97, 116, 105, 118, 101, 46, 73,
         110, 118, 111, 107, 101
     };
-
    uint8_t payer[] = {
         5, 129, 93, 52, 224, 233, 171, 115,
         161, 117, 236, 134, 255, 178, 74, 173,
@@ -113,36 +112,29 @@ static void test_ont_tx_serialization(void **state) {
     buffer_t buf = {.ptr = raw_tx, .size = sizeof(raw_tx), .offset = 0};
 
     parser_status_e status = transaction_deserialize(&buf, &tx);
-	
-    
+
     assert_int_equal(status, PARSING_OK);
     assert_int_equal(tx.version,0);
     assert_int_equal(tx.tx_type,209);
     assert_int_equal(tx.nonce,2869079573);
     assert_int_equal(tx.gas_price,2500);
     assert_int_equal(tx.gas_limit,20000);
-   // assert_int_equal(tx.payload->value,1000000000000000000);
     if(memcmp(tx.payer,payer,20) == 0 ) {
         assert_int_equal(20,20);
     } else {
         assert_string_equal(tx.payer,"abc");
     }
-    state_info_v2 info;
-    
-    parser_status_e status_info = state_info_deserialize(&buf,buf.size-buf.offset, &info);
+    //parse state info
+    parser_status_e status_info = state_info_deserialize(&buf,buf.size-buf.offset, &tx.payload);
     assert_int_equal(status_info, PARSING_OK);
-    /*
-    int value = state_info_deserialize(&buf,buf.size-buf.offset,&info);
-   assert_int_equal(value,141);
-   */
-    assert_int_equal(info.value,1000000000000000000);
- uint8_t ONG_ADDR[] = {
+    assert_int_equal(tx.payload->value,1000000000000000000);
+    uint8_t ONG_ADDR[] = {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2
     };
-if(memcmp(info.contract_addr,ONG_ADDR,20) == 0 ) {
+    if(memcmp(tx.payload->contract_addr,ONG_ADDR,20) == 0 ) {
         assert_int_equal(sizeof(ONG_ADDR),20);
     } else {
-        assert_string_equal(info.contract_addr,"abc");
+        assert_string_equal(tx.payload->contract_addr,"abc");
     }
 
 /*
@@ -207,26 +199,6 @@ static void test_state_info_serialization(void **state) {
         assert_int_equal(sizeof(payload_tx)-46-10,67);
     }
 
-   /*
-    buffer_seek_cur(&buf,4);
-    info.from = (uint8_t*)(buf.ptr+buf.offset);
-    if (!buffer_seek_cur(&buf, 20)) {
-	    assert_int_equal(1,2);
-    }
-    assert_int_equal(buf.offset,24);
-    buffer_seek_cur(&buf,4); 
-    info.to = (uint8_t*)(buf.ptr+buf.offset);
-    if (!buffer_seek_cur(&buf, 20)) {
-	    assert_int_equal(1,3);
-    }
-    assert_int_equal(buf.offset,48);
-    buffer_seek_cur(&buf,4); 
-    if (!buffer_read_u64(&buf, &info.value, LE)) {
-	    return VALUE_PARSING_ERROR;
-    }
-    assert_int_equal(buf.offset,60);
-    assert_int_equal(info.value,1000000000000000000);
-    */
     parser_status_e status = state_info_deserialize(&buf,sizeof(payload_tx), &info);
     assert_int_equal(status, PARSING_OK);
     assert_int_equal(info.value,1000000000000000000);

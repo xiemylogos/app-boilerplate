@@ -39,7 +39,7 @@ parser_status_e transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
     if(!buffer_read_u8(buf,&tx->version)) {
         return VERSION_PARSING_ERROR;
     }
-   //txType 
+    //txType
     if(!buffer_read_u8(buf,&tx->tx_type)) {
         return TXTYPE_PARSING_ERROR;
     }
@@ -58,23 +58,23 @@ parser_status_e transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
     //payer
     tx->payer = (uint8_t *) (buf->ptr + buf->offset);
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
-	    return PAYER_PARSING_ERROR;
+        return PAYER_PARSING_ERROR;
     }
     if (!buffer_seek_cur(buf,1)) {
-	    return BUFFER_OFFSET_MOVE_ERROR;
+        return BUFFER_OFFSET_MOVE_ERROR;
     }
-   return PARSING_OK;
+    return PARSING_OK;
 }
 
 parser_status_e state_info_deserialize(buffer_t *buf,size_t length, state_info_v2 *tx) {
-     if(!buffer_can_read(buf,length)) {
+    if(!buffer_can_read(buf,length)) {
         return WRONG_LENGTH_ERROR;
-     }
+    }
     if (length <= PAYLOAD_MIN_LENGTH_LIMIT) {
         return WRONG_LENGTH_ERROR;
     }
     if (memcmp(buf->ptr +buf->offset+ length - 22, "Ontology.Native.Invoke", 22) != 0) {
-	return PARSE_STRING_MATCH_ERROR;
+        return PARSE_STRING_MATCH_ERROR;
     }
     if (length > PAYLOAD_TRANSFER_V2_LEN) {
         if(memcmp(buf->ptr+buf->offset + length - 46 - 10, "transferV2", 10) != 0) {
@@ -90,20 +90,20 @@ parser_status_e state_info_deserialize(buffer_t *buf,size_t length, state_info_v
         if (!buffer_seek_cur(buf,4)) {
             return BUFFER_OFFSET_MOVE_ERROR;
         }
-	tx->to = (uint8_t*)(buf->ptr+buf->offset);
+        tx->to = (uint8_t*)(buf->ptr+buf->offset);
         if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
             return TO_PARSING_ERROR;
         }
         if (!buffer_seek_cur(buf,4)) {
             return BUFFER_OFFSET_MOVE_ERROR;
         }
-	if (!buffer_read_u64(buf, &tx->value, LE)) {
+        if (!buffer_read_u64(buf, &tx->value, LE)) {
             return VALUE_PARSING_ERROR;
         }
         if (!buffer_seek_cur(buf,18)) {
             return BUFFER_OFFSET_MOVE_ERROR;
         }
-	tx->contract_addr = (uint8_t *) (buf->ptr + buf->offset);
+        tx->contract_addr = (uint8_t *) (buf->ptr + buf->offset);
         if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
             return CONTRACT_ADDR_PARSING_ERROR;
         }
