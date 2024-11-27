@@ -60,12 +60,29 @@
  * Status word for signature fail.
  */
 #define SW_SIGNATURE_FAIL 0xB008
-
+/**
+ * Status word for fail of person msg parsing.
+ */
 #define SW_PERSON_MSG_PARSING_FAIL 0xB009
-
+/**
+ * Status word for fail of person msg hash.
+ */
 #define SW_PERSON_MSG_HASH_FAIL 0xB00A
-
+/**
+ * Status word for wrong person msg length.
+ */
 #define SW_WRONG_PERSON_MSG_LENGTH 0xB00B
-
+/**
+ * Status word for fail of payload transaction parsing.
+ */
 #define SW_TX_PAYLOAD_PARSING_FAIL 0xB00C
+/**
+ * Status word for fail of oep4 transaction parsing.
+ */
+#define SW_OEP4_TX_PARSING_FAIL 0xB00D
+/**
+ * Status word for fail of oep4 payload transaction parsing.
+ */
+#define SW_OEP4_TX_PAYLOAD_PARSING_FAIL 0xB00E
+
 

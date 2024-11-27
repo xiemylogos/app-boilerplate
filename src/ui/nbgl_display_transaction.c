@@ -71,20 +71,20 @@ int ui_display_transaction_bs_choice() {
     char amount[30] = {0};
     if (!format_fpu64(amount,
                       sizeof(amount),
-                      G_context.tx_info.transaction.payload->value,
+                      G_context.tx_info.transaction.payload.value,
                       EXPONENT_SMALLEST_UNIT)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
 
-    if (memcmp(G_context.tx_info.transaction.payload->contract_addr,ONT_CONTRACT_ADDRESS,20) ==0) {
+    if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONT_CONTRACT_ADDRESS,20) ==0) {
         snprintf(g_amount, sizeof(g_amount), "ont %.*s", sizeof(amount), amount);
-    } else if (memcmp(G_context.tx_info.transaction.payload->contract_addr,ONG_CONTRACT_ADDRESS,20) ==0 ) {
+    } else if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONG_CONTRACT_ADDRESS,20) ==0 ) {
         snprintf(g_amount, sizeof(g_amount), "ong %.*s", sizeof(amount), amount);
     }
    // snprintf(g_amount, sizeof(g_amount), "bal %.*s", sizeof(amount), amount);
     memset(g_address, 0, sizeof(g_address));
 
-    if (format_hex(G_context.tx_info.transaction.payload->to, ADDRESS_LEN, g_address, sizeof(g_address)) ==
+    if (format_hex(G_context.tx_info.transaction.payload.to, ADDRESS_LEN, g_address, sizeof(g_address)) ==
         -1) {
         return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
@@ -100,7 +100,7 @@ int ui_display_transaction_bs_choice() {
     pairList.nbPairs = 2;
     pairList.pairs = pairs;
 
-   if (memcmp(G_context.tx_info.transaction.payload->contract_addr,ONT_CONTRACT_ADDRESS,20) ==0) {
+   if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONT_CONTRACT_ADDRESS,20) ==0) {
         nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairList,
                            &C_app_boilerplate_64px,
@@ -108,7 +108,7 @@ int ui_display_transaction_bs_choice() {
                            NULL,
                            "Sign transaction\nto send ONT",
                            review_choice);
-   } else if (memcmp(G_context.tx_info.transaction.payload->contract_addr,ONG_CONTRACT_ADDRESS,20) ==0 ) {
+   } else if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONG_CONTRACT_ADDRESS,20) ==0 ) {
          nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairList,
                            &C_app_boilerplate_64px,
