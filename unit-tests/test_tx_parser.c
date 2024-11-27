@@ -146,17 +146,19 @@ static void test_state_info_serialization(void **state) {
         137, 51, 124, 128, 85, 169, 193, 237, 145, 88, 201, 71, 210, 32, 112, 215,
         106, 124, 200, 8, 0, 0, 100, 167, 179, 182, 224, 13, 106, 124, 200, 108,
         81, 193, 10, 116, 114, 97, 110, 115, 102, 101, 114, 86, 50, 20, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 104, 22, 79, 110,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 104, 22, 79, 110,
         116, 111, 108, 111, 103, 121, 46, 78, 97, 116, 105, 118, 101, 46, 73,
         110, 118, 111, 107, 101
     };
 
     buffer_t buf = {.ptr = payload_tx, .size = sizeof(payload_tx), .offset = 0};
-    if (memcmp(buf->ptr+sizeof(payload_tx)-46-10,"transferV2",22) != 0) {
-        assert_int_equal(sizeof(payload_tx)-46-10,67)
-    }
+    assert_int_equal(sizeof(payload_tx),123);
+    if (memcmp(buf.ptr+sizeof(payload_tx)-46-10,"transferV2",22) != 0) {
+        assert_int_equal(sizeof(payload_tx)-46-10,67);
+    } 
 
     parser_status_e status = state_info_deserialize(&buf,sizeof(payload_tx), &info);
+    assert_int_equal(status, PARSING_OK);
     assert_int_equal(info.value,1000000000000000000);
 }
 
@@ -177,9 +179,9 @@ static void test_payer_address(void **state) {
 }
 
 int main() {
-    const struct CMUnitTest tests[] = {cmocka_unit_test(test_ont_tx_serialization)};
+    //const struct CMUnitTest tests[] = {cmocka_unit_test(test_ont_tx_serialization)};
 
-    //const struct CMUnitTest tests[] = {cmocka_unit_test(test_state_info_serialization)};
+    const struct CMUnitTest tests[] = {cmocka_unit_test(test_state_info_serialization)};
     //const struct CMUnitTest tests[] = {cmocka_unit_test(test_payer_address)};
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
