@@ -118,22 +118,30 @@ parser_status_e state_info_deserialize(buffer_t *buf,size_t length, state_info_v
     }
     if (length > PAYLOAD_TRANSFER_V2_LEN) {
         if(memcmp(buf->ptr + length - 46 - 10, "transferV2", 10) != 0) {
-		return PARSE_STRING_MATCH_ERROR;
+            return PARSE_STRING_MATCH_ERROR;
         }
-        memcpy(tx->from,buf->ptr+4,20);
-        memcpy(tx->to,buf->ptr+28,20);
-        if (!buffer_seek_cur(buf, 2*ADDRESS_LEN)) {
+        tx->from = (uint8_t*)(buf->ptr+4);
+        if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+            return FROM_PARSING_ERROR;
+        }
+        tx->to = (uint8_t*)(buf->ptr+4);
+        if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
             return TO_PARSING_ERROR;
         }
-        if (!buffer_read_u64(buf, &tx->value, BE)) {
+        buf->offset = buf->offset+3;
+        if (!buffer_read_u64(buf, &tx->value, LE)) {
             return VALUE_PARSING_ERROR;
         }
-        memcpy(tx->contract_addr,buf->ptr+78,20);
+        buf->offset = buf->offset+11;
+        tx->contract_addr = (uint8_t *) (buf->ptr + buf->offset);
+        if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+            return CONTRACT_ADDR_PARSING_ERROR;
+        }
     } else if (length > PAYLOAD_TRANSFER_FROM_V2_LEN) {
         if(memcmp(buf->ptr + length - 46 - 14, "transferFromV2", 10) != 0) {
             return PARSE_STRING_MATCH_ERROR;
         }
-      return PARSE_STRING_MATCH_ERROR;
+        return PARSE_STRING_MATCH_ERROR;
     } else {
         return TO_PARSING_ERROR;
     }
