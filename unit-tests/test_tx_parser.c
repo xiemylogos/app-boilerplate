@@ -79,30 +79,29 @@ static void test_ont_tx_serialization(void **state) {
 
     ont_transaction_t tx;
     // clang-format off
-    uint8_t payload_tx[] = {
+ uint8_t payload_tx[] = {
         0, 198, 107, 20, 5, 129, 93, 52, 224, 233, 171, 115, 161, 117, 236, 134,
         255, 178, 74, 173, 91, 238, 32, 241, 106, 124, 200, 20, 20, 81, 16, 132,
         137, 51, 124, 128, 85, 169, 193, 237, 145, 88, 201, 71, 210, 32, 112, 215,
         106, 124, 200, 8, 0, 0, 100, 167, 179, 182, 224, 13, 106, 124, 200, 108,
         81, 193, 10, 116, 114, 97, 110, 115, 102, 101, 114, 86, 50, 20, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 104, 22, 79, 110,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 104, 22, 79, 110,
         116, 111, 108, 111, 103, 121, 46, 78, 97, 116, 105, 118, 101, 46, 73,
         110, 118, 111, 107, 101
     };
-
-    uint8_t raw_tx[] = {
+  
+ uint8_t raw_tx[] = {
         0, 209, 21, 174, 2, 171, 196, 9, 0, 0, 0, 0, 0, 0, 32, 78,
         0, 0, 0, 0, 0, 0, 5, 129, 93, 52, 224, 233, 171, 115, 161, 117,
-        236, 134, 255, 178, 74, 173, 91, 238, 32, 241, 123, 0, 198, 107,
-        20, 5, 129, 93, 52, 224, 233, 171, 115, 161, 117, 236, 134, 255,
-        178, 74, 173, 91, 238, 32, 241, 106, 124, 200, 20, 20, 81, 16,
-        132, 137, 51, 124, 128, 85, 169, 193, 237, 145, 88, 201, 71, 210,
-        32, 112, 215, 106, 124, 200, 8, 0, 0, 100, 167, 179, 182, 224,
-        13, 106, 124, 200, 108, 81, 193, 10, 116, 114, 97, 110, 115, 102,
-        101, 114, 86, 50, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 2, 0, 104, 22, 79, 110, 116, 111, 108, 111, 103,
-        121, 46, 78, 97, 116, 105, 118, 101, 46, 73, 110, 118, 111, 107,
-        101
+        236, 134, 255, 178, 74, 173, 91, 238, 32, 241, 123, 0, 198, 107, 
+	20, 5, 129, 93, 52, 224, 233, 171, 115, 161, 117, 236, 134,
+        255, 178, 74, 173, 91, 238, 32, 241, 106, 124, 200, 20, 20, 81, 16, 132,
+        137, 51, 124, 128, 85, 169, 193, 237, 145, 88, 201, 71, 210, 32, 112, 215,
+        106, 124, 200, 8, 0, 0, 100, 167, 179, 182, 224, 13, 106, 124, 200, 108,
+        81, 193, 10, 116, 114, 97, 110, 115, 102, 101, 114, 86, 50, 20, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 104, 22, 79, 110,
+        116, 111, 108, 111, 103, 121, 46, 78, 97, 116, 105, 118, 101, 46, 73,
+        110, 118, 111, 107, 101
     };
 
    uint8_t payer[] = {
@@ -115,22 +114,68 @@ static void test_ont_tx_serialization(void **state) {
 
     parser_status_e status = transaction_deserialize(&buf, &tx);
 	
- //   char address[21] = {0};
-
-  //   format_hex(tx.payer,20,address,sizeof(address));
-   //  printf("address :%s\n",address);
-
+    
     assert_int_equal(status, PARSING_OK);
     assert_int_equal(tx.version,0);
     assert_int_equal(tx.tx_type,209);
     assert_int_equal(tx.nonce,2869079573);
     assert_int_equal(tx.gas_price,2500);
     assert_int_equal(tx.gas_limit,20000);
+   // assert_int_equal(tx.payload->value,1000000000000000000);
     if(memcmp(tx.payer,payer,20) == 0 ) {
         assert_int_equal(20,20);
     } else {
         assert_string_equal(tx.payer,"abc");
     }
+    state_info_v2 info;
+    
+    parser_status_e status_info = state_info_deserialize(&buf,buf.size-buf.offset, &info);
+    assert_int_equal(status_info, PARSING_OK);
+    /*
+    int value = state_info_deserialize(&buf,buf.size-buf.offset,&info);
+   assert_int_equal(value,141);
+   */
+    assert_int_equal(info.value,1000000000000000000);
+ uint8_t ONG_ADDR[] = {
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2
+    };
+if(memcmp(info.contract_addr,ONG_ADDR,20) == 0 ) {
+        assert_int_equal(sizeof(ONG_ADDR),20);
+    } else {
+        assert_string_equal(info.contract_addr,"abc");
+    }
+
+/*
+    assert_int_equal(buf.size-buf.offset,123);
+    assert_int_equal(buf.offset,43);
+    assert_int_equal(buf.size-buf.offset,123);
+    assert_int_equal(sizeof(raw_tx)-buf.offset,123);
+    
+    assert_int_equal(buf1.size,123);
+*/
+	    
+    /*
+    state_info_v2 info;
+    
+    buffer_seek_cur(&buf1,4);
+    info.from = (uint8_t*)(buf1.ptr+buf1.offset);
+    if (!buffer_seek_cur(&buf1, 20)) {
+	    assert_int_equal(1,2);
+    }
+    assert_int_equal(buf1.offset,24);
+    buffer_seek_cur(&buf1,4); 
+    info.to = (uint8_t*)(buf1.ptr+buf1.offset);
+    if (!buffer_seek_cur(&buf, 20)) {
+	    assert_int_equal(1,3);
+    }
+    assert_int_equal(buf.offset,48+43);
+    buffer_seek_cur(&buf,4); 
+    if (!buffer_read_u64(&buf, &info.value, LE)) {
+	    return VALUE_PARSING_ERROR;
+    }
+    assert_int_equal(buf.offset,60+43);
+    assert_int_equal(info.value,1000000000000000000);
+    */
 }
 
 
@@ -188,7 +233,7 @@ static void test_state_info_serialization(void **state) {
     if(memcmp(info.contract_addr,ONG_ADDR,20) == 0 ) {
         assert_int_equal(sizeof(ONG_ADDR),20);
     } else {
-        assert_string_equal(tinfo.contract_addr,"abc");
+        assert_string_equal(info.contract_addr,"abc");
     }
 }
 
@@ -209,7 +254,7 @@ static void test_payer_address(void **state) {
 }
 
 int main() {
-    //const struct CMUnitTest tests[] = {cmocka_unit_test(test_ont_tx_serialization)};
+   // const struct CMUnitTest tests[] = {cmocka_unit_test(test_ont_tx_serialization)};
 
     const struct CMUnitTest tests[] = {cmocka_unit_test(test_state_info_serialization)};
     //const struct CMUnitTest tests[] = {cmocka_unit_test(test_payer_address)};
