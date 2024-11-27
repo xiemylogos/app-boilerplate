@@ -9,6 +9,7 @@
 
 #include "transaction/serialize.h"
 #include "transaction/deserialize.h"
+#include "person-msg/deserialize.h"
 #include "types.h"
 #include "format.h"
 
@@ -215,9 +216,9 @@ static void test_person_msg(void **state) {
     uint8_t person_msg[] = {
         116,101,115,116,32,109,115,103,32,104,97,115,104
     };
-    buffer_t buf = {.ptr = payload_tx, .size = sizeof(person_msg), .offset = 0};
+    buffer_t buf = {.ptr = person_msg, .size = sizeof(person_msg), .offset = 0};
     assert_int_equal(buf.size,13);
-    person_msg_info info
+    person_msg_info info;
     parser_status_e status = person_msg_deserialize(&buf, &info);
     assert_int_equal(status, PARSING_OK);
 }
