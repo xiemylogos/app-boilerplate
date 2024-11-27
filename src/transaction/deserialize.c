@@ -120,19 +120,29 @@ parser_status_e state_info_deserialize(buffer_t *buf,size_t length, state_info_v
         if(memcmp(buf->ptr + length - 46 - 10, "transferV2", 10) != 0) {
             return PARSE_STRING_MATCH_ERROR;
         }
-        tx->from = (uint8_t*)(buf->ptr+4);
+        if (!buffer_seek_cur(buf,4)) {
+            return BUFFER_OFFSET_MOVE_ERROR;
+        }
+        tx->from = (uint8_t*)(buf->ptr+buf->offset);
         if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
             return FROM_PARSING_ERROR;
         }
-        tx->to = (uint8_t*)(buf->ptr+4);
+        if (!buffer_seek_cur(buf,4)) {
+            return BUFFER_OFFSET_MOVE_ERROR;
+        }
+        tx->to = (uint8_t*)(buf->ptr+buf->offset);
         if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
             return TO_PARSING_ERROR;
         }
-        buf->offset = buf->offset+3;
+        if (!buffer_seek_cur(buf,4)) {
+            return BUFFER_OFFSET_MOVE_ERROR;
+        }
         if (!buffer_read_u64(buf, &tx->value, LE)) {
             return VALUE_PARSING_ERROR;
         }
-        buf->offset = buf->offset+11;
+        if (!buffer_seek_cur(buf,18)) {
+            return BUFFER_OFFSET_MOVE_ERROR;
+        }
         tx->contract_addr = (uint8_t *) (buf->ptr + buf->offset);
         if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
             return CONTRACT_ADDR_PARSING_ERROR;
