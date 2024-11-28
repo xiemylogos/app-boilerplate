@@ -59,13 +59,13 @@ target_link_libraries(test_tx_parser PUBLIC
                       person_msg_deserialize
                       transaction_serialize
                       buffer
-		      base58
+		              base58
                       bip32
                       cmocka
                       gcov
                       write
                       read
-		      format
+		              format
                       varint
                       transaction_utils)
 target_link_libraries(test_tx_utils PUBLIC
