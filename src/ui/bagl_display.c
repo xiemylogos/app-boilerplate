@@ -153,9 +153,9 @@ int ui_display_transaction() {
                       EXPONENT_SMALLEST_UNIT)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
-    if (memcpy(G_context.tx_info.transaction.payload->contract_addr,ONT_CONTRACT_ADDRESS,20) ==0) {
+    if (memcpy(G_context.tx_info.transaction.payload.contract_addr,ONT_CONTRACT_ADDRESS,20) ==0) {
        snprintf(g_amount, sizeof(g_amount), "ONT %.*s", sizeof(amount), amount);
-    } else if (memcpy(G_context.tx_info.transaction.payload->contract_addr,ONG_CONTRACT_ADDRESS,20) ==0 ) {
+    } else if (memcpy(G_context.tx_info.transaction.payload.contract_addr,ONG_CONTRACT_ADDRESS,20) ==0 ) {
        snprintf(g_amount, sizeof(g_amount), "ONG %.*s", sizeof(amount), amount);
     }
     //snprintf(g_amount, sizeof(g_amount), "BOL %.*s", sizeof(amount), amount);
@@ -163,7 +163,7 @@ int ui_display_transaction() {
 
     memset(g_address, 0, sizeof(g_address));
 
-    if (format_hex(G_context.tx_info.transaction.to, ADDRESS_LEN, g_address, sizeof(g_address)) ==
+    if (format_hex(G_context.tx_info.transaction.payload.to, ADDRESS_LEN, g_address, sizeof(g_address)) ==
         -1) {
         return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
