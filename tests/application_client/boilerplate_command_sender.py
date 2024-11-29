@@ -29,7 +29,7 @@ class InsType(IntEnum):
     GET_APP_NAME   = 0x04
     GET_PUBLIC_KEY = 0x05
     SIGN_TX        = 0x06
-    SIGN_PERSONAL_MESSAGE = 0x07
+    SIGN_PERSON_MESSAGE = 0x07
     SIGN_OEP4_TX = 0x08
 
 
@@ -135,7 +135,7 @@ class BoilerplateCommandSender:
     @contextmanager
     def sign_person_msg(self, path: str, personmsg: bytes) -> Generator[None, None, None]:
         self.backend.exchange(cla=CLA,
-                              ins=InsType.SIGN_PERSONAL_MESSAGE,
+                              ins=InsType.SIGN_PERSON_MESSAGE,
                               p1=P1.P1_START,
                               p2=P2.P2_MORE,
                               data=pack_derivation_path(path))
@@ -144,14 +144,14 @@ class BoilerplateCommandSender:
 
         for msg in messages[:-1]:
             self.backend.exchange(cla=CLA,
-                                  ins=InsType.SIGN_PERSONAL_MESSAGE,
+                                  ins=InsType.SIGN_PERSON_MESSAGE,
                                   p1=idx,
                                   p2=P2.P2_MORE,
                                   data=msg)
             idx += 1
 
         with self.backend.exchange_async(cla=CLA,
-                                         ins=InsType.SIGN_PERSONAL_MESSAGE,
+                                         ins=InsType.SIGN_PERSON_MESSAGE,
                                          p1=idx,
                                          p2=P2.P2_LAST,
                                          data=messages[-1]) as response:
