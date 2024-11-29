@@ -5,20 +5,20 @@ This documentation is a template and shall be updated with your own APDUs.
 
 ## About
 
-This documentation describes the APDU messages interface to communicate with the Boilerplate application.
+This documentation describes the APDU messages interface to communicate with the Ontology application.
 
 The application covers the following functionalities :
 
-  - Get a public Boilerplate address given a BIP 32 path
-  - Sign a basic Boilerplate transaction given a BIP 32 path and raw transaction
-  - Retrieve the Boilerplate app version
-  - Retrieve the Boilerplate app name
+  - Get a public Ont address given a BIP 32 path
+  - Sign a basic Ont transaction given a BIP 32 path and raw transaction
+  - Retrieve the Ont app version
+  - Retrieve the Ont app name
 
 The application interface can be accessed over HID or BLE
 
 ## APDUs
 
-### GET BOILERPLATE PUBLIC ADDRESS
+### GET ONT PUBLIC ADDRESS
 
 #### Description
 
@@ -54,11 +54,11 @@ The address can be optionally checked on the device before being returned.
 | Chain code                                                       | var    |
 
 
-### SIGN BOILERPLATE TRANSACTION
+### SIGN Ont TRANSACTION
 
 #### Description
 
-This command signs a Boilerplate transaction after having the user validate the transactions parameters.
+This command signs a Ont transaction after having the user validate the transactions parameters.
 
 The input data is the RLP encoded transaction streamed to the device in 255 bytes maximum data chunks.
 
@@ -155,10 +155,10 @@ The following standard Status Words are returned for all APDUs.
 
 | SW       | SW name                     | Description                                           |
 | ---      | ---                         | ---                                                   |
-|   6985   | SW_DENY	                   | Rejected by user                                      |
+|   6985   | SW_DENY	                 | Rejected by user                                      |
 |   6A86   | SW_WRONG_P1P2               | Either P1 or P2 is incorrect                          |
 |   6A87   | SW_WRONG_DATA_LENGTH        | Lc or minimum APDU length is incorrect                |
-|   6D00   | SW_INS_NOT_SUPPORTED	       | No command exists with INS                            |
+|   6D00   | SW_INS_NOT_SUPPORTED	     | No command exists with INS                            |
 |   6E00   | SW_CLA_NOT_SUPPORTED        | Bad CLA used for this application                     |
 |   B000   | SW_WRONG_RESPONSE_LENGTH    | Wrong response length (buffer size problem)           |
 |   B001   | SW_DISPLAY_BIP32_PATH_FAIL  | BIP32 path conversion to string failed                |
@@ -166,7 +166,13 @@ The following standard Status Words are returned for all APDUs.
 |   B003   | SW_DISPLAY_AMOUNT_FAIL      | Amount conversion to string failed                    |
 |   B004   | SW_WRONG_TX_LENGTH	         | Wrong raw transaction length                          |
 |   B005   | SW_TX_PARSING_FAIL          | Failed to parse raw transaction                       |
-|   B006   | SW_TX_HASH_FAIL	           | Failed to compute hash digest of raw transaction      |
+|   B006   | SW_TX_HASH_FAIL	         | Failed to compute hash digest of raw transaction      |
 |   B007   | SW_BAD_STATE                | Security issue with bad state                         |
 |   B008   | SW_SIGNATURE_FAIL           | Signature of raw transaction failed                   |
+|   B009   | SW_PERSON_MSG_PARSING_FAIL  | Failed to parse person msg                            |
+|   B00A   | SW_PERSON_MSG_HASH_FAIL     | Failed to compute hash digest of person msg           |
+|   B00B   | SW_WRONG_PERSON_MSG_LENGTH  | Wrong person msg length                               |
+|   B00C   | SW_TX_PAYLOAD_PARSING_FAIL  | Failed to parse tx payload                            |
+|   B00D   | SW_OEP4_TX_PARSING_FAIL     | Failed to parse oep4 tx                               |
+|   B00E   | SW_OEP4_TX_PAYLOAD_PARSING_FAIL | Failed to parse tx payload                        |
 |   9000   | OK	                         | Success                                               |
