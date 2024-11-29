@@ -168,7 +168,7 @@ The following standard Status Words are returned for all APDUs.
 |   B005   | SW_TX_PARSING_FAIL          | Failed to parse raw transaction                       |
 |   B006   | SW_TX_HASH_FAIL	         | Failed to compute hash digest of raw transaction      |
 |   B007   | SW_BAD_STATE                | Security issue with bad state                         |
-|   B008   | SW_SIGNATURE_FAIL           | Signature of raw transaction failed                   |
+|   B008   | SW_SIGNATURE_FAIL           | Signature of data(tx or person msg) failed            |
 |   B009   | SW_PERSON_MSG_PARSING_FAIL  | Failed to parse person msg                            |
 |   B00A   | SW_PERSON_MSG_HASH_FAIL     | Failed to compute hash digest of person msg           |
 |   B00B   | SW_WRONG_PERSON_MSG_LENGTH  | Wrong person msg length                               |
