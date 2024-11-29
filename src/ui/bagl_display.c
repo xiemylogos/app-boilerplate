@@ -158,7 +158,7 @@ int ui_display_transaction() {
     } else if (memcpy(G_context.tx_info.transaction.payload.contract_addr,ONG_CONTRACT_ADDRESS,20) ==0 ) {
        snprintf(g_amount, sizeof(g_amount), "ONG %.*s", sizeof(amount), amount);
     }
-    //snprintf(g_amount, sizeof(g_amount), "BOL %.*s", sizeof(amount), amount);
+    //snprintf(g_amount, sizeof(g_amount), "ONT %.*s", sizeof(amount), amount);
     PRINTF("Amount: %s\n", g_amount);
 
     memset(g_address, 0, sizeof(g_address));
