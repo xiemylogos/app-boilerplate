@@ -110,7 +110,7 @@ void validate_person_msg(bool choice) {
             G_context.state = STATE_NONE;
             io_send_sw(SW_SIGNATURE_FAIL);
         } else {
-            helper_send_response_sig();
+            helper_person_msg_send_response_sig();
         }
     } else {
         G_context.state = STATE_NONE;

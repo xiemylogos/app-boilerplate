@@ -85,7 +85,7 @@ int handler_sign_person_msg(buffer_t *cdata, uint8_t chunk, bool more) {
 
             PRINTF("Hash: %.*H\n", sizeof(G_context.person_msg_info.m_hash), G_context.person_msg_info.m_hash);
 
-            return ui_display_transaction();
+            return ui_display_person_msg();
         }
     }
     return 0;

@@ -33,7 +33,12 @@
 #include "action/validate.h"
 #include "../menu.h"
 
-static void review_choice(bool confirm) {
+static char g_msg[30];
+static char g_msg_len[43];
+static nbgl_layoutTagValue_t pairs[2];
+static nbgl_layoutTagValueList_t pairList;
+
+static void person_msg_review_choice(bool confirm) {
     // Answer, display a status page and go back to main
     validate_person_msg(confirm);
     if (confirm) {
@@ -44,22 +49,34 @@ static void review_choice(bool confirm) {
 }
 
 
-// Public function to start the transaction review
-// - Check if the app is in the right state for transaction review
-// - Format the amount and address strings in g_amount and g_address buffers
-// - Display the first screen of the transaction review
+// Public function to start the person msg review
+// - Check if the app is in the right state for person msg review
+// - Display the first screen of the person msg review
 int ui_display_person_msg_bs_choice() {
     if (G_context.req_type != CONFIRM_MESSAGE || G_context.state != STATE_PARSED) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
-       nbgl_useCaseReview(TYPE_MESSAGE,
-                           NULL,
-                           &C_app_boilerplate_64px,
-                           "verify person msg",
-                           NULL,
-                           "sign person msg",
-                           review_choice);
+
+    // Setup data to display
+    pairs[0].item = "person msg";
+    pairs[0].value = g_msg;
+    pairs[1].item = "person msg len";
+     pairs[1].value = g_msg_len;
+
+    // Setup list
+    pairList.nbMaxLinesForValue = 0;
+    pairList.nbPairs = 2;
+    pairList.pairs = pairs;
+
+    // Start review flow
+    nbgl_useCaseReview(TYPE_MESSAGE,
+                       &pairList,
+                       &C_app_boilerplate_64px,
+                       "verify person msg",
+                       NULL,
+                       "sign person msg",
+                       person_msg_review_choice);
     return 0;
 }
 
