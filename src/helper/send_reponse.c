@@ -40,7 +40,7 @@ int helper_send_response_pubkey() {
     return io_send_response_pointer(resp, offset, SW_OK);
 }
 
-int helper_send_response_sig() {
+int helper_tx_send_response_sig() {
     uint8_t resp[1 + MAX_DER_SIG_LEN + 1] = {0};
     size_t offset = 0;
 
@@ -52,6 +52,7 @@ int helper_send_response_sig() {
     return io_send_response_pointer(resp, offset, SW_OK);
 }
 
+
 int helper_person_msg_send_response_sig() {
     uint8_t resp[1 + MAX_DER_SIG_LEN + 1] = {0};
     size_t offset = 0;
@@ -60,6 +61,18 @@ int helper_person_msg_send_response_sig() {
     memmove(resp + offset, G_context.person_msg_info.signature, G_context.person_msg_info.signature_len);
     offset += G_context.person_msg_info.signature_len;
     resp[offset++] = (uint8_t) G_context.person_msg_info.v;
+
+    return io_send_response_pointer(resp, offset, SW_OK);
+}
+
+int helper_oep4_tx_send_response_sig() {
+    uint8_t resp[1 + MAX_DER_SIG_LEN + 1] = {0};
+    size_t offset = 0;
+
+    resp[offset++] = G_context.oep4_tx_info.signature_len;
+    memmove(resp + offset, G_context.oep4_tx_info.signature, G_context.oep4_tx_info.signature_len);
+    offset += G_context.oep4_tx_info.signature_len;
+    resp[offset++] = (uint8_t) G_context.oep4_tx_info.v;
 
     return io_send_response_pointer(resp, offset, SW_OK);
 }

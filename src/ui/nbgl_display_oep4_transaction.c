@@ -46,9 +46,9 @@ static nbgl_layoutTagValue_t pairs[2];
 static nbgl_layoutTagValueList_t pairList;
 
 // called when long press button on 3rd page is long-touched or when reject footer is touched
-static void review_choice(bool confirm) {
+static void oep4_tx_review_choice(bool confirm) {
     // Answer, display a status page and go back to main
-    validate_transaction(confirm);
+    validate_oep4_transaction(confirm);
     if (confirm) {
         nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_SIGNED, ui_menu_main);
     } else {
@@ -107,7 +107,7 @@ int ui_display_oep4_transaction_bs_choice() {
                            "Review transaction\nto send ONT",
                            NULL,
                            "Sign transaction\nto send ONT",
-                           review_choice);
+                           oep4_tx_review_choice);
    } else if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONG_CONTRACT_ADDRESS,20) ==0 ) {
          nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairList,
@@ -115,7 +115,7 @@ int ui_display_oep4_transaction_bs_choice() {
                            "Review transaction\nto send ONG",
                            NULL,
                            "Sign transaction\nto send ONG",
-                           review_choice);
+                           oep4_tx_review_choice);
    }
     return 0;
 }
