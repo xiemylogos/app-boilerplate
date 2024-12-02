@@ -82,7 +82,7 @@ static void review_warning_choice(bool confirm) {
 
     // Reset setting menu to the right page
     nbgl_useCaseHomeAndSettings(APPNAME,
-                                &C_app_boilerplate_64px,
+                                &C_icon_ont_64px,
                                 NULL,
                                 initSettingPage,
                                 &settingContents,
@@ -143,7 +143,7 @@ void ui_menu_main(void) {
     switches[DUMMY_SWITCH_2_ID].tuneId = TUNE_TAP_CASUAL;
 
     nbgl_useCaseHomeAndSettings(APPNAME,
-                                &C_app_boilerplate_64px,
+                                &C_icon_ont_64px,
                                 NULL,
                                 INIT_HOME_PAGE,
                                 &settingContents,

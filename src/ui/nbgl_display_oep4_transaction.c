@@ -97,7 +97,7 @@ int ui_display_oep4_transaction_bs_choice() {
 
     nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairList,
-                           &C_app_boilerplate_64px,
+                           &C_icon_ont_64px,
                            "Review transaction\nto send oep4",
                            NULL,
                            "Sign transaction\nto send oep4",

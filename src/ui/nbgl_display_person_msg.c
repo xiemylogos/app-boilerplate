@@ -72,7 +72,7 @@ int ui_display_person_msg_bs_choice() {
     // Start review flow
     nbgl_useCaseReview(TYPE_MESSAGE,
                        &pairList,
-                       &C_app_boilerplate_64px,
+                       &C_icon_ont_64px,
                        "verify person msg",
                        NULL,
                        "sign person msg",

@@ -111,7 +111,7 @@ int ui_display_transaction_bs_choice() {
    if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONT_ADDR,20) == 0) {
         nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairList,
-                           &C_app_boilerplate_64px,
+                           &C_icon_ont_64px,
                            "Review transaction\nto send ONT",
                            NULL,
                            "Sign transaction\nto send ONT",
@@ -119,7 +119,7 @@ int ui_display_transaction_bs_choice() {
    } else if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONG_ADDR,20) == 0) {
          nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairList,
-                           &C_app_boilerplate_64px,
+                           &C_icon_ont_64px,
                            "Review transaction\nto send ONG",
                            NULL,
                            "Sign transaction\nto send ONG",
