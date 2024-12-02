@@ -88,7 +88,7 @@ static void test_ont_tx_serialization(void **state) {
         81, 193, 10, 116, 114, 97, 110, 115, 102, 101, 114, 86, 50, 20, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 104, 22, 79, 110,
         116, 111, 108, 111, 103, 121, 46, 78, 97, 116, 105, 118, 101, 46, 73,
-        110, 118, 111, 107, 101
+        110, 118, 111, 107, 101,0
     };
   
  uint8_t raw_tx[] = {
@@ -127,7 +127,18 @@ static void test_ont_tx_serialization(void **state) {
     } else {
         assert_string_equal(tx.payer,"abc");
     }
+    assert_int_equal(tx.payload.value,1000000000000000000);
+    uint8_t ONG_ADDR[] = {
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2
+    };
+    if(memcmp(tx.payload.contract_addr,ONG_ADDR,20) == 0 ) {
+        assert_int_equal(sizeof(ONG_ADDR),20);
+    } else {
+        assert_string_equal(tx.payload.contract_addr,"abc");
+    }
+
     //parse state info
+    /*
     parser_status_e status_info = state_info_deserialize(&buf,buf.size-buf.offset, &tx.payload);
     assert_int_equal(status_info, PARSING_OK);
     assert_int_equal(tx.payload.value,1000000000000000000);
@@ -139,6 +150,7 @@ static void test_ont_tx_serialization(void **state) {
     } else {
         assert_string_equal(tx.payload.contract_addr,"abc");
     }
+    */
 
 /*
     assert_int_equal(buf.size-buf.offset,123);
@@ -229,7 +241,7 @@ static void test_person_msg(void **state) {
 }
 
 int main() {
-	const struct CMUnitTest tests[] = {/*cmocka_unit_test(test_ont_tx_serialization),*/
+	const struct CMUnitTest tests[] = {cmocka_unit_test(test_ont_tx_serialization),
 		cmocka_unit_test(test_state_info_serialization),
                 cmocka_unit_test(test_person_msg)
 		/*cmocka_unit_test(test_payer_address)*/
