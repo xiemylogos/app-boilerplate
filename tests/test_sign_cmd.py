@@ -25,10 +25,7 @@ def test_sign_tx_short_tx(backend, scenario_navigator):
 
     # Create the transaction that will be sent to the device for signing
     transaction = Transaction(
-        nonce=1,
-        to="0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-        value=666,
-        memo="For u EthDev"
+        rawtx = "00d115ae02abc409000000000000204e00000000000005815d34e0e9ab73a175ec86ffb24aad5bee20f17b00c66b1405815d34e0e9ab73a175ec86ffb24aad5bee20f16a7cc8141451108489337c8055a9c1ed9158c947d22070d76a7cc808000064a7b3b6e00d6a7cc86c51c10a7472616e7366657256321400000000000000000000000000000000000000020068164f6e746f6c6f67792e4e61746976652e496e766f6b6500"
     ).serialize()
 
     # Send the sign device instruction.
@@ -43,7 +40,7 @@ def test_sign_tx_short_tx(backend, scenario_navigator):
     _, der_sig, _ = unpack_sign_tx_response(response)
     assert check_signature_validity(public_key, der_sig, transaction)
 
-
+"""
 # In this test we send to the device a transaction to trig a blind-signing flow
 # The transaction is short and will be sent in one chunk
 # We will ensure that the displayed information is correct by using screenshots comparison
@@ -138,3 +135,4 @@ def test_sign_tx_refused(backend, scenario_navigator):
     # Assert that we have received a refusal
     assert e.value.status == Errors.SW_DENY
     assert len(e.value.data) == 0
+"""

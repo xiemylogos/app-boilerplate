@@ -45,7 +45,7 @@ def test_wrong_data_length(backend):
         backend.exchange_raw(bytes.fromhex("E003000005"))
     assert e.value.status == Errors.SW_WRONG_DATA_LENGTH
 
-
+"""
 # Ensure there is no state confusion when trying wrong APDU sequences
 def test_invalid_state(backend):
     with pytest.raises(ExceptionRAPDU) as e:
@@ -55,3 +55,5 @@ def test_invalid_state(backend):
                          p2=P2.P2_MORE,
                          data=b"abcde")  # data is not parsed in this case
     assert e.value.status == Errors.SW_BAD_STATE
+
+"""

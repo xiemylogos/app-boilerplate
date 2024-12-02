@@ -73,11 +73,11 @@ parser_status_e state_info_deserialize(buffer_t *buf,size_t length, state_info_v
     if (length <= PAYLOAD_MIN_LENGTH_LIMIT) {
         return WRONG_LENGTH_ERROR;
     }
-    if (memcmp(buf->ptr +buf->offset+ length - 22-1, "Ontology.Native.Invoke", 22) != 0) {
+    if (memcmp(buf->ptr +buf->offset+ length - 22 - 1, "Ontology.Native.Invoke", 22) != 0) {
         return PARSE_STRING_MATCH_ERROR;
     }
     if (length > PAYLOAD_TRANSFER_V2_LEN) {
-        if(memcmp(buf->ptr+buf->offset + length - 46 - 10-1, "transferV2", 10) != 0) {
+        if(memcmp(buf->ptr+buf->offset + length - 46 - 10 - 1, "transferV2", 10) != 0) {
             return PARSE_STRING_MATCH_ERROR;
         }
         if (!buffer_seek_cur(buf,4)) {
