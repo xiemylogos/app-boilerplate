@@ -81,12 +81,13 @@ int handler_sign_oep4_tx(buffer_t *cdata, uint8_t chunk, bool more) {
             if (status != PARSING_OK) {
                 return io_send_sw(SW_OEP4_TX_PARSING_FAIL);
             }
+            /*
             parser_status_e status_payload = oep4_state_info_deserialize(&buf,buf.size-buf.offset, &G_context.tx_info.transaction.payload);
             PRINTF("PayLoad Parsing  status: %d.\n", status);
             if (status_payload != PARSING_OK) {
                 return io_send_sw(SW_OEP4_TX_PAYLOAD_PARSING_FAIL);
             }
-
+            */
             G_context.state = STATE_PARSED;
 
             if (cx_keccak_256_hash(G_context.oep4_tx_info.raw_tx,

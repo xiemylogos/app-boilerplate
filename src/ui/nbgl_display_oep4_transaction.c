@@ -37,9 +37,9 @@
 #include "../transaction/types.h"
 #include "../menu.h"
 
-// Buffer where the transaction amount string is written
+// Buffer where the oep4 transaction amount string is written
 static char g_amount[30];
-// Buffer where the transaction address string is written
+// Buffer where the oep4 transaction address string is written
 static char g_address[43];
 
 static nbgl_layoutTagValue_t pairs[2];
@@ -56,10 +56,10 @@ static void oep4_tx_review_choice(bool confirm) {
     }
 }
 
-// Public function to start the transaction review
-// - Check if the app is in the right state for transaction review
+// Public function to start the oep4 transaction review
+// - Check if the app is in the right state for oep4 transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
-// - Display the first screen of the transaction review
+// - Display the first screen of the oep4 transaction review
 int ui_display_oep4_transaction_bs_choice() {
     if (G_context.req_type != CONFIRM_OEP4_TRANSACTION || G_context.state != STATE_PARSED) {
         G_context.state = STATE_NONE;
@@ -75,13 +75,8 @@ int ui_display_oep4_transaction_bs_choice() {
                       EXPONENT_SMALLEST_UNIT)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
-    //todo oep4 transaction
-    if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONT_CONTRACT_ADDRESS,20) ==0) {
-            snprintf(g_amount, sizeof(g_amount), "ont %.*s", sizeof(amount), amount);
-    } else if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONG_CONTRACT_ADDRESS,20) ==0 ) {
-        snprintf(g_amount, sizeof(g_amount), "ong %.*s", sizeof(amount), amount);
-    }
-   // snprintf(g_amount, sizeof(g_amount), "bal %.*s", sizeof(amount), amount);
+    snprintf(g_amount, sizeof(g_amount), "oep4 %.*s", sizeof(amount), amount);
+
     memset(g_address, 0, sizeof(g_address));
 
     if (format_hex(G_context.tx_info.transaction.payload.to, ADDRESS_LEN, g_address, sizeof(g_address)) ==
@@ -100,23 +95,15 @@ int ui_display_oep4_transaction_bs_choice() {
     pairList.nbPairs = 2;
     pairList.pairs = pairs;
 
-   if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONT_CONTRACT_ADDRESS,20) ==0) {
-        nbgl_useCaseReview(TYPE_TRANSACTION,
+    nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairList,
                            &C_app_boilerplate_64px,
-                           "Review transaction\nto send ONT",
+                           "Review transaction\nto send oep4",
                            NULL,
-                           "Sign transaction\nto send ONT",
+                           "Sign transaction\nto send oep4",
                            oep4_tx_review_choice);
-   } else if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONG_CONTRACT_ADDRESS,20) ==0 ) {
-         nbgl_useCaseReview(TYPE_TRANSACTION,
-                           &pairList,
-                           &C_app_boilerplate_64px,
-                           "Review transaction\nto send ONG",
-                           NULL,
-                           "Sign transaction\nto send ONG",
-                           oep4_tx_review_choice);
-   }
+
+
     return 0;
 }
 

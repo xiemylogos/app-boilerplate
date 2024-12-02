@@ -10,20 +10,6 @@
 #define PAYLOAD_TRANSFER_V2_LEN  54
 #define PAYLOAD_TRANSFER_FROM_V2_LEN  58
 
-/** length of a tx.output Address, after Base58 encoding. */
-#define ONT_CONTRACT_ADDRESS  "0100000000000000000000000000000000000000"
-/*
-#define ONG_CONTRACT_ADDRESS                          \
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  \
-        0x00, 0x00, 0x00, 0x02
-
-#define ONT_CONTRACT_ADDRESS                         \
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  \
-        0x00, 0x00, 0x00, 0x01                                                                   \
-*/
-
-#define ONG_CONTRACT_ADDRESS  "0200000000000000000000000000000000000000"
-
 typedef struct {
     uint64_t nonce;     /// nonce (8 bytes)
     uint64_t value;     /// amount value (8 bytes)
