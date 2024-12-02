@@ -45,6 +45,6 @@ typedef struct{
     uint32_t nonce;
     uint64_t gas_price;
     uint64_t gas_limit;
-    uint8_t *payer;
+    uint8_t *payer;        /// pointer to address (20 bytes)
     state_info_v2 payload;
 }ont_transaction_t;

@@ -27,4 +27,4 @@ class PersonMsg:
         personmsg_len: int = read_varint(buf)
         personmsg: str = read(buf, personmsg_len).decode("ascii")
 
-        return cls(memo=personmsg)
+        return cls(personmsg=personmsg)
