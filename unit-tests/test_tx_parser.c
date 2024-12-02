@@ -213,11 +213,14 @@ static void test_state_info_serialization(void **state) {
 static void test_person_msg(void **state) {
     (void) state;
 
-    uint8_t person_msg[] = {
+    uint8_t raw__person_msg[] = {
+        //person msg length
+        0x0D,
+        //person msg
         116,101,115,116,32,109,115,103,32,104,97,115,104
     };
-    buffer_t buf = {.ptr = person_msg, .size = sizeof(person_msg), .offset = 0};
-    assert_int_equal(buf.size,13);
+    buffer_t buf = {.ptr = raw__person_msg, .size = sizeof(raw__person_msg), .offset = 0};
+    assert_int_equal(buf.size,14);
     person_msg_info info;
     parser_status_e status = person_msg_deserialize(&buf, &info);
     assert_int_equal(status, PARSING_OK);
