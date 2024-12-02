@@ -64,46 +64,46 @@ parser_status_e transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
         return BUFFER_OFFSET_MOVE_ERROR;
     }
     if (memcmp(buf->ptr +buf->size - 22 - 1, "Ontology.Native.Invoke", 22) != 0) {
-	    return PARSE_STRING_MATCH_ERROR;
+        return PARSE_STRING_MATCH_ERROR;
     }
     if (buf->size-buf->offset > PAYLOAD_TRANSFER_V2_LEN) {
-	    if(memcmp(buf->ptr+buf->size - 46 - 10 - 1, "transferV2", 10) != 0) {
-		    return PARSE_STRING_MATCH_ERROR;
-	    }
-	    if (!buffer_seek_cur(buf,4)) {
-		    return BUFFER_OFFSET_MOVE_ERROR;
-	    }
-	    tx->payload.from = (uint8_t*)(buf->ptr+buf->offset);
-	    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
-		    return FROM_PARSING_ERROR;
-	    }
-	    if (!buffer_seek_cur(buf,4)) {
-		    return BUFFER_OFFSET_MOVE_ERROR;
-	    }
-	    tx->payload.to = (uint8_t*)(buf->ptr+buf->offset);
-	    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
-		    return TO_PARSING_ERROR;
-	    }
-	    if (!buffer_seek_cur(buf,4)) {
-		    return BUFFER_OFFSET_MOVE_ERROR;
-	    }
-	    if (!buffer_read_u64(buf, &tx->payload.value, LE)) {
-		    return VALUE_PARSING_ERROR;
-	    }
-	    if (!buffer_seek_cur(buf,18)) {
-		    return BUFFER_OFFSET_MOVE_ERROR;
-	    }
-	    tx->payload.contract_addr = (uint8_t *) (buf->ptr + buf->offset);
-	    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
-		    return CONTRACT_ADDR_PARSING_ERROR;
-	    }
+        if(memcmp(buf->ptr+buf->size - 46 - 10 - 1, "transferV2", 10) != 0) {
+            return PARSE_STRING_MATCH_ERROR;
+        }
+        if (!buffer_seek_cur(buf,4)) {
+            return BUFFER_OFFSET_MOVE_ERROR;
+        }
+        tx->payload.from = (uint8_t*)(buf->ptr+buf->offset);
+        if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+            return FROM_PARSING_ERROR;
+        }
+        if (!buffer_seek_cur(buf,4)) {
+            return BUFFER_OFFSET_MOVE_ERROR;
+        }
+        tx->payload.to = (uint8_t*)(buf->ptr+buf->offset);
+        if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+            return TO_PARSING_ERROR;
+        }
+        if (!buffer_seek_cur(buf,4)) {
+            return BUFFER_OFFSET_MOVE_ERROR;
+        }
+        if (!buffer_read_u64(buf, &tx->payload.value, LE)) {
+            return VALUE_PARSING_ERROR;
+        }
+        if (!buffer_seek_cur(buf,18)) {
+            return BUFFER_OFFSET_MOVE_ERROR;
+        }
+        tx->payload.contract_addr = (uint8_t *) (buf->ptr + buf->offset);
+        if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+            return CONTRACT_ADDR_PARSING_ERROR;
+        }
     } else if (buf->size-buf->offset > PAYLOAD_TRANSFER_FROM_V2_LEN) {
-	    if(memcmp(buf->ptr + buf->size-buf->offset - 46 - 14, "transferFromV2", 10) != 0) {
-		    return PARSE_STRING_MATCH_ERROR;
-	    }
-	    return PARSE_STRING_MATCH_ERROR;
+        if(memcmp(buf->ptr + buf->size-buf->offset - 46 - 14, "transferFromV2", 10) != 0) {
+            return PARSE_STRING_MATCH_ERROR;
+        }
+        return PARSE_STRING_MATCH_ERROR;
     } else {
-	    return TO_PARSING_ERROR;
+        return TO_PARSING_ERROR;
     }
 
     return PARSING_OK;

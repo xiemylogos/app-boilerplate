@@ -78,11 +78,13 @@ int handler_sign_tx(buffer_t *cdata, uint8_t chunk, bool more) {
             if (status != PARSING_OK) {
                 return io_send_sw(SW_TX_PARSING_FAIL);
             }
+            /*
             parser_status_e status_payload = state_info_deserialize(&buf,buf.size-buf.offset, &G_context.tx_info.transaction.payload);
             PRINTF("PayLoad Parsing  status: %d.\n", status);
             if (status_payload != PARSING_OK) {
                 return io_send_sw(SW_TX_PAYLOAD_PARSING_FAIL);
-            }
+             }
+             */
             G_context.state = STATE_PARSED;
 
             if (cx_keccak_256_hash(G_context.tx_info.raw_tx,
