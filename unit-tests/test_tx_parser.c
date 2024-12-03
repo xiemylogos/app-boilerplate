@@ -277,6 +277,44 @@ static void test_oep4_transaction(void **state) {
     }
 }
 
+static void test_oep4_paylod(void **state) {
+    (void) state;
+
+    state_info_v2 info;
+    uint8_t oep4_payload[] = {
+        28, 108, 152,
+        194, 35, 244, 40, 93, 242, 72, 210, 207, 129, 251, 84, 183, 251,
+        195, 20, 200, 65, 8, 116, 114, 97, 110, 115, 102, 101, 114, 20,
+        81, 16, 132, 137, 51, 124, 128, 85, 169, 193, 237, 145, 88, 201,
+        71, 210, 32, 112, 215, 236, 148, 65, 191, 50, 139, 108, 214, 96,
+        123, 56, 71, 195, 11, 126, 174, 215, 86, 218, 190, 64, 66, 15,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    //AHdJGoAKkZDTGAAhQawKry6EE2CPdzhXk3
+    uint8_t from[] = {
+        20, 81, 16,132,137,51,124,128,85,
+        169,193,237,145,88,201,71,210,32,112,215
+    };
+    uint8_t to[] = {
+        236,148,65,191,50,139,108,214, 96, 123, 56, 71, 195, 11, 126, 174, 215, 86, 218, 190
+    };
+    assert_int_equal(sizeof(oep4_paylod),86);
+    buffer_t buf = {.ptr = oep4_payload, .size = sizeof(oep4_payload), .offset = 0};
+    parser_status_e status = oep4_state_info_deserialize(&buf, &info);
+    assert_int_equal(status, PARSING_OK);
+    assert_int_equal(info.value,1000000);
+    if(memcmp(info.from,from,20) == 0 ) {
+        assert_int_equal(20,20);
+    } else {
+        assert_string_equal(info.from,"oep4-from");
+    }
+    if(memcmp(info.to,to,20) == 0 ) {
+        assert_int_equal(20,20);
+    } else {
+        assert_string_equal(info.to,"oep4-to");
+    }
+}
+
 int main() {
 	const struct CMUnitTest tests[] = {cmocka_unit_test(test_ont_tx_serialization),
 		cmocka_unit_test(test_state_info_serialization),
