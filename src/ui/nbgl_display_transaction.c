@@ -100,7 +100,7 @@ int ui_display_transaction_bs_choice() {
     // Setup data to display
     pairs[0].item = "Amount";
     pairs[0].value = g_amount;
-    pairs[1].item = "Address";
+    pairs[1].item = "To";
     pairs[1].value = g_address;
 
     // Setup list
