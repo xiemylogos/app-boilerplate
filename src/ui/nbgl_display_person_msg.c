@@ -73,9 +73,9 @@ int ui_display_person_msg_bs_choice() {
     nbgl_useCaseReview(TYPE_MESSAGE,
                        &pairList,
                        &C_icon_ont_64px,
-                       "verify person msg",
+                       "verify the message",
                        NULL,
-                       "sign person msg",
+                       "Sign the message",
                        person_msg_review_choice);
     return 0;
 }

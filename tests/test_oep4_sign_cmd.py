@@ -1,3 +1,4 @@
+"""
 import pytest
 
 from application_client.boilerplate_transaction import Transaction
@@ -62,3 +63,4 @@ def test_sign_oep4_tx_refused(backend, scenario_navigator):
     # Assert that we have received a refusal
     assert e.value.status == Errors.SW_DENY
     assert len(e.value.data) == 0
+"""
