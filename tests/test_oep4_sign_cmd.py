@@ -1,4 +1,3 @@
-"""
 import pytest
 
 from application_client.boilerplate_transaction import Transaction
@@ -53,7 +52,7 @@ def test_sign_oep4_tx_refused(backend, scenario_navigator):
     _, pub_key, _, _ = unpack_get_public_key_response(rapdu.data)
 
     oep4_transaction = Transaction(
-        rawtx = "00d115ae02abc409000000000000204e00000000000005815d34e0e9ab73a175ec86ffb24aad5bee20f17b00c66b1405815d34e0e9ab73a175ec86ffb24aad5bee20f16a7cc8141451108489337c8055a9c1ed9158c947d22070d76a7cc808000064a7b3b6e00d6a7cc86c51c10a7472616e7366657256321400000000000000000000000000000000000000020068164f6e746f6c6f67792e4e61746976652e496e766f6b6500"
+        rawtx = "00d2d64f9355c409000000000000409c0000000000001451108489337c8055a9c1ed9158c947d22070d7561c6c98c223f4285df248d2cf81fb54b7fbc314c841087472616e736665721451108489337c8055a9c1ed9158c947d22070d7ec9441bf328b6cd6607b3847c30b7eaed756dabe40420f000000000000000000000000000000"
     ).serialize()
 
     with pytest.raises(ExceptionRAPDU) as e:
@@ -63,4 +62,3 @@ def test_sign_oep4_tx_refused(backend, scenario_navigator):
     # Assert that we have received a refusal
     assert e.value.status == Errors.SW_DENY
     assert len(e.value.data) == 0
-"""
