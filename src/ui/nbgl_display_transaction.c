@@ -90,8 +90,8 @@ int ui_display_transaction_bs_choice() {
     }
 
    // snprintf(g_amount, sizeof(g_amount), "bal %.*s", sizeof(amount), amount);
-    memset(g_address, 0, sizeof(g_address));
-
+    //memset(g_address, 0, sizeof(g_address));
+    //script_hash_to_address(g_address,20,G_context.tx_info.transaction.payload.to);
     if (format_hex(G_context.tx_info.transaction.payload.to, ADDRESS_LEN, g_address, sizeof(g_address)) ==
         -1) {
         return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);

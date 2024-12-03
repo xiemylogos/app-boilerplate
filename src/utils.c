@@ -1,5 +1,7 @@
 #include "utils.h"
 #include "base58.h"
+#include "lcx_common.h"
+#include "lcx_sha256.h"
 
 
 /** the length of a SHA256 hash */
