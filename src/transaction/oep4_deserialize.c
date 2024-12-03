@@ -63,21 +63,22 @@ parser_status_e oep4_transaction_deserialize(buffer_t *buf, ont_transaction_t *t
     if (!buffer_seek_cur(buf,1)) {
         return BUFFER_OFFSET_MOVE_ERROR;
     }
-    if(memcmp(buf->ptr+buf->size + length - 56 - 8, "transfer", 8) != 0) {
+    //payload  
+    if(memcmp(buf->ptr+buf->size - 56-8-2, "transfer", 8) != 0) {
         return PARSE_STRING_MATCH_ERROR;
     }
-    if (!buffer_seek_cur(buf,buf->size - 56)) {
+    if (!buffer_seek_cur(buf,buf->size -56-2)) {
         return BUFFER_OFFSET_MOVE_ERROR;
     }
-    tx->from = (uint8_t*)(buf->ptr+buf->offset);
+    tx->payload.from = (uint8_t*)(buf->ptr+buf->offset);
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return FROM_PARSING_ERROR;
     }
-    tx->to = (uint8_t*)(buf->ptr+buf->offset);
+    tx->payload.to = (uint8_t*)(buf->ptr+buf->offset);
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return TO_PARSING_ERROR;
     }
-    if (!buffer_read_u64(buf, &tx->value, LE)) {
+    if (!buffer_read_u64(buf, &tx->payload.value, LE)) {
         return VALUE_PARSING_ERROR;
     }
     /*

@@ -279,15 +279,15 @@ static void test_oep4_transaction(void **state) {
         assert_string_equal(tx.payer,"oep4tx");
     }
     assert_int_equal(tx.payload.value,1000000);
-    if(memcmp(tx.payload.from,from,20) == 0 ) {
+    if(memcmp(tx.payload.from,payer,20) == 0 ) {
         assert_int_equal(20,20);
     } else {
-        assert_string_equal(info.from,"oep4-from");
+        assert_string_equal(tx.payload.from,"oep4-from");
     }
     if(memcmp(tx.payload.to,to,20) == 0 ) {
         assert_int_equal(20,20);
     } else {
-        assert_string_equal(info.to,"oep4-to");
+        assert_string_equal(tx.payload.to,"oep4-to");
     }
 }
 
