@@ -300,7 +300,7 @@ static void test_oep4_paylod(void **state) {
     };
     assert_int_equal(sizeof(oep4_paylod),86);
     buffer_t buf = {.ptr = oep4_payload, .size = sizeof(oep4_payload), .offset = 0};
-    parser_status_e status = oep4_state_info_deserialize(&buf, &info);
+    parser_status_e status = oep4_state_info_deserialize(&buf,buf.size, &info);
     assert_int_equal(status, PARSING_OK);
     assert_int_equal(info.value,1000000);
     if(memcmp(info.from,from,20) == 0 ) {
@@ -319,7 +319,8 @@ int main() {
 	const struct CMUnitTest tests[] = {cmocka_unit_test(test_ont_tx_serialization),
 		cmocka_unit_test(test_state_info_serialization),
                 cmocka_unit_test(test_person_msg),
-                cmocka_unit_test(test_oep4_transaction)
+                cmocka_unit_test(test_oep4_transaction),
+                cmocka_unit_test(test_oep4_paylod)
 		/*cmocka_unit_test(test_payer_address)*/
 	};
     return cmocka_run_group_tests(tests, NULL, NULL);
