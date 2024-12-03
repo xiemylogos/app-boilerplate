@@ -261,6 +261,9 @@ static void test_oep4_transaction(void **state) {
         20, 81, 16,132,137,51,124,128,85,
         169,193,237,145,88,201,71,210,32,112,215
     };
+    uint8_t to[] = {
+        236,148,65,191,50,139,108,214, 96, 123, 56, 71, 195, 11, 126, 174, 215, 86, 218, 190
+    };
     assert_int_equal(sizeof(oep4_tx),131);
     buffer_t buf = {.ptr = oep4_tx, .size = sizeof(oep4_tx), .offset = 0};
     parser_status_e status = oep4_transaction_deserialize(&buf, &tx);
@@ -274,6 +277,17 @@ static void test_oep4_transaction(void **state) {
         assert_int_equal(20,20);
     } else {
         assert_string_equal(tx.payer,"oep4tx");
+    }
+    assert_int_equal(tx.payload.value,1000000);
+    if(memcmp(tx.payload.from,from,20) == 0 ) {
+        assert_int_equal(20,20);
+    } else {
+        assert_string_equal(info.from,"oep4-from");
+    }
+    if(memcmp(tx.payload.to,to,20) == 0 ) {
+        assert_int_equal(20,20);
+    } else {
+        assert_string_equal(info.to,"oep4-to");
     }
 }
 
