@@ -54,6 +54,7 @@ add_library(transaction_serialize ../src/transaction/serialize.c)
 add_library(transaction_utils ../src/transaction/utils.c)
 add_library(person_msg_deserialize ../src/person-msg/deserialize.c)
 add_library(oep4_transaction_deserialize ../src/transaction/oep4_deserialize.c)
+add_library(addr_utils ../src/utils.c)
 
 target_link_libraries(test_tx_parser PUBLIC
                       transaction_deserialize
@@ -69,7 +70,8 @@ target_link_libraries(test_tx_parser PUBLIC
                       read
 		              format
                       varint
-                      transaction_utils)
+                      transaction_utils
+		      addr_utils)
 target_link_libraries(test_tx_utils PUBLIC
                       cmocka
                       gcov
