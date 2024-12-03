@@ -34,7 +34,7 @@
 #include "../menu.h"
 
 static char g_msg[30];
-static char g_msg_len[43];
+
 static nbgl_layoutTagValue_t pairs[2];
 static nbgl_layoutTagValueList_t pairList;
 
@@ -57,16 +57,20 @@ int ui_display_person_msg_bs_choice() {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
-
+    if(G_context.person_msg_info.msg_info.person_msg_len >= 30) {
+        memcpy(g_msg, G_context.person_msg_info.msg_info.person_msg, 29);
+        g_msg[29] = '\0';
+    } else {
+        memcpy(g_msg, G_context.person_msg_info.msg_info.person_msg,G_context.person_msg_info.msg_info.person_msg_len);
+        g_msg[G_context.person_msg_info.msg_info.person_msg_len+1] = '\0';
+    }
     // Setup data to display
-    pairs[0].item = "person msg";
+    pairs[0].item = "msg content:";
     pairs[0].value = g_msg;
-    pairs[1].item = "person msg len";
-     pairs[1].value = g_msg_len;
 
     // Setup list
     pairList.nbMaxLinesForValue = 0;
-    pairList.nbPairs = 2;
+    pairList.nbPairs = 1;
     pairList.pairs = pairs;
 
     // Start review flow
