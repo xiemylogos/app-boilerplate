@@ -77,7 +77,7 @@ parser_status_e oep4_state_info_deserialize(buffer_t *buf,size_t length, state_i
     if(memcmp(buf->ptr+buf->offset + length - 56 - 8, "transfer", 8) != 0) {
         return PARSE_STRING_MATCH_ERROR;
     }
-    if (!buffer_seek_cur(buf,buf->offset + length - 56)) {
+    if (!buffer_seek_cur(buf,length - 56)) {
         return BUFFER_OFFSET_MOVE_ERROR;
     }
     tx->from = (uint8_t*)(buf->ptr+buf->offset);
@@ -96,6 +96,7 @@ parser_status_e oep4_state_info_deserialize(buffer_t *buf,size_t length, state_i
     if (!buffer_read_u64(buf, &tx->value, LE)) {
         return VALUE_PARSING_ERROR;
     }
+    /*
     if (!buffer_seek_cur(buf,18)) {
         return BUFFER_OFFSET_MOVE_ERROR;
     }
@@ -103,5 +104,6 @@ parser_status_e oep4_state_info_deserialize(buffer_t *buf,size_t length, state_i
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return CONTRACT_ADDR_PARSING_ERROR;
     }
+    */
     return PARSING_OK;
 }
