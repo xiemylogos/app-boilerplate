@@ -13,6 +13,7 @@
 #include "person-msg/deserialize.h"
 #include "types.h"
 #include "format.h"
+#include "lcx_sha256.h"
 
 static void test_tx_serialization(void **state) {
     (void) state;
@@ -309,9 +310,9 @@ static void test_oep4_paylod(void **state) {
         20, 81, 16,132,137,51,124,128,85,
         169,193,237,145,88,201,71,210,32,112,215
     };
-    uint8_t to[] = {
-        236,148,65,191,50,139,108,214, 96, 123, 56, 71, 195, 11, 126, 174, 215, 86, 218, 190
-    };
+
+    script_hash_to_address(info.)
+
     assert_int_equal(sizeof(oep4_payload),88);
     buffer_t buf = {.ptr = oep4_payload, .size = sizeof(oep4_payload), .offset = 0};
     parser_status_e status = oep4_state_info_deserialize(&buf,sizeof(oep4_payload), &info);
@@ -329,12 +330,27 @@ static void test_oep4_paylod(void **state) {
     //assert_int_equal(info.value,1000000);
 }
 
+static void test_address(void **state) {
+    (void) state;
+
+    //AHdJGoAKkZDTGAAhQawKry6EE2CPdzhXk3
+    uint8_t from[] = {
+        20, 81, 16,132,137,51,124,128,85,
+        169,193,237,145,88,201,71,210,32,112,215
+    };
+    size_t length = 20; // 需要分配的长度
+    char *addr = (char *)malloc(length * sizeof(char)); // 动态分配内存
+    script_hash_to_address(addr,length,from)
+    assert_string_equal(info.from,"AHdJGoAKkZDTGAAhQawKry6EE2CPdzhXk3");
+}
+
 int main() {
 	const struct CMUnitTest tests[] = {cmocka_unit_test(test_ont_tx_serialization),
 		cmocka_unit_test(test_state_info_serialization),
                 cmocka_unit_test(test_person_msg),
                 cmocka_unit_test(test_oep4_transaction),
-                cmocka_unit_test(test_oep4_paylod)
+                cmocka_unit_test(test_oep4_paylod),
+                cmocka_unit_test(test_address)
 		/*cmocka_unit_test(test_payer_address)*/
 	};
     return cmocka_run_group_tests(tests, NULL, NULL);
