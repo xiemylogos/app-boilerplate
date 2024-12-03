@@ -53,19 +53,21 @@ add_library(transaction_deserialize ../src/transaction/deserialize.c)
 add_library(transaction_serialize ../src/transaction/serialize.c)
 add_library(transaction_utils ../src/transaction/utils.c)
 add_library(person_msg_deserialize ../src/person-msg/deserialize.c)
+add_library(oep4_transaction_deserialize ../src/transaction/oep4_deserialize.c)
 
 target_link_libraries(test_tx_parser PUBLIC
                       transaction_deserialize
                       person_msg_deserialize
                       transaction_serialize
+                      oep4_transaction_deserialize
                       buffer
-		              base58
+		      base58
                       bip32
                       cmocka
                       gcov
                       write
                       read
-		              format
+		      format
                       varint
                       transaction_utils)
 target_link_libraries(test_tx_utils PUBLIC

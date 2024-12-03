@@ -9,6 +9,7 @@
 
 #include "transaction/serialize.h"
 #include "transaction/deserialize.h"
+#include "transaction/oep4_deserialize.h"
 #include "person-msg/deserialize.h"
 #include "types.h"
 #include "format.h"
@@ -242,6 +243,8 @@ static void test_person_msg(void **state) {
 
 static void test_oep4_transaction(void **state) {
     (void) state;
+
+    ont_transaction_t tx;
     uint8_t oep4_tx[] = {
         0, 210, 214, 79, 147, 85, 196, 9, 0, 0, 0, 0, 0, 0, 64, 156,
         0, 0, 0, 0, 0, 0, 20, 81, 16, 132, 137, 51, 124, 128, 85, 169,
@@ -258,7 +261,7 @@ static void test_oep4_transaction(void **state) {
         20, 81, 16,132,137,51,124,128,85,
         169,193,237,145,88,201,71,210,32,112,215
     };
-    assert_int_equal(sizeof(data),131);
+    assert_int_equal(sizeof(oep4_tx),131);
     buffer_t buf = {.ptr = oep4_tx, .size = sizeof(oep4_tx), .offset = 0};
     parser_status_e status = oep4_transaction_deserialize(&buf, &tx);
     assert_int_equal(status, PARSING_OK);
