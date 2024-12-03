@@ -67,7 +67,7 @@ parser_status_e oep4_transaction_deserialize(buffer_t *buf, ont_transaction_t *t
     if(memcmp(buf->ptr+buf->size - 56-8-2, "transfer", 8) != 0) {
         return PARSE_STRING_MATCH_ERROR;
     }
-    if (!buffer_seek_cur(buf,buf->size -56-2)) {
+    if (!buffer_seek_cur(buf,buf->size-buf->offset -56-2)) {
         return BUFFER_OFFSET_MOVE_ERROR;
     }
     tx->payload.from = (uint8_t*)(buf->ptr+buf->offset);
@@ -101,10 +101,10 @@ parser_status_e oep4_state_info_deserialize(buffer_t *buf,size_t length, state_i
     if (length <= PAYLOAD_MIN_LENGTH_LIMIT) {
         return WRONG_LENGTH_ERROR;
     }
-    if(memcmp(buf->ptr+buf->offset + length - 56 - 8, "transfer", 8) != 0) {
+    if(memcmp(buf->ptr+buf->offset + length - 56 - 8-2, "transfer", 8) != 0) {
         return PARSE_STRING_MATCH_ERROR;
     }
-    if (!buffer_seek_cur(buf,length - 56)) {
+    if (!buffer_seek_cur(buf,length - 56-2)) {
         return BUFFER_OFFSET_MOVE_ERROR;
     }
     tx->from = (uint8_t*)(buf->ptr+buf->offset);
