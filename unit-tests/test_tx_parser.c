@@ -242,7 +242,7 @@ static void test_person_msg(void **state) {
 
 static void test_oep4_transaction(void **state) {
     (void) state;
-    uint8_t data[] = {
+    uint8_t oep4_tx[] = {
         0, 210, 214, 79, 147, 85, 196, 9, 0, 0, 0, 0, 0, 0, 64, 156,
         0, 0, 0, 0, 0, 0, 20, 81, 16, 132, 137, 51, 124, 128, 85, 169,
         193, 237, 145, 88, 201, 71, 210, 32, 112, 215, 86, 28, 108, 152,
@@ -253,7 +253,25 @@ static void test_oep4_transaction(void **state) {
         123, 56, 71, 195, 11, 126, 174, 215, 86, 218, 190, 64, 66, 15,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
-    assert_int_equal(sizeof(data),131)
+    //AHdJGoAKkZDTGAAhQawKry6EE2CPdzhXk3
+    uint8_t payer[] = {
+        20, 81, 16,132,137,51,124,128,85,
+        169,193,237,145,88,201,71,210,32,112,215
+    };
+    assert_int_equal(sizeof(data),131);
+    buffer_t buf = {.ptr = oep4_tx, .size = sizeof(oep4_tx), .offset = 0};
+    parser_status_e status = oep4_transaction_deserialize(&buf, &tx);
+    assert_int_equal(status, PARSING_OK);
+    assert_int_equal(tx.version,0);
+    assert_int_equal(tx.tx_type,210);
+    assert_int_equal(tx.nonce,1435717590);
+    assert_int_equal(tx.gas_price,2500);
+    assert_int_equal(tx.gas_limit,40000);
+    if(memcmp(tx.payer,payer,20) == 0 ) {
+        assert_int_equal(20,20);
+    } else {
+        assert_string_equal(tx.payer,"oep4tx");
+    }
 }
 
 int main() {
