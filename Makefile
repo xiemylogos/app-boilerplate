@@ -38,10 +38,10 @@ APP_SOURCE_PATH += src
 
 # Application icons following guidelines:
 # https://developers.ledger.com/docs/embedded-app/design-requirements/#device-icon
-ICON_NANOX = icons/nanox_app_ont.gif
-ICON_NANOSP = icons/nanos_app_ont.gif
-ICON_STAX = icons/stax_app_ont.gif
-ICON_FLEX = icons/flex_app_ont.gif
+ICON_NANOX = icons/nanox_app_ont16px.png
+ICON_NANOSP = icons/nanos_app_ont14px.png
+ICON_STAX = icons/stax_app_ont32px.png
+ICON_FLEX = icons/flex_app_ont40px.png
 
 # Application allowed derivation curves.
 # Possibles curves are: secp256k1, secp256r1, ed25519 and bls12381g1

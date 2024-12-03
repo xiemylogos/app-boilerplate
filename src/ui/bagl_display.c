@@ -52,6 +52,18 @@ static void ui_action_validate_transaction(bool choice) {
     ui_menu_main();
 }
 
+// Validate/Invalidate person msg and go back to home
+static void ui_action_validate_person_msg(bool choice) {
+    validate_person_msg(choice);
+    ui_menu_main();
+}
+
+// Validate/Invalidate person msg and go back to home
+static void ui_action_validate_oep4_transaction(bool choice) {
+    validate_oep4_transaction(choice);
+    ui_menu_main();
+}
+
 // Step with icon and text
 UX_STEP_NOCB(ux_display_confirm_addr_step, pn, {&C_icon_eye, "Confirm Address"});
 // Step with title/text for address
@@ -153,12 +165,18 @@ int ui_display_transaction() {
                       EXPONENT_SMALLEST_UNIT)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
-    if (memcpy(G_context.tx_info.transaction.payload.contract_addr,ONT_CONTRACT_ADDRESS,20) ==0) {
-       snprintf(g_amount, sizeof(g_amount), "ONT %.*s", sizeof(amount), amount);
-    } else if (memcpy(G_context.tx_info.transaction.payload.contract_addr,ONG_CONTRACT_ADDRESS,20) ==0 ) {
-       snprintf(g_amount, sizeof(g_amount), "ONG %.*s", sizeof(amount), amount);
+     uint8_t ONG_ADDR[] = {
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2
+    };
+
+    uint8_t ONT_ADDR[] = {
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
+    };
+     if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONT_ADDR,20) == 0) {
+        snprintf(g_amount, sizeof(g_amount), "ont %.*s", sizeof(amount), amount);
+    } else if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONG_ADDR,20) == 0) {
+        snprintf(g_amount, sizeof(g_amount), "ong %.*s", sizeof(amount), amount);
     }
-    //snprintf(g_amount, sizeof(g_amount), "ONT %.*s", sizeof(amount), amount);
     PRINTF("Amount: %s\n", g_amount);
 
     memset(g_address, 0, sizeof(g_address));
@@ -171,6 +189,76 @@ int ui_display_transaction() {
     g_validate_callback = &ui_action_validate_transaction;
 
     ux_flow_init(0, ux_display_transaction_flow, NULL);
+
+    return 0;
+}
+
+// FLOW to display oep4 transaction information:
+// #1 screen : eye icon + "Review Transaction"
+// #2 screen : display amount
+// #3 screen : display destination address
+// #4 screen : approve button
+// #5 screen : reject button
+UX_FLOW(ux_display_person_msg_flow,
+        &ux_display_review_step,
+        &ux_display_approve_step,
+        &ux_display_reject_step);
+
+int ui_display_person_msg() {
+    if (G_context.req_type != CONFIRM_MESSAGE || G_context.state != STATE_PARSED) {
+        G_context.state = STATE_NONE;
+        return io_send_sw(SW_BAD_STATE);
+    }
+
+    g_validate_callback = &ui_action_validate_person_msg;
+
+    ux_flow_init(0, ux_display_person_msg_flow, NULL);
+
+    return 0;
+}
+
+// FLOW to display oep4 transaction information:
+// #1 screen : eye icon + "Review Transaction"
+// #2 screen : display amount
+// #3 screen : display destination address
+// #4 screen : approve button
+// #5 screen : reject button
+UX_FLOW(ux_display_oep4_transaction_flow,
+        &ux_display_review_step,
+        &ux_display_address_step,
+        &ux_display_amount_step,
+        &ux_display_approve_step,
+        &ux_display_reject_step);
+
+int ui_display_oep4_transaction() {
+    if (G_context.req_type != CONFIRM_OEP4_TRANSACTION || G_context.state != STATE_PARSED) {
+        G_context.state = STATE_NONE;
+        return io_send_sw(SW_BAD_STATE);
+    }
+
+    memset(g_amount, 0, sizeof(g_amount));
+    char amount[30] = {0};
+    if (!format_fpu64(amount,
+                      sizeof(amount),
+                      G_context.tx_info.transaction.payload.value,
+                      EXPONENT_SMALLEST_UNIT)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    }
+
+    snprintf(g_amount, sizeof(g_amount), "token %.*s", sizeof(amount), amount);
+
+    PRINTF("Amount: %s\n", g_amount);
+
+    memset(g_address, 0, sizeof(g_address));
+
+    if (format_hex(G_context.tx_info.transaction.payload.to, ADDRESS_LEN, g_address, sizeof(g_address)) ==
+        -1) {
+        return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    }
+
+    g_validate_callback = &ui_action_validate_oep4_transaction;
+
+    ux_flow_init(0, ux_display_oep4_transaction_flow, NULL);
 
     return 0;
 }
