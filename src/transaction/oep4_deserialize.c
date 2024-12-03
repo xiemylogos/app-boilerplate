@@ -44,21 +44,24 @@ parser_status_e oep4_transaction_deserialize(buffer_t *buf, ont_transaction_t *t
         return TXTYPE_PARSING_ERROR;
     }
     //nonce
-    if(!buffer_read_u32(buf,&tx->nonce,BE)) {
+    if(!buffer_read_u32(buf,&tx->nonce,LE)) {
         return NONCE_PARSING_ERROR;
     }
     //gasPrice
-    if(!buffer_read_u64(buf,&tx->gas_price,BE)) {
+    if(!buffer_read_u64(buf,&tx->gas_price,LE)) {
         return GASPRICE_PARSING_ERROR;
     }
     //gasLimit
-    if(!buffer_read_u64(buf,&tx->gas_limit,BE)) {
+    if(!buffer_read_u64(buf,&tx->gas_limit,LE)) {
         return GASLIMIT_PARSING_ERROR;
     }
     //payer
     tx->payer = (uint8_t *) (buf->ptr + buf->offset);
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return PAYER_PARSING_ERROR;
+    }
+    if (!buffer_seek_cur(buf,1)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
     }
     return PARSING_OK;
     //return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
