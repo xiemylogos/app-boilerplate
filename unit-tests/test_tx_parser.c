@@ -13,8 +13,10 @@
 #include "person-msg/deserialize.h"
 #include "types.h"
 #include "format.h"
+#include "utils.h"
+/*
 #include "lcx_sha256.h"
-
+*/
 static void test_tx_serialization(void **state) {
     (void) state;
 
@@ -307,11 +309,13 @@ static void test_oep4_paylod(void **state) {
     };
     //AHdJGoAKkZDTGAAhQawKry6EE2CPdzhXk3
     uint8_t from[] = {
-        20, 81, 16,132,137,51,124,128,85,
-        169,193,237,145,88,201,71,210,32,112,215
+	    20, 81, 16,132,137,51,124,128,85,
+	    169,193,237,145,88,201,71,210,32,112,215
     };
 
-    script_hash_to_address(info.)
+    uint8_t to[] = {
+	    236,148,65,191,50,139,108,214, 96, 123, 56, 71, 195, 11, 126, 174, 215, 86, 218, 190
+    };
 
     assert_int_equal(sizeof(oep4_payload),88);
     buffer_t buf = {.ptr = oep4_payload, .size = sizeof(oep4_payload), .offset = 0};
@@ -338,10 +342,10 @@ static void test_address(void **state) {
         20, 81, 16,132,137,51,124,128,85,
         169,193,237,145,88,201,71,210,32,112,215
     };
-    size_t length = 20; // 需要分配的长度
-    char *addr = (char *)malloc(length * sizeof(char)); // 动态分配内存
-    script_hash_to_address(addr,length,from)
-    assert_string_equal(info.from,"AHdJGoAKkZDTGAAhQawKry6EE2CPdzhXk3");
+    size_t length = 20;
+    char *addr = (char *)malloc(length * sizeof(char));
+    script_hash_to_address(addr,length,from);
+    assert_string_equal(addr,"AHdJGoAKkZDTGAAhQawKry6EE2CPdzhXk3");
 }
 
 int main() {
