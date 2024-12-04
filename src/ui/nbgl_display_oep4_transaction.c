@@ -42,10 +42,13 @@
 // Buffer where the oep4 transaction amount string is written
 static char g_amount[30];
 // Buffer where the oep4 transaction address string is written
-static char g_toAddr[34];
+static char g_fromAddr[40];
+static char g_toAddr[40];
 
-static nbgl_layoutTagValue_t pairs[2];
-static nbgl_layoutTagValueList_t pairList;
+#define OEP4_MAX_PAIRS        3
+
+static nbgl_layoutTagValue_t pairs[3];
+static nbgl_layoutTagValueList_t pairsList;
 
 // called when long press button on 3rd page is long-touched or when reject footer is touched
 static void oep4_tx_review_choice(bool confirm) {
@@ -58,6 +61,42 @@ static void oep4_tx_review_choice(bool confirm) {
     }
 }
 
+static uint8_t setTagValuePairs(void) {
+    uint8_t nbPairs = 0;
+    explicit_bzero(pairs, sizeof(pairs));
+     // Format amount and address to g_amount and g_address buffers
+    memset(g_amount, 0, sizeof(g_amount));
+    if (!format_fpu64(g_amount,
+                      sizeof(g_amount),
+                      G_context.tx_info.transaction.payload.value,
+                      EXPONENT_SMALLEST_UNIT)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    }
+    pairs[0].item = "Oep4 Amount";
+    pairs[nbPairs].value = g_amount;
+    nbPairs++;
+    //fromAddr
+    memset(g_fromAddr, 0, sizeof(g_fromAddr));
+    if (script_hash_to_address(g_fromAddr,sizeof(g_fromAddr),G_context.tx_info.transaction.payload.from) ==
+        -1) {
+           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+        }
+    pairs[nbPairs].item = "From";
+    pairs[nbPairs].value = g_fromAddr;
+    nbPairs++;
+     //toAddr
+    memset(g_toAddr, 0, sizeof(g_toAddr));
+    if (script_hash_to_address(g_toAddr,sizeof(g_toAddr),G_context.tx_info.transaction.payload.to) ==
+        -1) {
+           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+        }
+    pairs[nbPairs].item = "to";
+    pairs[nbPairs].value = g_toAddr;
+    nbPairs++;
+
+    return nbPairs;
+}
+
 // Public function to start the oep4 transaction review
 // - Check if the app is in the right state for oep4 transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
@@ -68,36 +107,13 @@ int ui_display_oep4_transaction_bs_choice() {
         return io_send_sw(SW_BAD_STATE);
     }
 
-    // Format amount and address to g_amount and g_address buffers
-    memset(g_amount, 0, sizeof(g_amount));
-    char amount[30] = {0};
-    if (!format_fpu64(amount,
-                      sizeof(amount),
-                      G_context.tx_info.transaction.payload.value,
-                      EXPONENT_SMALLEST_UNIT)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
-    snprintf(g_amount, sizeof(g_amount), "oep4 %.*s", sizeof(amount), amount);
+    explicit_bzero(&pairsList, sizeof(pairsList));
 
-     memset(g_toAddr, 0, sizeof(g_toAddr));
-     if (script_hash_to_address(g_toAddr,sizeof(g_toAddr),G_context.tx_info.transaction.payload.to) ==
-        -1) {
-           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
-        }
-
-    // Setup data to display
-    pairs[0].item = "Amount";
-    pairs[0].value = g_amount;
-    pairs[1].item = "To";
-    pairs[1].value = g_toAddr;
-
-    // Setup list
-    pairList.nbMaxLinesForValue = 0;
-    pairList.nbPairs = 2;
-    pairList.pairs = pairs;
+    pairsList.nbPairs = setTagValuePairs();
+    pairsList.pairs = pairs;
 
     nbgl_useCaseReview(TYPE_TRANSACTION,
-                           &pairList,
+                           &pairsList,
                            &C_icon_ont_64px,
                            "Review transaction\nto send oep4",
                            NULL,
