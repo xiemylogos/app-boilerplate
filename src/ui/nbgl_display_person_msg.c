@@ -33,9 +33,9 @@
 #include "action/validate.h"
 #include "../menu.h"
 
-static char g_msg[30];
+static char g_msg[1024];
 
-static nbgl_layoutTagValue_t pairs[2];
+static nbgl_layoutTagValue_t pairs[1];
 static nbgl_layoutTagValueList_t pairList;
 
 static void person_msg_review_choice(bool confirm) {
@@ -57,8 +57,8 @@ int ui_display_person_msg_bs_choice() {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
-    if(G_context.person_msg_info.msg_info.person_msg_len >= 30) {
-        memcpy(g_msg, G_context.person_msg_info.msg_info.person_msg, 29);
+    if(G_context.person_msg_info.msg_info.person_msg_len >= 1024) {
+        memcpy(g_msg, G_context.person_msg_info.msg_info.person_msg, 1023);
         g_msg[29] = '\0';
     } else {
         memcpy(g_msg, G_context.person_msg_info.msg_info.person_msg,G_context.person_msg_info.msg_info.person_msg_len);
