@@ -35,10 +35,11 @@
 #include "action/validate.h"
 #include "../transaction/types.h"
 #include "../menu.h"
+#include "../utils.h"
 
 static action_validate_cb g_validate_callback;
 static char g_amount[30];
-static char g_address[43];
+static char g_address[40];
 
 // Validate/Invalidate public key and go back to home
 static void ui_action_validate_pubkey(bool choice) {
@@ -58,7 +59,7 @@ static void ui_action_validate_person_msg(bool choice) {
     ui_menu_main();
 }
 
-// Validate/Invalidate person msg and go back to home
+// Validate/Invalidate oep4 transaction and go back to home
 static void ui_action_validate_oep4_transaction(bool choice) {
     validate_oep4_transaction(choice);
     ui_menu_main();
@@ -158,30 +159,18 @@ int ui_display_transaction() {
     }
 
     memset(g_amount, 0, sizeof(g_amount));
-    char amount[30] = {0};
-    if (!format_fpu64(amount,
-                      sizeof(amount),
-                      G_context.tx_info.transaction.payload.value,
-                      EXPONENT_SMALLEST_UNIT)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
-     uint8_t ONG_ADDR[] = {
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2
-    };
 
-    uint8_t ONT_ADDR[] = {
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
-    };
-     if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONT_ADDR,20) == 0) {
-        snprintf(g_amount, sizeof(g_amount), "ont %.*s", sizeof(amount), amount);
+    if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONT_ADDR,20) == 0) {
+        format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value,9);
     } else if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONG_ADDR,20) == 0) {
-        snprintf(g_amount, sizeof(g_amount), "ong %.*s", sizeof(amount), amount);
+        format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value,9);
     }
+
     PRINTF("Amount: %s\n", g_amount);
 
     memset(g_address, 0, sizeof(g_address));
 
-    if (format_hex(G_context.tx_info.transaction.payload.to, ADDRESS_LEN, g_address, sizeof(g_address)) ==
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.transaction.payload.to) ==
         -1) {
         return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
@@ -193,7 +182,7 @@ int ui_display_transaction() {
     return 0;
 }
 
-// FLOW to display oep4 transaction information:
+// FLOW to display person msg information:
 // #1 screen : eye icon + "Review Transaction"
 // #2 screen : display amount
 // #3 screen : display destination address
@@ -218,7 +207,7 @@ int ui_display_person_msg() {
 }
 
 // FLOW to display oep4 transaction information:
-// #1 screen : eye icon + "Review Transaction"
+// #1 screen : eye icon + "Review oep4 Transaction"
 // #2 screen : display amount
 // #3 screen : display destination address
 // #4 screen : approve button
@@ -245,13 +234,13 @@ int ui_display_oep4_transaction() {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
 
-    snprintf(g_amount, sizeof(g_amount), "token %.*s", sizeof(amount), amount);
+    snprintf(g_amount, sizeof(g_amount), "oep4 %.*s", sizeof(amount), amount);
 
     PRINTF("Amount: %s\n", g_amount);
 
     memset(g_address, 0, sizeof(g_address));
 
-    if (format_hex(G_context.tx_info.transaction.payload.to, ADDRESS_LEN, g_address, sizeof(g_address)) ==
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.transaction.payload.to) ==
         -1) {
         return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
