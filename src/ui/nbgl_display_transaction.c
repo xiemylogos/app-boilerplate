@@ -70,13 +70,6 @@ int ui_display_transaction_bs_choice() {
 
     // Format amount and address to g_amount and g_address buffers
     memset(g_amount, 0, sizeof(g_amount));
-    char amount[30] = {0};
-    if (!format_fpu64(amount,
-                      sizeof(amount),
-                      G_context.tx_info.transaction.payload.value,
-                      EXPONENT_SMALLEST_UNIT)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
     uint8_t ONG_ADDR[] = {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2
     };
@@ -84,13 +77,15 @@ int ui_display_transaction_bs_choice() {
     uint8_t ONT_ADDR[] = {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
     };
-
+    // Setup data to display
     if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONT_ADDR,20) == 0) {
-        snprintf(g_amount, sizeof(g_amount), "ont %.*s", sizeof(amount), amount);
+         pairs[0].item = "ONT Amount";
+       format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value,9);
     } else if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONG_ADDR,20) == 0) {
-        snprintf(g_amount, sizeof(g_amount), "ong %.*s", sizeof(amount), amount);
+       pairs[0].item = "ONG Amount";
+       format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value,9);
     }
-
+    pairs[0].value = g_amount;
     /*
     memset(g_fromAddr, 0, sizeof(g_fromAddr));
     script_hash_to_address(g_fromAddr,sizeof(g_fromAddr),G_context.tx_info.transaction.payload.from);
@@ -101,10 +96,6 @@ int ui_display_transaction_bs_choice() {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
 
-
-    // Setup data to display
-    pairs[0].item = "Amount";
-    pairs[0].value = g_amount;
     /*
     pairs[1].item = "From";
     pairs[1].value = g_fromAddr;
