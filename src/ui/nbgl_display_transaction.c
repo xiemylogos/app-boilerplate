@@ -41,11 +41,14 @@
 // Buffer where the transaction amount string is written
 static char g_amount[30];
 // Buffer where the transaction address string is written
-//static char g_fromAddr[34];
-static char g_toAddr[34];
+static char g_fromAddr[40];
+static char g_toAddr[40];
 
-static nbgl_layoutTagValue_t pairs[2];
-static nbgl_layoutTagValueList_t pairList;
+#define MAX_PAIRS        3
+
+static nbgl_contentTagValue_t pairs[MAX_PAIRS];
+static nbgl_contentTagValueList_t pairsList;
+
 
 // called when long press button on 3rd page is long-touched or when reject footer is touched
 static void tx_review_choice(bool confirm) {
@@ -58,6 +61,43 @@ static void tx_review_choice(bool confirm) {
     }
 }
 
+static uint8_t setTagValuePairs(void) {
+    uint8_t nbPairs = 0;
+    explicit_bzero(pairs, sizeof(pairs));
+     // Format amount and address to g_amount and g_address buffers
+    memset(g_amount, 0, sizeof(g_amount));
+    // Setup data to display
+    if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONT_ADDR,20) == 0) {
+        pairs[nbPairs].item = "ONT Amount";
+        format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value,9);
+    } else if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONG_ADDR,20) == 0) {
+        pairs[nbPairs].item = "ONG Amount";
+        format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value,9);
+    }
+    pairs[nbPairs].value = g_amount;
+    nbPairs++;
+    //fromAddr
+    memset(g_fromAddr, 0, sizeof(g_fromAddr));
+    if (script_hash_to_address(g_fromAddr,sizeof(g_fromAddr),G_context.tx_info.transaction.payload.from) ==
+        -1) {
+           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+        }
+    pairs[nbPairs].item = "From";
+    pairs[nbPairs].value = g_fromAddr;
+    nbPairs++;
+     //toAddr
+    memset(g_toAddr, 0, sizeof(g_toAddr));
+    if (script_hash_to_address(g_toAddr,sizeof(g_toAddr),G_context.tx_info.transaction.payload.to) ==
+        -1) {
+           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+        }
+    pairs[nbPairs].item = "to";
+    pairs[nbPairs].value = g_toAddr;
+    nbPairs++;
+
+    return nbPairs;
+}
+
 // Public function to start the transaction review
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
@@ -67,49 +107,14 @@ int ui_display_transaction_bs_choice() {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
+    explicit_bzero(&pairsList, sizeof(pairsList));
 
-    // Format amount and address to g_amount and g_address buffers
-    memset(g_amount, 0, sizeof(g_amount));
-    uint8_t ONG_ADDR[] = {
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2
-    };
-
-    uint8_t ONT_ADDR[] = {
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
-    };
-    // Setup data to display
-    if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONT_ADDR,20) == 0) {
-         pairs[0].item = "ONT Amount";
-       format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value,9);
-    } else if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONG_ADDR,20) == 0) {
-       pairs[0].item = "ONG Amount";
-       format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value,9);
-    }
-    pairs[0].value = g_amount;
-    /*
-    memset(g_fromAddr, 0, sizeof(g_fromAddr));
-    script_hash_to_address(g_fromAddr,sizeof(g_fromAddr),G_context.tx_info.transaction.payload.from);
-    */
-    memset(g_toAddr, 0, sizeof(g_toAddr));
-    if (script_hash_to_address(g_toAddr,sizeof(g_toAddr),G_context.tx_info.transaction.payload.to) ==
-        -1) {
-           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
-        }
-
-    /*
-    pairs[1].item = "From";
-    pairs[1].value = g_fromAddr;
-    */
-    pairs[1].item = "To";
-    pairs[1].value = g_toAddr;
-    // Setup list
-    pairList.nbMaxLinesForValue = 0;
-    pairList.nbPairs = 2;
-    pairList.pairs = pairs;
+    pairsList.nbPairs = setTagValuePairs();
+    pairsList.pairs = pairs;
 
    if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONT_ADDR,20) == 0) {
         nbgl_useCaseReview(TYPE_TRANSACTION,
-                           &pairList,
+                           &pairsList,
                            &C_icon_ont_64px,
                            "Review transaction\nto send ONT",
                            NULL,
@@ -117,7 +122,7 @@ int ui_display_transaction_bs_choice() {
                            tx_review_choice);
    } else if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONG_ADDR,20) == 0) {
          nbgl_useCaseReview(TYPE_TRANSACTION,
-                           &pairList,
+                           &pairsList,
                            &C_icon_ont_64px,
                            "Review transaction\nto send ONG",
                            NULL,
