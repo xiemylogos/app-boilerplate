@@ -23,7 +23,7 @@
 #define ADDRESS_LEN_PRE (1 + SCRIPT_HASH_LEN + SCRIPT_HASH_CHECKSUM_LEN)
 
 
-void script_hash_to_address(char* out, size_t out_len, const unsigned char* script_hash) {
+int script_hash_to_address(char* out, size_t out_len, const unsigned char* script_hash) {
 
     static cx_sha256_t data_hash;
     unsigned char data_hash_1[SHA256_HASH_LEN];
@@ -40,5 +40,5 @@ void script_hash_to_address(char* out, size_t out_len, const unsigned char* scri
 
     memcpy(&address[1 + SCRIPT_HASH_LEN], data_hash_2, SCRIPT_HASH_CHECKSUM_LEN);
 
-    base58_encode(address, sizeof(address), out, out_len);
+    return base58_encode(address, sizeof(address), out, out_len);
 }

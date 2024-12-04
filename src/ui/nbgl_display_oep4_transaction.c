@@ -36,6 +36,8 @@
 #include "action/validate.h"
 #include "../transaction/types.h"
 #include "../menu.h"
+#include "../utils.h"
+
 
 // Buffer where the oep4 transaction amount string is written
 static char g_amount[30];
@@ -78,9 +80,10 @@ int ui_display_oep4_transaction_bs_choice() {
     snprintf(g_amount, sizeof(g_amount), "oep4 %.*s", sizeof(amount), amount);
 
      memset(g_toAddr, 0, sizeof(g_toAddr));
-     script_hash_to_address(g_toAddr,sizeof(g_toAddr),G_context.tx_info.transaction.payload.to);
-
-
+     if (script_hash_to_address(g_toAddr,sizeof(g_toAddr),G_context.tx_info.transaction.payload.to) ==
+        -1) {
+           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+        }
 
     // Setup data to display
     pairs[0].item = "Amount";

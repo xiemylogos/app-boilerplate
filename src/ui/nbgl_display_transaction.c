@@ -96,7 +96,10 @@ int ui_display_transaction_bs_choice() {
     script_hash_to_address(g_fromAddr,sizeof(g_fromAddr),G_context.tx_info.transaction.payload.from);
     */
     memset(g_toAddr, 0, sizeof(g_toAddr));
-    script_hash_to_address(g_toAddr,sizeof(g_toAddr),G_context.tx_info.transaction.payload.to);
+    if (script_hash_to_address(g_toAddr,sizeof(g_toAddr),G_context.tx_info.transaction.payload.to) ==
+        -1) {
+           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+        }
 
 
     // Setup data to display
