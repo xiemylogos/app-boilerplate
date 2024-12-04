@@ -32,7 +32,7 @@ The address can be optionally checked on the device before being returned.
 
 | CLA | INS   | P1                                                 | P2    | Lc       | Le       |
 | --- | ---   | ---                                                | ---   | ---      | ---      |
-| E0  |  05   |  00 : return address                               | 00    | variable | variable |
+| 80  |  05   |  00 : return address                               | 00    | variable | variable |
 |     |       |  01 : display address and confirm before returning |       |          |          |
 
 ##### `Input data`
@@ -54,7 +54,7 @@ The address can be optionally checked on the device before being returned.
 | Chain code                                                       | var    |
 
 
-### SIGN Ont TRANSACTION
+### SIGN Ont/Ong TRANSACTION
 
 #### Description
 
@@ -68,7 +68,7 @@ The input data is the RLP encoded transaction streamed to the device in 255 byte
 
 | CLA | INS  | P1                   | P2                               | Lc       | Le       |
 | --- | ---  | ---                  | ---                              | ---      | ---      |
-| E0  | 06   |  00-FF : chunk index | 00 : last transaction data block | variable | variable |
+| 80  | 02   |  00-FF : chunk index | 00 : last transaction data block | variable | variable |
 |     |      |                      | 80 : subsequent transaction data block |    |          |
 
 ##### `Input data (first transaction data block)`
@@ -76,9 +76,9 @@ The input data is the RLP encoded transaction streamed to the device in 255 byte
 | Description                                          | Length   | 
 | ---                                                  | ---      | 
 | Number of BIP 32 derivations to perform (max 10)     | 1        |
-| First derivation index (big endian)                  | 4        |
+| First derivation index (little endian)               | 4        |
 | ...                                                  | 4        |
-| Last derivation index (big endian)                   | 4        |
+| Last derivation index (little endian)                | 4        |
   
 ##### `Input data (other transaction data block)`
 
@@ -86,6 +86,97 @@ The input data is the RLP encoded transaction streamed to the device in 255 byte
 | ---                                                  | ---      |
 | Transaction chunk                                    | variable |
                               
+
+##### `Output data`
+
+| Description                                          | Length   |
+| ---                                                  | ---      | 
+| Signature length                                     | 1        |
+| Signature                                            | variable |
+| v                                                    | 1        |
+
+
+### SIGN PERSON MESSAGE
+
+#### Description
+
+This command signs a person message after having the user validate the message parameters.
+
+The input data is the RLP encoded transaction streamed to the device in 255 bytes maximum data chunks.
+
+#### Coding
+
+##### `Command`
+
+| CLA | INS  | P1                   | P2                               | Lc       | Le       |
+| --- | ---  | ---                  | ---                              | ---      | ---      |
+| 80  | 07   |  00-FF : chunk index | 00 : last person msg data block  | variable | variable |
+|     |      |                      | 80 : subsequent person msg data block |    |          |
+
+##### `Input data (first person message data block)`
+
+| Description                                          | Length   | 
+| ---                                                  | ---      | 
+| Number of BIP 32 derivations to perform (max 10)     | 1        |
+| First derivation index (little endian)               | 4        |
+| ...                                                  | 4        |
+| Last derivation index (little endian)                | 4        |
+
+```
+for example
+uint32_t msg_length = 11;
+uint8_t msg_content[] = {'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd'};
+[0x00, 0x00, 0x00, 0x0B] [0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64]
+|      msg length       |                      message content                            |
+```
+##### `Input data (other person msg data block)`
+
+| Description                                          | Length   |
+| ---                                                  | ---      |
+| message chunk                                        | variable |
+
+
+##### `Output data`
+
+| Description                                          | Length   |
+| ---                                                  | ---      | 
+| Signature length                                     | 1        |
+| Signature                                            | variable |
+| v                                                    | 1        |
+
+
+### SIGN OEP4  TRANSACTION
+
+#### Description
+
+This command signs a Oep4 transaction after having the user validate the Oep4 transactions parameters.
+
+The input data is the RLP encoded transaction streamed to the device in 255 bytes maximum data chunks.
+
+#### Coding
+
+##### `Command`
+
+| CLA | INS  | P1                   | P2                                    | Lc       | Le       |
+| --- | ---  | ---                  | ---                                   | ---      | ---      |
+| 80  | 08   |  00-FF : chunk index | 00 : last oep4 transaction data block | variable | variable |
+|     |      |                      | 80 : subsequent oep4 transaction data block |    |          |
+
+##### `Input data (first oep4 transaction data block)`
+
+| Description                                          | Length   | 
+| ---                                                  | ---      | 
+| Number of BIP 32 derivations to perform (max 10)     | 1        |
+| First derivation index (little endian)               | 4        |
+| ...                                                  | 4        |
+| Last derivation index (little endian)                | 4        |
+
+##### `Input data (other transaction data block)`
+
+| Description                                          | Length   |
+| ---                                                  | ---      |
+| Transaction chunk                                    | variable |
+
 
 ##### `Output data`
 
@@ -108,7 +199,7 @@ This command returns boilerplate application version
 
 | CLA | INS | P1  | P2  | Lc   | Le |
 | --- | --- | --- | --- | ---  | ---|
-| E0  | 03  | 00  | 00  | 00   | 04 |
+| 80  | 03  | 00  | 00  | 00   | 04 |
 
 ##### `Input data`
 
@@ -134,7 +225,7 @@ This command returns boilerplate application name
 ##### `Command`
 | CLA | INS | P1  | P2  | Lc   | Le |
 | --- | --- | --- | --- | ---  | ---|
-| E0  | 04  | 00  | 00  | 00   | 04 |
+| 80  | 04  | 00  | 00  | 00   | 04 |
 
 ##### `Input data`
 
