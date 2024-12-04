@@ -36,11 +36,13 @@
 #include "action/validate.h"
 #include "../transaction/types.h"
 #include "../menu.h"
+#include "../utils.h"
 
 // Buffer where the transaction amount string is written
 static char g_amount[30];
 // Buffer where the transaction address string is written
-static char g_address[43];
+//static char g_fromAddr[34];
+static char g_toAddr[34];
 
 static nbgl_layoutTagValue_t pairs[2];
 static nbgl_layoutTagValueList_t pairList;
@@ -89,20 +91,23 @@ int ui_display_transaction_bs_choice() {
         snprintf(g_amount, sizeof(g_amount), "ong %.*s", sizeof(amount), amount);
     }
 
-   // snprintf(g_amount, sizeof(g_amount), "bal %.*s", sizeof(amount), amount);
-    //memset(g_address, 0, sizeof(g_address));
-    //script_hash_to_address(g_address,20,G_context.tx_info.transaction.payload.to);
-    if (format_hex(G_context.tx_info.transaction.payload.to, ADDRESS_LEN, g_address, sizeof(g_address)) ==
-        -1) {
-        return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
-    }
+    /*
+    memset(g_fromAddr, 0, sizeof(g_fromAddr));
+    script_hash_to_address(g_fromAddr,sizeof(g_fromAddr),G_context.tx_info.transaction.payload.from);
+    */
+    memset(g_toAddr, 0, sizeof(g_toAddr));
+    script_hash_to_address(g_toAddr,sizeof(g_toAddr),G_context.tx_info.transaction.payload.to);
+
 
     // Setup data to display
     pairs[0].item = "Amount";
     pairs[0].value = g_amount;
+    /*
+    pairs[1].item = "From";
+    pairs[1].value = g_fromAddr;
+    */
     pairs[1].item = "To";
-    pairs[1].value = g_address;
-
+    pairs[1].value = g_toAddr;
     // Setup list
     pairList.nbMaxLinesForValue = 0;
     pairList.nbPairs = 2;
