@@ -40,7 +40,7 @@
 // Buffer where the oep4 transaction amount string is written
 static char g_amount[30];
 // Buffer where the oep4 transaction address string is written
-static char g_address[43];
+static char g_toAddr[34];
 
 static nbgl_layoutTagValue_t pairs[2];
 static nbgl_layoutTagValueList_t pairList;
@@ -77,18 +77,16 @@ int ui_display_oep4_transaction_bs_choice() {
     }
     snprintf(g_amount, sizeof(g_amount), "oep4 %.*s", sizeof(amount), amount);
 
-    memset(g_address, 0, sizeof(g_address));
+     memset(g_toAddr, 0, sizeof(g_toAddr));
+     script_hash_to_address(g_toAddr,sizeof(g_toAddr),G_context.tx_info.transaction.payload.to);
 
-    if (format_hex(G_context.tx_info.transaction.payload.to, ADDRESS_LEN, g_address, sizeof(g_address)) ==
-        -1) {
-        return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
-    }
+
 
     // Setup data to display
     pairs[0].item = "Amount";
     pairs[0].value = g_amount;
-    pairs[1].item = "Address";
-    pairs[1].value = g_address;
+    pairs[1].item = "To";
+    pairs[1].value = g_toAddr;
 
     // Setup list
     pairList.nbMaxLinesForValue = 0;
