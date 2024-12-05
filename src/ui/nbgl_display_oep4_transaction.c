@@ -41,13 +41,15 @@
 
 // Buffer where the oep4 transaction amount string is written
 static char g_amount[30];
+static char g_gasPrice[40];
+static char g_gasLimit[40];
 // Buffer where the oep4 transaction address string is written
 static char g_fromAddr[40];
 static char g_toAddr[40];
 
-#define OEP4_MAX_PAIRS        3
+#define OEP4_MAX_PAIRS        5
 
-static nbgl_layoutTagValue_t pairs[3];
+static nbgl_layoutTagValue_t pairs[OEP4_MAX_PAIRS];
 static nbgl_layoutTagValueList_t pairsList;
 
 // called when long press button on 3rd page is long-touched or when reject footer is touched
@@ -93,7 +95,22 @@ static uint8_t setTagValuePairs(void) {
     pairs[nbPairs].item = "to";
     pairs[nbPairs].value = g_toAddr;
     nbPairs++;
-
+    //gasPrice
+    memset(g_gasPrice, 0, sizeof(g_gasPrice));
+    if (!format_u64(g_gasPrice,sizeof(g_gasPrice),G_context.tx_info.transaction.gas_price)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    }
+    pairs[nbPairs].item = "gasPrice";
+    pairs[nbPairs].value = g_gasPrice;
+    nbPairs++;
+    //gasLimit
+    memset(g_gasLimit, 0, sizeof(g_gasLimit));
+    if (!format_u64(g_gasLimit,sizeof(g_gasLimit),G_context.tx_info.transaction.gas_limit)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    }
+    pairs[nbPairs].item = "gasLimit";
+    pairs[nbPairs].value = g_gasLimit;
+    nbPairs++;
     return nbPairs;
 }
 
