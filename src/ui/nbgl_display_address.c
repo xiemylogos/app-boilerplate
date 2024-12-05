@@ -35,6 +35,7 @@
 #include "action/validate.h"
 #include "../transaction/types.h"
 #include "../menu.h"
+#include "../utils.h"
 
 static char g_address[43];
 
@@ -59,9 +60,8 @@ int ui_display_address() {
     if (!address_from_pubkey(G_context.pk_info.raw_public_key, address, sizeof(address))) {
         return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
-
-    if (format_hex(address, sizeof(address), g_address, sizeof(g_address)) == -1) {
-        return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    if (script_hash_to_address(g_address,sizeof(g_address),address) == -1) {
+           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
 
     nbgl_useCaseAddressReview(g_address,
