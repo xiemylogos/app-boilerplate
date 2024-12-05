@@ -292,7 +292,7 @@ static void test_oep4_transaction(void **state) {
     assert_int_equal(tx.payload.value,1000000);
 }
 
-static void test_oep4_paylod(void **state) {
+static void test_oep4_payload(void **state) {
     (void) state;
 
     state_info_v2 info;

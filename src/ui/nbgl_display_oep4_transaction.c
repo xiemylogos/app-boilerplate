@@ -68,10 +68,7 @@ static uint8_t setTagValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
      // Format amount and address to g_amount and g_address buffers
     memset(g_amount, 0, sizeof(g_amount));
-    if (!format_fpu64(g_amount,
-                      sizeof(g_amount),
-                      G_context.tx_info.transaction.payload.value,
-                      EXPONENT_SMALLEST_UNIT)) {
+    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[0].item = "Oep4 Amount";
