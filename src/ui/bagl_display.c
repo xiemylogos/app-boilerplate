@@ -38,8 +38,8 @@
 #include "../utils.h"
 
 static action_validate_cb g_validate_callback;
-static char g_amount[30];
-static char g_address[40];
+static char g_amount[40];
+static char g_address[43];
 
 // Validate/Invalidate public key and go back to home
 static void ui_action_validate_pubkey(bool choice) {
@@ -113,13 +113,14 @@ int ui_display_address() {
         return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
 
-    if (format_hex(address, sizeof(address), g_address, sizeof(g_address)) == -1) {
-        return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    if (script_hash_to_address(g_address,sizeof(g_address),address) == -1) {
+           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
 
     g_validate_callback = &ui_action_validate_pubkey;
 
     ux_flow_init(0, ux_display_pubkey_flow, NULL);
+
     return 0;
 }
 
@@ -163,7 +164,7 @@ int ui_display_transaction() {
     if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONT_ADDR,20) == 0) {
         format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value,9);
     } else if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONG_ADDR,20) == 0) {
-        format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value,9);
+        format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value,18);
     }
 
     PRINTF("Amount: %s\n", g_amount);
@@ -226,11 +227,7 @@ int ui_display_oep4_transaction() {
     }
 
     memset(g_amount, 0, sizeof(g_amount));
-    char amount[30] = {0};
-    if (!format_fpu64(amount,
-                      sizeof(amount),
-                      G_context.tx_info.transaction.payload.value,
-                      EXPONENT_SMALLEST_UNIT)) {
+    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
 
