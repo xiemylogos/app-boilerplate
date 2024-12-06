@@ -231,8 +231,6 @@ int ui_display_oep4_transaction() {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
 
-    snprintf(g_amount, sizeof(g_amount), "oep4 %.*s", sizeof(amount), amount);
-
     PRINTF("Amount: %s\n", g_amount);
 
     memset(g_address, 0, sizeof(g_address));
