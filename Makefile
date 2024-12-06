@@ -64,8 +64,8 @@ PATH_APP_LOAD_PARAMS = "44'/1024'"   # purpose=coin(44) / coin_type=Testnet(1)
 # - <VARIANT_VALUES> a list of variant that can be build using this app code.
 #   * It must at least contains one value.
 #   * Values can be the app ticker or anything else but should be unique.
-VARIANT_PARAM = COIN
-VARIANT_VALUES = ONT
+#VARIANT_PARAM = COIN
+#VARIANT_VALUES = ONT
 
 # Enabling DEBUG flag will enable PRINTF and disable optimizations
 #DEBUG = 1
