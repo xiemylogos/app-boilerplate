@@ -52,7 +52,6 @@ static char g_toAddr[40];
 static nbgl_contentTagValue_t pairs[MAX_PAIRS];
 static nbgl_contentTagValueList_t pairsList;
 
-
 // called when long press button on 3rd page is long-touched or when reject footer is touched
 static void tx_review_choice(bool confirm) {
     // Answer, display a status page and go back to main
