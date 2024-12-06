@@ -41,6 +41,7 @@
 
 // Buffer where the oep4 transaction amount string is written
 static char g_amount[30];
+static char g_fee[40];
 static char g_gasPrice[40];
 static char g_gasLimit[40];
 // Buffer where the oep4 transaction address string is written
@@ -91,6 +92,12 @@ static uint8_t setTagValuePairs(void) {
         }
     pairs[nbPairs].item = "to";
     pairs[nbPairs].value = g_toAddr;
+    nbPairs++;
+    //fee
+    memset(g_fee, 0, sizeof(g_fee));
+    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.transaction.gas_price*G_context.tx_info.transaction.gas_limit,9);
+    pairs[nbPairs].item = "Fee:Ong";
+    pairs[nbPairs].value = g_fee;
     nbPairs++;
     //gasPrice
     memset(g_gasPrice, 0, sizeof(g_gasPrice));

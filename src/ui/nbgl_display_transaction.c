@@ -40,13 +40,14 @@
 
 // Buffer where the transaction amount string is written
 static char g_amount[40];
+static char g_fee[40];
 static char g_gasPrice[40];
 static char g_gasLimit[40];
 // Buffer where the transaction address string is written
 static char g_fromAddr[40];
 static char g_toAddr[40];
 
-#define MAX_PAIRS        5
+#define MAX_PAIRS        6
 
 static nbgl_contentTagValue_t pairs[MAX_PAIRS];
 static nbgl_contentTagValueList_t pairsList;
@@ -95,6 +96,12 @@ static uint8_t setTagValuePairs(void) {
         }
     pairs[nbPairs].item = "to";
     pairs[nbPairs].value = g_toAddr;
+    nbPairs++;
+    //fee
+    memset(g_fee, 0, sizeof(g_fee));
+    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.transaction.gas_price*G_context.tx_info.transaction.gas_limit,9);
+    pairs[nbPairs].item = "Fee:Ong";
+    pairs[nbPairs].value = g_fee;
     nbPairs++;
     //gasPrice
     memset(g_gasPrice, 0, sizeof(g_gasPrice));
