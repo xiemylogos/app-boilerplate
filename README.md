@@ -1,8 +1,15 @@
 [![Ensure compliance with Ledger guidelines](https://github.com/LedgerHQ/app-boilerplate/actions/workflows/guidelines_enforcer.yml/badge.svg)](https://github.com/LedgerHQ/app-boilerplate/actions/workflows/guidelines_enforcer.yml) [![Build and run functional tests using ragger through reusable workflow](https://github.com/LedgerHQ/app-boilerplate/actions/workflows/build_and_functional_tests.yml/badge.svg?branch=master)](https://github.com/LedgerHQ/app-boilerplate/actions/workflows/build_and_functional_tests.yml)
 
-# Ledger Boilerplate Application
+# Ontology app for Ledger Wallet
 
-This is a boilerplate application which can be forked to start a new project for the Ledger Nano X/SP, Stax and Flex.
+## About the project
+
+Ontology wallet application framework for Nano S, Nano S Plus and Nano X.
+Ledger Blue is not maintained anymore, but the app can still be compiled for this target using the branch [`blue-final-release`](https://github.com/LedgerHQ/app-ont).
+
+Current Features:
+- Parse, display and sign ont/ong transaction and oep4 transaction
+- Sign Person Message
 
 ## Quick start guide
 
