@@ -25,7 +25,7 @@ include $(BOLOS_SDK)/Makefile.defines
 #        Mandatory configuration       #
 ########################################
 # Application name
-APPNAME = "Ontology"
+APPNAME = "ONT"
 
 # Application version
 APPVERSION_M = 1
@@ -65,7 +65,7 @@ PATH_APP_LOAD_PARAMS = "44'/1024'"   # purpose=coin(44) / coin_type=Testnet(1)
 #   * It must at least contains one value.
 #   * Values can be the app ticker or anything else but should be unique.
 VARIANT_PARAM = COIN
-VARIANT_VALUES = Ontology
+VARIANT_VALUES = ONT
 
 # Enabling DEBUG flag will enable PRINTF and disable optimizations
 #DEBUG = 1
