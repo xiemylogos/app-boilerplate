@@ -70,7 +70,7 @@ VARIANT_VALUES = ONT
 
 # Enabling DEBUG flag will enable PRINTF and disable optimizations
 #DEBUG = 1
-
+APPFLAGS = 0x240
 ########################################
 #     Application custom permissions   #
 ########################################
