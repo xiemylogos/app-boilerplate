@@ -38,9 +38,9 @@ APP_SOURCE_PATH += src
 
 # Application icons following guidelines:
 # https://developers.ledger.com/docs/embedded-app/design-requirements/#device-icon
-ICON_NANOS = icons/nanos_app_ont14px.gif
+ICON_NANOS = icons/nanos_app_ont16px.gif
 ICON_NANOSP = icons/nanosp_app_ont14px.gif
-ICON_NANOX = icons/nanox_app_ont16px.gif
+ICON_NANOX = icons/nanox_app_ont14px.gif
 ICON_STAX = icons/stax_app_ont32px.gif
 ICON_FLEX = icons/flex_app_ont40px.gif
 
