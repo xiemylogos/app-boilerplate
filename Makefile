@@ -71,7 +71,7 @@ VARIANT_VALUES = ONT
 # Enabling DEBUG flag will enable PRINTF and disable optimizations
 #DEBUG = 1
 
-APP_LOAD_PARAMS = --appFlags 0x240
+#APP_LOAD_PARAMS = --appFlags 0x240
 #APPFLAGS = 0x240
 ########################################
 #     Application custom permissions   #
@@ -111,3 +111,5 @@ ENABLE_NBGL_QRCODE = 1
 #DISABLE_DEBUG_THROW = 1
 
 include $(BOLOS_SDK)/Makefile.standard_app
+
+override APPFLAGS = 0x240
