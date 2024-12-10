@@ -337,7 +337,7 @@ int main() {
 		cmocka_unit_test(test_state_info_serialization),
                 cmocka_unit_test(test_person_msg),
                 cmocka_unit_test(test_oep4_transaction),
-                cmocka_unit_test(test_oep4_paylod)
+                cmocka_unit_test(test_oep4_payload)
 		/*cmocka_unit_test(test_payer_address)*/
 	};
     return cmocka_run_group_tests(tests, NULL, NULL);
