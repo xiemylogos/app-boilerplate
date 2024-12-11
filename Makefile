@@ -112,4 +112,4 @@ ENABLE_NBGL_QRCODE = 1
 
 include $(BOLOS_SDK)/Makefile.standard_app
 
-override APPFLAGS = 0x240
+override STANDARD_APP_FLAGS = 0x240
