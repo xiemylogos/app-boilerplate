@@ -14,7 +14,7 @@ def test_get_public_key_no_confirm(backend):
         response = client.get_public_key(path=path).data
         _, public_key, _, chain_code = unpack_get_public_key_response(response)
 
-        ref_public_key, ref_chain_code = calculate_public_key_and_chaincode(CurveChoice.Secp256k1, path=path)
+        ref_public_key, ref_chain_code = calculate_public_key_and_chaincode(CurveChoice.Nist256p1, path=path)
         assert public_key.hex() == ref_public_key
         assert chain_code.hex() == ref_chain_code
 
@@ -29,7 +29,7 @@ def test_get_public_key_confirm_accepted(backend, scenario_navigator):
     response = client.get_async_response().data
     _, public_key, _, chain_code = unpack_get_public_key_response(response)
 
-    ref_public_key, ref_chain_code = calculate_public_key_and_chaincode(CurveChoice.Secp256k1, path=path)
+    ref_public_key, ref_chain_code = calculate_public_key_and_chaincode(CurveChoice.Nist256p1, path=path)
     assert public_key.hex() == ref_public_key
     assert chain_code.hex() == ref_chain_code
 

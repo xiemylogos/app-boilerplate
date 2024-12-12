@@ -5,6 +5,7 @@ from application_client.boilerplate_command_sender import BoilerplateCommandSend
 from application_client.boilerplate_response_unpacker import unpack_get_public_key_response, unpack_sign_person_msg_response
 from ragger.error import ExceptionRAPDU
 from utils import check_signature_validity
+from utils import checkperson_signature_validity
 
 # In this tests we check the behavior of the device when asked to sign a person msg
 
@@ -37,7 +38,7 @@ def test_sign_person_msg_short_msg(backend, scenario_navigator):
     # The device as yielded the result, parse it and ensure that the signature is correct
     response = client.get_async_response().data
     _, der_sig, _ = unpack_sign_person_msg_response(response)
-    assert check_signature_validity(public_key, der_sig, personmsg)
+    assert checkperson_signature_validity(public_key, der_sig, personmsg)
 
 
 def test_sign_person_msg_long_msg(backend, scenario_navigator):
@@ -60,7 +61,7 @@ def test_sign_person_msg_long_msg(backend, scenario_navigator):
 
     response = client.get_async_response().data
     _, der_sig, _ = unpack_sign_person_msg_response(response)
-    assert check_signature_validity(public_key, der_sig, personmsg)
+    assert checkperson_signature_validity(public_key, der_sig, personmsg)
 
 
 # person msg signature refused test

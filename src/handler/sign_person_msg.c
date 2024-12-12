@@ -77,7 +77,7 @@ int handler_sign_person_msg(buffer_t *cdata, uint8_t chunk, bool more) {
 
             G_context.state = STATE_PARSED;
 
-            if (cx_keccak_256_hash(G_context.person_msg_info.raw_msg,
+            if (cx_sha256_hash(G_context.person_msg_info.raw_msg,
                                    G_context.person_msg_info.raw_msg_len,
                                    G_context.person_msg_info.m_hash) != CX_OK) {
                 return io_send_sw(SW_PERSON_MSG_HASH_FAIL);

@@ -37,7 +37,7 @@ static int crypto_sign_tx(void) {
     uint32_t info = 0;
     size_t sig_len = sizeof(G_context.tx_info.signature);
 
-    cx_err_t error = bip32_derive_ecdsa_sign_hash_256(CX_CURVE_256K1,
+    cx_err_t error = bip32_derive_ecdsa_sign_hash_256(CX_CURVE_256R1,
                                                       G_context.bip32_path,
                                                       G_context.bip32_path_len,
                                                       CX_RND_RFC6979 | CX_LAST,
@@ -80,7 +80,7 @@ static int crypto_sign_person_message(void) {
     uint32_t info = 0;
     size_t sig_len = sizeof(G_context.person_msg_info.signature);
 
-    cx_err_t error = bip32_derive_ecdsa_sign_hash_256(CX_CURVE_256K1,
+    cx_err_t error = bip32_derive_ecdsa_sign_hash_256(CX_CURVE_256R1,
                                                       G_context.bip32_path,
                                                       G_context.bip32_path_len,
                                                       CX_RND_RFC6979 | CX_LAST,
@@ -123,7 +123,7 @@ static int crypto_sign_oep4_tx(void) {
     uint32_t info = 0;
     size_t sig_len = sizeof(G_context.oep4_tx_info.signature);
 
-    cx_err_t error = bip32_derive_ecdsa_sign_hash_256(CX_CURVE_256K1,
+    cx_err_t error = bip32_derive_ecdsa_sign_hash_256(CX_CURVE_256R1,
                                                       G_context.bip32_path,
                                                       G_context.bip32_path_len,
                                                       CX_RND_RFC6979 | CX_LAST,
