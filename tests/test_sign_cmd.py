@@ -4,6 +4,11 @@ from application_client.boilerplate_transaction import Transaction
 from application_client.boilerplate_command_sender import BoilerplateCommandSender, Errors
 from application_client.boilerplate_response_unpacker import unpack_get_public_key_response, unpack_sign_tx_response
 from ragger.error import ExceptionRAPDU
+from ecdsa.curves import NIST256p
+from ecdsa.keys import VerifyingKey
+from ecdsa.util import sigdecode_der
+from hashlib import sha256
+from pathlib import Path
 from ragger.navigator import NavInsID
 from utils import check_signature_validity
 
@@ -23,9 +28,14 @@ def test_sign_tx_short_tx(backend, scenario_navigator):
     rapdu = client.get_public_key(path=path)
     _, public_key, _, _ = unpack_get_public_key_response(rapdu.data)
 
+    pk: VerifyingKey = VerifyingKey.from_string(
+        public_key,
+        curve=NIST256p,
+        hashfunc=sha256
+    )
     # Create the transaction that will be sent to the device for signing
     transaction = Transaction(
-        rawtx = "00d115ae02abc409000000000000204e00000000000005815d34e0e9ab73a175ec86ffb24aad5bee20f17b00c66b1405815d34e0e9ab73a175ec86ffb24aad5bee20f16a7cc8141451108489337c8055a9c1ed9158c947d22070d76a7cc808000064a7b3b6e00d6a7cc86c51c10a7472616e7366657256321400000000000000000000000000000000000000020068164f6e746f6c6f67792e4e61746976652e496e766f6b6500"
+        rawtx = "00d1d3179047c409000000000000204e000000000000dd4c1bd4b823e76b6905416a60f6ed36d088480b7b00c66b14dd4c1bd4b823e76b6905416a60f6ed36d088480b6a7cc814d207d448db5eab0fab396e24d59a6a9fbae456bf6a7cc80800943577000000006a7cc86c51c10a7472616e7366657256321400000000000000000000000000000000000000020068164f6e746f6c6f67792e4e61746976652e496e766f6b6500"
     ).serialize()
 
     # Send the sign device instruction.
@@ -37,8 +47,15 @@ def test_sign_tx_short_tx(backend, scenario_navigator):
 
     # The device as yielded the result, parse it and ensure that the signature is correct
     response = client.get_async_response().data
-    _, der_sig, _ = unpack_sign_tx_response(response)
-    assert check_signature_validity(public_key, der_sig, transaction)
+
+   # _, der_sig, _ = unpack_sign_tx_response(response)
+    assert pk.verify(signature=response,
+                     data=sha256(transaction).digest(),
+                     hashfunc=sha256,
+                     sigdecode=sigdecode_der) is True
+
+  #  _, der_sig, _ = unpack_sign_tx_response(response)
+  #  assert check_signature_validity(public_key, der_sig, transaction)
 
 
 # Transaction signature refused test

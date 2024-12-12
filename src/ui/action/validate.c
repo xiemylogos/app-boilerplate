@@ -24,6 +24,7 @@
 #include "../../sw.h"
 #include "../../globals.h"
 #include "../../helper/send_response.h"
+#include "crypto.h"
 
 void validate_pubkey(bool choice) {
     if (choice) {
@@ -34,10 +35,36 @@ void validate_pubkey(bool choice) {
 }
 
 static int crypto_sign_tx(void) {
+    cx_err_t error = CX_OK;
     uint32_t info = 0;
     size_t sig_len = sizeof(G_context.tx_info.signature);
 
-    cx_err_t error = bip32_derive_ecdsa_sign_hash_256(CX_CURVE_256K1,
+    // derive private key according to BIP44 path
+    cx_ecfp_private_key_t private_key = {0};
+    crypto_derive_private_key(&private_key, G_context.bip32_path, BIP44_PATH_LEN);
+
+    memcpy(G_context.tx_info.raw_tx, G_context.tx_info.m_hash, 32);
+
+    cx_sha256_t msg_hash;
+    cx_sha256_init(&msg_hash);
+    CX_CHECK(cx_hash_no_throw((cx_hash_t *) &msg_hash,
+                              CX_LAST /*mode*/,
+                              G_context.tx_info.raw_tx /* data in */,
+                              sizeof(G_context.tx_info.m_hash) /* data in len */,
+                              G_context.tx_info.m_hash /* hash out*/,
+                              sizeof(G_context.tx_info.m_hash) /* hash out len */));
+
+    CX_CHECK(cx_ecdsa_sign_no_throw(&private_key,
+                                    CX_RND_RFC6979 | CX_LAST,
+                                    CX_SHA256,
+                                    G_context.tx_info.m_hash,
+                                    sizeof(G_context.tx_info.m_hash),
+                                    G_context.tx_info.signature,
+                                    &sig_len,
+                                    NULL));
+
+    /*
+    cx_err_t error = bip32_derive_ecdsa_sign_hash_256(CX_CURVE_256R1,
                                                       G_context.bip32_path,
                                                       G_context.bip32_path_len,
                                                       CX_RND_RFC6979 | CX_LAST,
@@ -48,6 +75,14 @@ static int crypto_sign_tx(void) {
                                                       &sig_len,
                                                       &info);
     if (error != CX_OK) {
+        return -1;
+    }
+     */
+
+    end:
+    explicit_bzero(&private_key, sizeof(cx_ecfp_256_private_key_t));
+    if (error != CX_OK) {
+        PRINTF("In crypto_sign: ERROR %x \n", error);
         return -1;
     }
 
@@ -77,10 +112,33 @@ void validate_transaction(bool choice) {
 
 
 static int crypto_sign_person_message(void) {
+    cx_err_t error = CX_OK;
     uint32_t info = 0;
     size_t sig_len = sizeof(G_context.person_msg_info.signature);
 
-    cx_err_t error = bip32_derive_ecdsa_sign_hash_256(CX_CURVE_256K1,
+    cx_ecfp_private_key_t private_key = {0};
+    crypto_derive_private_key(&private_key, G_context.bip32_path, BIP44_PATH_LEN);
+    memcpy(G_context.person_msg_info.raw_msg, G_context.person_msg_info.m_hash, 32);
+
+    cx_sha256_t msg_hash;
+    cx_sha256_init(&msg_hash);
+    CX_CHECK(cx_hash_no_throw((cx_hash_t *) &msg_hash,
+                              CX_LAST /*mode*/,
+                              G_context.person_msg_info.raw_msg /* data in */,
+                              sizeof(G_context.person_msg_info.m_hash) /* data in len */,
+                              G_context.person_msg_info.m_hash /* hash out*/,
+                              sizeof(G_context.person_msg_info.m_hash) /* hash out len */));
+
+    CX_CHECK(cx_ecdsa_sign_no_throw(&private_key,
+                                    CX_RND_RFC6979 | CX_LAST,
+                                    CX_SHA256,
+                                    G_context.person_msg_info.m_hash,
+                                    sizeof(G_context.person_msg_info.m_hash),
+                                    G_context.person_msg_info.signature,
+                                    &sig_len,
+                                    NULL));
+    /*
+    cx_err_t error = bip32_derive_ecdsa_sign_hash_256(CX_CURVE_256R1,
                                                       G_context.bip32_path,
                                                       G_context.bip32_path_len,
                                                       CX_RND_RFC6979 | CX_LAST,
@@ -93,6 +151,14 @@ static int crypto_sign_person_message(void) {
     if (error != CX_OK) {
         return -1;
     }
+     */
+    end:
+    explicit_bzero(&private_key, sizeof(cx_ecfp_256_private_key_t));
+    if (error != CX_OK) {
+        PRINTF("In crypto_sign: ERROR %x \n", error);
+        return -1;
+    }
+
 
     PRINTF("Signature: %.*H\n", sig_len, G_context.person_msg_info.signature);
 
@@ -123,7 +189,7 @@ static int crypto_sign_oep4_tx(void) {
     uint32_t info = 0;
     size_t sig_len = sizeof(G_context.oep4_tx_info.signature);
 
-    cx_err_t error = bip32_derive_ecdsa_sign_hash_256(CX_CURVE_256K1,
+    cx_err_t error = bip32_derive_ecdsa_sign_hash_256(CX_CURVE_256R1,
                                                       G_context.bip32_path,
                                                       G_context.bip32_path_len,
                                                       CX_RND_RFC6979 | CX_LAST,

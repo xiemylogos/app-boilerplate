@@ -77,12 +77,22 @@ int handler_sign_person_msg(buffer_t *cdata, uint8_t chunk, bool more) {
 
             G_context.state = STATE_PARSED;
 
+            cx_sha256_t personmsg_hash;
+            cx_sha256_init(&personmsg_hash);
+            CX_ASSERT(cx_hash_no_throw((cx_hash_t *) &personmsg_hash,
+                                       CX_LAST /*mode*/,
+                                       G_context.person_msg_info.raw_msg /* data in */,
+                                       G_context.person_msg_info.raw_msg_len /* data in len */,
+                                       G_context.person_msg_info.m_hash /* hash out*/,
+                                       sizeof(G_context.person_msg_info.m_hash) /* hash out len */));
+
+            /*
             if (cx_keccak_256_hash(G_context.person_msg_info.raw_msg,
                                    G_context.person_msg_info.raw_msg_len,
                                    G_context.person_msg_info.m_hash) != CX_OK) {
                 return io_send_sw(SW_PERSON_MSG_HASH_FAIL);
             }
-
+            */
             PRINTF("Hash: %.*H\n", sizeof(G_context.person_msg_info.m_hash), G_context.person_msg_info.m_hash);
 
             return ui_display_person_msg();

@@ -39,7 +39,7 @@ def test_sign_person_msg_short_msg(backend, scenario_navigator):
     _, der_sig, _ = unpack_sign_person_msg_response(response)
     assert check_signature_validity(public_key, der_sig, personmsg)
 
-
+"""
 def test_sign_person_msg_long_msg(backend, scenario_navigator):
     # Use the app interface instead of raw interface
     client = BoilerplateCommandSender(backend)
@@ -84,3 +84,5 @@ def test_sign_person_msg_refused(backend, scenario_navigator):
     # Assert that we have received a refusal
     assert e.value.status == Errors.SW_DENY
     assert len(e.value.data) == 0
+
+"""

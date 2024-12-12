@@ -32,8 +32,11 @@
 #include "../sw.h"
 #include "../ui/display.h"
 #include "../helper/send_response.h"
+#include "crypto.h"
+#include "cx_errors.h"
 
 int handler_get_public_key(buffer_t *cdata, bool display) {
+    cx_err_t error = CX_OK;
     explicit_bzero(&G_context, sizeof(G_context));
     G_context.req_type = CONFIRM_ADDRESS;
     G_context.state = STATE_NONE;
@@ -43,12 +46,23 @@ int handler_get_public_key(buffer_t *cdata, bool display) {
         return io_send_sw(SW_WRONG_DATA_LENGTH);
     }
 
-    cx_err_t error = bip32_derive_get_pubkey_256(CX_CURVE_256K1,
+    /*
+    cx_err_t error = bip32_derive_get_pubkey_256(CX_CURVE_256R1,
                                                  G_context.bip32_path,
                                                  G_context.bip32_path_len,
                                                  G_context.pk_info.raw_public_key,
                                                  G_context.pk_info.chain_code,
-                                                 CX_SHA512);
+                                                 CX_SHA256);
+                                                 */
+    cx_ecfp_private_key_t private_key = {0};
+    cx_ecfp_public_key_t public_key = {0};
+
+    // Derive private key according to BIP44 path
+    crypto_derive_private_key(&private_key, G_context.bip32_path, BIP44_PATH_LEN);
+    // Generate corresponding public key
+    crypto_init_public_key(&private_key, &public_key, G_context.pk_info.raw_public_key);
+    // Clear private key
+    explicit_bzero(&private_key, sizeof(private_key));
 
     if (error != CX_OK) {
         return io_send_sw(error);
