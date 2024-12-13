@@ -24,7 +24,8 @@ class PersonMsg:
     def from_bytes(cls, hexa: Union[bytes, BytesIO]):
         buf: BytesIO = BytesIO(hexa) if isinstance(hexa, bytes) else hexa
 
-        personmsg_len: int = read_varint(buf)
-        personmsg: str = read(buf, personmsg_len).decode("ascii")
+        #personmsg_len: int = read_varint(buf)
+        #personmsg: str = read(buf, personmsg_len).decode("ascii")
 
+        personmsg: str = read(buf).decode("ascii")
         return cls(personmsg=personmsg)

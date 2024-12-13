@@ -47,6 +47,7 @@ def test_sign_person_msg_short_msg(backend, scenario_navigator):
     logger.debug("personmsg len:%d",len(personmsg))
     logger.debug("pubkey:%s,der_sig:%s,personmsg:%s",public_key.hex(),der_sig.hex(),personmsg.hex())
     assert checkperson_signature_validity(public_key, der_sig, personmsg)
+    #assert len(der_sig) == 72
 
 
 
