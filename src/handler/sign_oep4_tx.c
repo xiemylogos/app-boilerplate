@@ -90,20 +90,25 @@ int handler_sign_oep4_tx(buffer_t *cdata, uint8_t chunk, bool more) {
             */
             G_context.state = STATE_PARSED;
 
-            uint8_t first_hash[32];
+
             if (cx_sha256_hash(G_context.oep4_tx_info.raw_tx,
                                G_context.oep4_tx_info.raw_tx_len,
-                               first_hash) != CX_OK) {
+                               G_context.oep4_tx_info.m_hash) != CX_OK) {
                 return io_send_sw(SW_TX_HASH_FAIL);
             }
 
-            if (cx_sha256_hash(first_hash,
-                               32,
-                               G_context.oep4_tx_info.m_hash) != CX_OK) {
-                explicit_bzero(&first_hash, sizeof(first_hash));
+            uint8_t second_hash[32];
+            if (cx_sha256_hash(G_context.oep4_tx_info.m_hash, 32, second_hash) != CX_OK) {
                 return io_send_sw(SW_TX_HASH_FAIL);
             }
-            explicit_bzero(&first_hash, sizeof(first_hash));
+
+            memcpy(G_context.oep4_tx_info.m_hash, second_hash, 32);
+
+            if (cx_sha256_hash(G_context.oep4_tx_info.m_hash, 32, second_hash) != CX_OK) {
+                return io_send_sw(SW_TX_HASH_FAIL);
+            }
+
+            memcpy(G_context.tx_info.m_hash, second_hash, 32);
 
             PRINTF("Hash: %.*H\n",
                    sizeof(G_context.oep4_tx_info.m_hash),
