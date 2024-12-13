@@ -6,7 +6,11 @@ from application_client.boilerplate_response_unpacker import unpack_get_public_k
 from ragger.error import ExceptionRAPDU
 from utils import check_signature_validity
 from utils import checkperson_signature_validity
+import logging
 
+# Configure logger
+logger = logging.getLogger("test_logger")
+logger.setLevel(logging.DEBUG)
 # In this tests we check the behavior of the device when asked to sign a person msg
 
 
@@ -22,11 +26,12 @@ def test_sign_person_msg_short_msg(backend, scenario_navigator):
     # First we need to get the public key of the device in order to build the person msg
     rapdu = client.get_public_key(path=path)
     _, public_key, _, _ = unpack_get_public_key_response(rapdu.data)
-
+    logger.debug("pubkey:%s",public_key.hex())
     # Create the personmsg that will be sent to the device for signing
     personmsg = PersonMsg(
-        personmsg="test msg hash"
+        personmsg="test message"
     ).serialize()
+    logger.debug("person msg:%s",personmsg.hex())
 
     # Send the sign device instruction.
     # As it requires on-screen validation, the function is asynchronous.
@@ -38,7 +43,11 @@ def test_sign_person_msg_short_msg(backend, scenario_navigator):
     # The device as yielded the result, parse it and ensure that the signature is correct
     response = client.get_async_response().data
     _, der_sig, _ = unpack_sign_person_msg_response(response)
+    logger.debug("sig:%s",der_sig.hex())
+    logger.debug("personmsg len:%d",len(personmsg))
+    logger.debug("pubkey:%s,der_sig:%s,personmsg:%s",public_key.hex(),der_sig.hex(),personmsg.hex())
     assert checkperson_signature_validity(public_key, der_sig, personmsg)
+
 
 
 def test_sign_person_msg_long_msg(backend, scenario_navigator):
