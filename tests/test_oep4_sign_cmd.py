@@ -6,7 +6,7 @@ from application_client.boilerplate_response_unpacker import unpack_get_public_k
 from ragger.error import ExceptionRAPDU
 from ragger.navigator import NavInsID
 from utils import check_signature_validity
-
+import hashlib
 # In this tests we check the behavior of the device when asked to sign a oep4 transaction
 
 
@@ -38,7 +38,8 @@ def test_sign_oep4_tx_short_tx(backend, scenario_navigator):
     # The device as yielded the result, parse it and ensure that the signature is correct
     response = client.get_async_response().data
     _, der_sig, _ = unpack_sign_tx_response(response)
-    assert check_signature_validity(public_key, der_sig, ope4_transaction)
+    first_hash = hashlib.sha256(ope4_transaction).digest()
+    assert check_signature_validity(public_key, der_sig, first_hash)
 
 
 # Oep4 Transaction signature refused test

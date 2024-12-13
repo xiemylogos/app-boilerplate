@@ -87,11 +87,18 @@ int handler_sign_tx(buffer_t *cdata, uint8_t chunk, bool more) {
              */
             G_context.state = STATE_PARSED;
 
-            if (cx_keccak_256_hash(G_context.tx_info.raw_tx,
-                                   G_context.tx_info.raw_tx_len,
-                                   G_context.tx_info.m_hash) != CX_OK) {
+            if (cx_sha256_hash(G_context.tx_info.raw_tx,
+                               G_context.tx_info.raw_tx_len,
+                               G_context.tx_info.m_hash) != CX_OK) {
                 return io_send_sw(SW_TX_HASH_FAIL);
             }
+
+            uint8_t second_hash[32];
+            if (cx_sha256_hash(G_context.tx_info.m_hash, 32, second_hash) != CX_OK) {
+                return io_send_sw(SW_TX_HASH_FAIL);
+            }
+
+            memcpy(G_context.tx_info.m_hash, second_hash, 32);
 
             PRINTF("Hash: %.*H\n", sizeof(G_context.tx_info.m_hash), G_context.tx_info.m_hash);
 
