@@ -118,6 +118,182 @@ int apdu_dispatcher(const command_t *cmd) {
             buf.offset = 0;
 
             return handler_sign_oep4_tx(&buf, cmd->p1, (bool) (cmd->p2 & P2_MORE));
+        case SIGN_REGISTER_CANDIDATE:
+            if ((cmd->p1 == P1_START && cmd->p2 != P2_MORE) ||  //
+                cmd->p1 > P1_MAX ||                             //
+                (cmd->p2 != P2_LAST && cmd->p2 != P2_MORE)) {
+                return io_send_sw(SW_WRONG_P1P2);
+            }
+
+            if (!cmd->data) {
+                return io_send_sw(SW_WRONG_DATA_LENGTH);
+            }
+
+            buf.ptr = cmd->data;
+            buf.size = cmd->lc;
+            buf.offset = 0;
+
+            return handler_sign_register_candidate_tx(&buf, cmd->p1, (bool) (cmd->p2 & P2_MORE));
+        case SIGN_WITH_DRAW:
+            if ((cmd->p1 == P1_START && cmd->p2 != P2_MORE) ||  //
+                cmd->p1 > P1_MAX ||                             //
+                (cmd->p2 != P2_LAST && cmd->p2 != P2_MORE)) {
+                return io_send_sw(SW_WRONG_P1P2);
+            }
+
+            if (!cmd->data) {
+                return io_send_sw(SW_WRONG_DATA_LENGTH);
+            }
+
+            buf.ptr = cmd->data;
+            buf.size = cmd->lc;
+            buf.offset = 0;
+
+            return handler_sign_withdraw_tx(&buf, cmd->p1, (bool) (cmd->p2 & P2_MORE));
+        case SIGN_QUIT_NODE:
+            if ((cmd->p1 == P1_START && cmd->p2 != P2_MORE) ||  //
+                cmd->p1 > P1_MAX ||                             //
+                (cmd->p2 != P2_LAST && cmd->p2 != P2_MORE)) {
+                return io_send_sw(SW_WRONG_P1P2);
+            }
+
+            if (!cmd->data) {
+                return io_send_sw(SW_WRONG_DATA_LENGTH);
+            }
+
+            buf.ptr = cmd->data;
+            buf.size = cmd->lc;
+            buf.offset = 0;
+
+            return handler_sign_quit_node_tx(&buf, cmd->p1, (bool) (cmd->p2 & P2_MORE));
+        case SIGN_ADD_INIT_POS:
+            if ((cmd->p1 == P1_START && cmd->p2 != P2_MORE) ||  //
+                cmd->p1 > P1_MAX ||                             //
+                (cmd->p2 != P2_LAST && cmd->p2 != P2_MORE)) {
+                return io_send_sw(SW_WRONG_P1P2);
+            }
+
+            if (!cmd->data) {
+                return io_send_sw(SW_WRONG_DATA_LENGTH);
+            }
+
+            buf.ptr = cmd->data;
+            buf.size = cmd->lc;
+            buf.offset = 0;
+
+            return handler_sign_add_init_pos_tx(&buf, cmd->p1, (bool) (cmd->p2 & P2_MORE));
+        case SIGN_REDUCE_INIT_POS:
+            if ((cmd->p1 == P1_START && cmd->p2 != P2_MORE) ||  //
+                cmd->p1 > P1_MAX ||                             //
+                (cmd->p2 != P2_LAST && cmd->p2 != P2_MORE)) {
+                return io_send_sw(SW_WRONG_P1P2);
+            }
+
+            if (!cmd->data) {
+                return io_send_sw(SW_WRONG_DATA_LENGTH);
+            }
+
+            buf.ptr = cmd->data;
+            buf.size = cmd->lc;
+            buf.offset = 0;
+
+            return handler_sign_reduce_init_pos_tx(&buf, cmd->p1, (bool) (cmd->p2 & P2_MORE));
+        case SIGN_CHANGE_MAX_AUTHORIZATION:
+            if ((cmd->p1 == P1_START && cmd->p2 != P2_MORE) ||  //
+                cmd->p1 > P1_MAX ||                             //
+                (cmd->p2 != P2_LAST && cmd->p2 != P2_MORE)) {
+                return io_send_sw(SW_WRONG_P1P2);
+            }
+
+            if (!cmd->data) {
+                return io_send_sw(SW_WRONG_DATA_LENGTH);
+            }
+
+            buf.ptr = cmd->data;
+            buf.size = cmd->lc;
+            buf.offset = 0;
+
+            return handler_sign_change_max_authorization_tx(&buf, cmd->p1, (bool) (cmd->p2 & P2_MORE));
+        case SIGN_SET_FEE_PERCENT_AGE:
+            if ((cmd->p1 == P1_START && cmd->p2 != P2_MORE) ||  //
+                cmd->p1 > P1_MAX ||                             //
+                (cmd->p2 != P2_LAST && cmd->p2 != P2_MORE)) {
+                return io_send_sw(SW_WRONG_P1P2);
+            }
+
+            if (!cmd->data) {
+                return io_send_sw(SW_WRONG_DATA_LENGTH);
+            }
+
+            buf.ptr = cmd->data;
+            buf.size = cmd->lc;
+            buf.offset = 0;
+
+            return handler_sign_set_fee_percentage_tx(&buf, cmd->p1, (bool) (cmd->p2 & P2_MORE));
+        case SIGN_AUTHORIZE_FOR_PEER:
+            if ((cmd->p1 == P1_START && cmd->p2 != P2_MORE) ||  //
+                cmd->p1 > P1_MAX ||                             //
+                (cmd->p2 != P2_LAST && cmd->p2 != P2_MORE)) {
+                return io_send_sw(SW_WRONG_P1P2);
+            }
+
+            if (!cmd->data) {
+                return io_send_sw(SW_WRONG_DATA_LENGTH);
+            }
+
+            buf.ptr = cmd->data;
+            buf.size = cmd->lc;
+            buf.offset = 0;
+
+            return handler_sign_authorize_for_peer_tx(&buf, cmd->p1, (bool) (cmd->p2 & P2_MORE));
+        case SIGN_UN_AUTHORIZE_FOR_PEER:
+            if ((cmd->p1 == P1_START && cmd->p2 != P2_MORE) ||  //
+                cmd->p1 > P1_MAX ||                             //
+                (cmd->p2 != P2_LAST && cmd->p2 != P2_MORE)) {
+                return io_send_sw(SW_WRONG_P1P2);
+            }
+
+            if (!cmd->data) {
+                return io_send_sw(SW_WRONG_DATA_LENGTH);
+            }
+
+            buf.ptr = cmd->data;
+            buf.size = cmd->lc;
+            buf.offset = 0;
+
+            return handler_sign_un_authorize_for_peer_tx(&buf, cmd->p1, (bool) (cmd->p2 & P2_MORE));
+        case SIGN_WITH_DRAW_ONG:
+            if ((cmd->p1 == P1_START && cmd->p2 != P2_MORE) ||  //
+                cmd->p1 > P1_MAX ||                             //
+                (cmd->p2 != P2_LAST && cmd->p2 != P2_MORE)) {
+                return io_send_sw(SW_WRONG_P1P2);
+            }
+
+            if (!cmd->data) {
+                return io_send_sw(SW_WRONG_DATA_LENGTH);
+            }
+
+            buf.ptr = cmd->data;
+            buf.size = cmd->lc;
+            buf.offset = 0;
+
+            return handler_sign_withdraw_ong_tx(&buf, cmd->p1, (bool) (cmd->p2 & P2_MORE));
+        case SIGN_WITH_DRAW_FEE:
+            if ((cmd->p1 == P1_START && cmd->p2 != P2_MORE) ||  //
+                cmd->p1 > P1_MAX ||                             //
+                (cmd->p2 != P2_LAST && cmd->p2 != P2_MORE)) {
+                return io_send_sw(SW_WRONG_P1P2);
+            }
+
+            if (!cmd->data) {
+                return io_send_sw(SW_WRONG_DATA_LENGTH);
+            }
+
+            buf.ptr = cmd->data;
+            buf.size = cmd->lc;
+            buf.offset = 0;
+
+            return handler_sign_withdraw_fee_tx(&buf, cmd->p1, (bool) (cmd->p2 & P2_MORE));
         default:
             return io_send_sw(SW_INS_NOT_SUPPORTED);
     }

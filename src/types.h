@@ -43,6 +43,17 @@ typedef enum {
     SIGN_TX = 0x02,                  /// sign transaction with BIP32 path
     SIGN_PERSON_MESSAGE = 0x07,      /// sign person message
     SIGN_OEP4_TX = 0x08              /// sign OEP4 transaction with BIP32 path
+    SIGN_REGISTER_CANDIDATE = 0x09   ///sign registerCandidate
+    SIGN_WITH_DRAW  = 0x0A           ///sign withdraw
+    SIGN_QUIT_NODE  = 0x0B           ///sign quitNode
+    SIGN_ADD_INIT_POS = 0x0C         ///sign addInitPos
+    SIGN_REDUCE_INIT_POS = 0x0D      ///sign  reduceInitPos
+    SIGN_CHANGE_MAX_AUTHORIZATION = 0x0E  ///sign changeMaxAuthorization
+    SIGN_SET_FEE_PERCENT_AGE  = 0x0F  ///sign setFeePercentage
+    SIGN_AUTHORIZE_FOR_PEER = 0x10    ///sign authorizeForPeer
+    SIGN_UN_AUTHORIZE_FOR_PEER = 0x11  ///sign unAuthorizeForPeer
+    SIGN_WITH_DRAW_ONG  = 0x12         ///sign withdrawOng
+    SIGN_WITH_DRAW_FEE  = 0x13        ///sign withdrawFee
 } command_e;
 /**
  * Enumeration with parsing state.
@@ -57,10 +68,21 @@ typedef enum {
  * Enumeration with user request type.
  */
 typedef enum {
-    CONFIRM_ADDRESS,          /// confirm address derived from public key
-    CONFIRM_TRANSACTION,      /// confirm transaction information
-    CONFIRM_MESSAGE,          /// confirm message information
-    CONFIRM_OEP4_TRANSACTION  /// confirm oep4 transaction information
+    CONFIRM_ADDRESS,                    /// confirm address derived from public key
+    CONFIRM_TRANSACTION,                /// confirm transaction information
+    CONFIRM_MESSAGE,                    /// confirm message information
+    CONFIRM_OEP4_TRANSACTION            /// confirm oep4 transaction information
+    CONFIRM_REGISTER_CANDIDATE          ///confirm registerCandidate
+    CONFIRM_WITHDRAW                    ///confirm withdraw
+    CONFIRM_QUIT_NODE                   ///confirm quitNode
+    CONFIRM_ADD_INIT_POS                ///confirm addInitPos
+    CONFIRM_REDUCE_INIT_POS             ///confirm reduceInitPos
+    CONFIRM_CHANGE_MAX_AUTHORIZATION    ///confirm changeMaxAuthorization
+    CONFIRM_SET_FEE_PERCENTAGE          ///confirm setFeePercentage
+    CONFIRM_AUTHORIZE_FOR_PEER          ///confirm authorizeForPeer
+    CONFIRM_UN_AUTHORIZE_FOR_PEER       ///confirm unAuthorizeForPeer
+    CONFIRM_WITHDRAW_ONG                ///confirm withdrawOng
+    CONFIRM_WITHDRAW_FEE                ///confirm withdrawFee
 } request_type_e;
 
 /**
@@ -104,6 +126,116 @@ typedef struct {
     uint8_t v;                            /// parity of y-coordinate of R in ECDSA signature
 } oep4_transaction_ctx_t;
 
+
+typedef  struct {
+    uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
+    size_t raw_tx_len;                    /// length of raw transaction
+    ont_transaction_t transaction;        /// structured transaction
+    uint8_t m_hash[32];                   /// message hash digest
+    uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
+    uint8_t signature_len;                /// length of transaction signature
+    uint8_t v;
+}register_candidate_ctx_t;
+
+typedef  struct {
+    uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
+    size_t raw_tx_len;                    /// length of raw transaction
+    ont_transaction_t transaction;        /// structured transaction
+    uint8_t m_hash[32];                   /// message hash digest
+    uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
+    uint8_t signature_len;                /// length of transaction signature
+    uint8_t v;
+}withdraw_ctx_t;
+
+typedef struct {
+    uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
+    size_t raw_tx_len;                    /// length of raw transaction
+    ont_transaction_t transaction;        /// structured transaction
+    uint8_t m_hash[32];                   /// message hash digest
+    uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
+    uint8_t signature_len;                /// length of transaction signature
+    uint8_t v;
+}quit_node_ctx_t;
+
+typedef struct {
+    uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
+    size_t raw_tx_len;                    /// length of raw transaction
+    ont_transaction_t transaction;        /// structured transaction
+    uint8_t m_hash[32];                   /// message hash digest
+    uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
+    uint8_t signature_len;                /// length of transaction signature
+    uint8_t v;
+}add_init_pos_ctx_t;
+
+typedef struct {
+    uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
+    size_t raw_tx_len;                    /// length of raw transaction
+    ont_transaction_t transaction;        /// structured transaction
+    uint8_t m_hash[32];                   /// message hash digest
+    uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
+    uint8_t signature_len;                /// length of transaction signature
+    uint8_t v;
+}reduce_init_pos_ctx_t;
+
+typedef struct {
+    uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
+    size_t raw_tx_len;                    /// length of raw transaction
+    ont_transaction_t transaction;        /// structured transaction
+    uint8_t m_hash[32];                   /// message hash digest
+    uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
+    uint8_t signature_len;                /// length of transaction signature
+    uint8_t v;
+}change_max_authorization_ctx_t;
+
+typedef struct {
+    uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
+    size_t raw_tx_len;                    /// length of raw transaction
+    ont_transaction_t transaction;        /// structured transaction
+    uint8_t m_hash[32];                   /// message hash digest
+    uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
+    uint8_t signature_len;                /// length of transaction signature
+    uint8_t v;
+}set_fee_percentage_ctx_t;
+
+typedef struct {
+    uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
+    size_t raw_tx_len;                    /// length of raw transaction
+    ont_transaction_t transaction;        /// structured transaction
+    uint8_t m_hash[32];                   /// message hash digest
+    uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
+    uint8_t signature_len;                /// length of transaction signature
+    uint8_t v;
+}authorize_for_peer_ctx_t;
+
+typedef struct {
+    uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
+    size_t raw_tx_len;                    /// length of raw transaction
+    ont_transaction_t transaction;        /// structured transaction
+    uint8_t m_hash[32];                   /// message hash digest
+    uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
+    uint8_t signature_len;                /// length of transaction signature
+    uint8_t v;
+}un_authorize_for_peer_ctx_t;
+
+typedef struct {
+    uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
+    size_t raw_tx_len;                    /// length of raw transaction
+    ont_transaction_t transaction;        /// structured transaction
+    uint8_t m_hash[32];                   /// message hash digest
+    uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
+    uint8_t signature_len;                /// length of transaction signature
+    uint8_t v;
+}withdraw_ong_ctx_t;
+
+typedef struct {
+    uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
+    size_t raw_tx_len;                    /// length of raw transaction
+    ont_transaction_t transaction;        /// structured transaction
+    uint8_t m_hash[32];                   /// message hash digest
+    uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
+    uint8_t signature_len;                /// length of transaction signature
+    uint8_t v;
+}withdraw_fee_ctx_t;
 /**
  * Structure for global context.
  */
@@ -114,6 +246,17 @@ typedef struct {
         transaction_ctx_t tx_info;            /// transaction context
         person_msg_ctx_t person_msg_info;     /// person msg context
         oep4_transaction_ctx_t oep4_tx_info;  ///oep4 transaction context
+        register_candidate_ctx_t register_candidate_tx_info; ///registerCandidate transaction context
+        withdraw_ctx_t  withdraw_tx_info;                    ///withdraw transaction context
+        quit_node_ctx_t  quit_node_tx_info;                  ///quitNode transaction context
+        add_init_pos_ctx_t  add_init_pos_tx_info;            ///addInitPos transaction context
+        reduce_init_pos_ctx_t reduce_init_pos_tx_info;       ///reduceInitPos transaction context
+        change_max_authorization_ctx_t change_max_authorization_tx_info; ///changeMaxAuthorization transaction context
+        set_fee_percentage_ctx_t  set_fee_percentage_tx_info;  ///setFeePercentage transaction context
+        authorize_for_peer_ctx_t authorize_for_peer_tx_info;   ///authorizeForPeer transaction context
+        un_authorize_for_peer_ctx_t un_authorize_for_peer_tx_info; ///unAuthorizeForPeer transaction context
+        withdraw_ong_ctx_t  withdraw_ong_tx_info;             ///withdrawOng transaction context
+        withdraw_fee_ctx_t  withdraw_fee_tx_info;             ///withdrawFee transaction context
     };
     request_type_e req_type;                  /// user request
     uint32_t bip32_path[MAX_BIP32_PATH];      /// BIP32 path
