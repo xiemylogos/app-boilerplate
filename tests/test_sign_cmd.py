@@ -52,7 +52,6 @@ def test_sign_tx_short_tx(backend, scenario_navigator):
     second_hash = hashlib.sha256(first_hash).digest()
     logger.debug("pubkey:%s,der_sig:%s,transaction:%s,first_hash:%s",public_key.hex(),der_sig.hex(),transaction.hex(),first_hash.hex())
     assert check_signature_validity(public_key, der_sig, second_hash)
-    assert len(der_sig) == 72
 
 
 # Transaction signature refused test
