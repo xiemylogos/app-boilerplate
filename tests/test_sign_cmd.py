@@ -7,6 +7,8 @@ from ragger.error import ExceptionRAPDU
 from ragger.navigator import NavInsID
 from utils import check_signature_validity
 import hashlib
+from utils import hex_to_bytes
+
 # In this tests we check the behavior of the device when asked to sign a transaction
 import logging
 
@@ -25,6 +27,8 @@ def test_sign_tx_short_tx(backend, scenario_navigator):
 
     # First we need to get the public key of the device in order to build the transaction
     rapdu = client.get_public_key(path=path)
+    logger.debug("rapu.data.hex:%s",rapdu.data.hex())
+
     _, public_key, _, _ = unpack_get_public_key_response(rapdu.data)
     logger.debug("pubkey:%s",public_key.hex())
 
@@ -45,8 +49,9 @@ def test_sign_tx_short_tx(backend, scenario_navigator):
     response = client.get_async_response().data
     _, der_sig, _ = unpack_sign_tx_response(response)
     first_hash = hashlib.sha256(transaction).digest()
+    second_hash = hashlib.sha256(first_hash).digest()
     logger.debug("pubkey:%s,der_sig:%s,transaction:%s,first_hash:%s",public_key.hex(),der_sig.hex(),transaction.hex(),first_hash.hex())
-    assert check_signature_validity(public_key, der_sig, first_hash)
+    assert check_signature_validity(public_key, der_sig, second_hash)
     assert len(der_sig) == 72
 
 

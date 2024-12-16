@@ -48,7 +48,7 @@ int handler_get_public_key(buffer_t *cdata, bool display) {
                                                  G_context.bip32_path_len,
                                                  G_context.pk_info.raw_public_key,
                                                  G_context.pk_info.chain_code,
-                                                 CX_SHA512);
+                                                 CX_SHA256);
 
     if (error != CX_OK) {
         return io_send_sw(error);

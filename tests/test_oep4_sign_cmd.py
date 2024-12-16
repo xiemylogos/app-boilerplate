@@ -39,7 +39,8 @@ def test_sign_oep4_tx_short_tx(backend, scenario_navigator):
     response = client.get_async_response().data
     _, der_sig, _ = unpack_sign_tx_response(response)
     first_hash = hashlib.sha256(ope4_transaction).digest()
-    assert check_signature_validity(public_key, der_sig, first_hash)
+    second_hash = hashlib.sha256(first_hash).digest()
+    assert check_signature_validity(public_key, der_sig, second_hash)
 
 
 # Oep4 Transaction signature refused test

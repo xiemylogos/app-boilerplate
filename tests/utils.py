@@ -1,5 +1,4 @@
 from hashlib import sha256
-from sha3 import keccak_256
 from _sha256 import sha256
 from ecdsa.curves import NIST256p
 
