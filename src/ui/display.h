@@ -52,9 +52,9 @@ int ui_display_reduce_init_pos_tx(void);
 
 int ui_display_change_max_authorization_tx(void);
 
-int ui_display_change_set_fee_percentage_tx(void);
+int ui_display_set_fee_percentage_tx(void);
 
-int ui_display_change_authorize_for_peer_tx(void);
+int ui_display_authorize_for_peer_tx(void);
 
 int ui_display_un_authorize_for_peer_tx(void);
 

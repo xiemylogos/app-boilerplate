@@ -312,7 +312,7 @@ UX_FLOW(ux_display_register_candidate_transaction_flow,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
-int ui_display_register_candidate_transaction() {
+int ui_display_register_candidate_tx() {
     if (G_context.req_type != CONFIRM_REGISTER_CANDIDATE || G_context.state != STATE_PARSED) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
@@ -348,7 +348,7 @@ UX_FLOW(ux_display_withdraw_transaction_flow,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
-int ui_display_withdraw_transaction() {
+int ui_display_withdraw_tx() {
     if (G_context.req_type != CONFIRM_WITHDRAW || G_context.state != STATE_PARSED) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
@@ -383,7 +383,7 @@ UX_FLOW(ux_display_quit_node_transaction_flow,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
-int ui_display_quit_node_transaction() {
+int ui_display_quit_node_tx() {
     if (G_context.req_type != CONFIRM_QUIT_NODE || G_context.state != STATE_PARSED) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
@@ -419,7 +419,7 @@ UX_FLOW(ux_display_add_init_pos_transaction_flow,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
-int ui_display_add_init_pos_transaction() {
+int ui_display_add_init_pos_tx() {
     if (G_context.req_type != CONFIRM_ADD_INIT_POS || G_context.state != STATE_PARSED) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
@@ -454,7 +454,7 @@ UX_FLOW(ux_display_reduce_init_pos_transaction_flow,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
-int ui_display_reduce_init_pos_transaction() {
+int ui_display_reduce_init_pos_tx() {
     if (G_context.req_type != CONFIRM_REDUCE_INIT_POS || G_context.state != STATE_PARSED) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
@@ -489,7 +489,7 @@ UX_FLOW(ux_display_change_max_authorization_transaction_flow,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
-int ui_display_change_max_authorization_transaction() {
+int ui_display_change_max_authorization_tx() {
     if (G_context.req_type != CONFIRM_CHANGE_MAX_AUTHORIZATION || G_context.state != STATE_PARSED) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
@@ -524,7 +524,7 @@ UX_FLOW(ux_display_set_fee_percentage_transaction_flow,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
-int ui_display_set_fee_percentage_transaction() {
+int ui_display_set_fee_percentage_tx() {
     if (G_context.req_type != CONFIRM_SET_FEE_PERCENTAGE || G_context.state != STATE_PARSED) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
@@ -559,7 +559,7 @@ UX_FLOW(ux_display_authorize_for_peer_transaction_flow,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
-int ui_display_authorize_for_peer_transaction() {
+int ui_display_authorize_for_peer_tx() {
     if (G_context.req_type != CONFIRM_AUTHORIZE_FOR_PEER || G_context.state != STATE_PARSED) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
@@ -594,7 +594,7 @@ UX_FLOW(ux_display_un_authorize_for_peer_transaction_flow,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
-int ui_display_un_authorize_for_peer_transaction() {
+int ui_display_un_authorize_for_peer_tx() {
     if (G_context.req_type != CONFIRM_UN_AUTHORIZE_FOR_PEER || G_context.state != STATE_PARSED) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
@@ -629,7 +629,7 @@ UX_FLOW(ux_display_withdraw_ong_transaction_flow,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
-int ui_display_withdraw_ong_transaction() {
+int ui_display_withdraw_ong_tx() {
     if (G_context.req_type != CONFIRM_WITHDRAW_ONG || G_context.state != STATE_PARSED) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
@@ -664,7 +664,7 @@ UX_FLOW(ux_display_withdraw_fee_transaction_flow,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
-int ui_display_withdraw_fee_transaction() {
+int ui_display_withdraw_fee_tx() {
     if (G_context.req_type != CONFIRM_WITHDRAW_FEE || G_context.state != STATE_PARSED) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);

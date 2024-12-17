@@ -37,3 +37,146 @@ typedef struct{
     uint8_t *payer;        /// pointer to address (20 bytes)
     state_info_v2 payload;
 }ont_transaction_t;
+
+typedef struct {
+    uint8_t version;
+    uint8_t tx_type;
+    uint32_t nonce;
+    uint64_t gas_price;
+    uint64_t gas_limit;
+    uint8_t *payer;        /// pointer to address (20 bytes)
+    uint8_t *peer_pubkey;
+    uint64_t peer_pubkey_length;
+    uint8_t *account;
+    uint64_t init_pos;
+    uint8_t *ont_id;
+    uint64_t ont_id_len;
+    uint64_t key_no;
+}register_candidate_t;
+
+typedef struct {
+    uint8_t version;
+    uint8_t tx_type;
+    uint32_t nonce;
+    uint64_t gas_price;
+    uint64_t gas_limit;
+    uint8_t *payer;
+    uint8_t *account;
+    uint64_t peer_pubkey_length;
+    uint8_t *peer_pubkey;
+    uint64_t withdraw_list_length;
+    uint8_t *withdraw_list;
+}withdraw_t;
+
+typedef struct {
+    uint8_t version;
+    uint8_t tx_type;
+    uint32_t nonce;
+    uint64_t gas_price;
+    uint64_t gas_limit;
+    uint8_t *payer;
+    uint64_t peer_pubkey_length;
+    uint8_t *peer_pubkey;
+    uint8_t *account;
+}quit_node_t;
+
+typedef struct {
+    uint8_t version;
+    uint8_t tx_type;
+    uint32_t nonce;
+    uint64_t gas_price;
+    uint64_t gas_limit;
+    uint8_t *payer;
+    uint64_t peer_pubkey_length;
+    uint8_t *peer_pubkey;
+    uint8_t *account;
+    uint64_t pos;
+}add_init_pos_t;
+
+typedef struct {
+    uint8_t version;
+    uint8_t tx_type;
+    uint32_t nonce;
+    uint64_t gas_price;
+    uint64_t gas_limit;
+    uint8_t *payer;
+    uint64_t peer_pubkey_length;
+    uint8_t *peer_pubkey;
+    uint8_t *account;
+    uint64_t pos;
+}reduce_init_pos_t;
+
+typedef struct {
+    uint8_t version;
+    uint8_t tx_type;
+    uint32_t nonce;
+    uint64_t gas_price;
+    uint64_t gas_limit;
+    uint8_t *payer;
+    uint64_t peer_pubkey_length;
+    uint8_t *peer_pubkey;
+    uint8_t *account;
+    uint64_t max_authorize;
+}change_max_authorization_t;
+
+typedef struct {
+    uint8_t version;
+    uint8_t tx_type;
+    uint32_t nonce;
+    uint64_t gas_price;
+    uint64_t gas_limit;
+    uint8_t *payer;
+    uint64_t peer_pubkey_length;
+    uint8_t *peer_pubkey;
+    uint8_t *account;
+    uint64_t peer_cost;
+    uint64_t stakeCost;
+}set_fee_percentage_t;
+
+typedef struct {
+    uint8_t version;
+    uint8_t tx_type;
+    uint32_t nonce;
+    uint64_t gas_price;
+    uint64_t gas_limit;
+    uint8_t *payer;
+    uint8_t *account;
+    uint64_t peer_pubkey_length;
+    uint8_t *peer_pubkey;
+    uint64_t pos_list_length;
+    uint8_t *pos_list;
+}authorize_for_peer_t;
+
+typedef struct {
+    uint8_t version;
+    uint8_t tx_type;
+    uint32_t nonce;
+    uint64_t gas_price;
+    uint64_t gas_limit;
+    uint8_t *payer;
+    uint8_t *account;
+    uint64_t peer_pubkey_length;
+    uint8_t *peer_pubkey;
+    uint64_t pos_list_length;
+    uint8_t *pos_list;
+}un_authorize_for_peer_t;
+
+typedef struct {
+    uint8_t version;
+    uint8_t tx_type;
+    uint32_t nonce;
+    uint64_t gas_price;
+    uint64_t gas_limit;
+    uint8_t *payer;
+    uint8_t *account;
+}withdraw_ong_t;
+
+typedef struct {
+    uint8_t version;
+    uint8_t tx_type;
+    uint32_t nonce;
+    uint64_t gas_price;
+    uint64_t gas_limit;
+    uint8_t *payer;
+    uint8_t *account;
+}withdraw_fee_t;
