@@ -33,6 +33,7 @@
 #include "../handler/sign_tx.h"
 #include "../handler/sign_person_msg.h"
 #include "../handler/sign_oep4_tx.h"
+#include "../handler/sign_govern_tx.h"
 
 int apdu_dispatcher(const command_t *cmd) {
     LEDGER_ASSERT(cmd != NULL, "NULL cmd");

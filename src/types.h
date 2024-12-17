@@ -37,23 +37,23 @@ typedef enum {
  * Enumeration with expected INS of APDU commands.
  */
 typedef enum {
-    GET_VERSION = 0x03,              /// version of the application
-    GET_APP_NAME = 0x04,             /// name of the application
-    GET_PUBLIC_KEY = 0x05,           /// public key of corresponding BIP32 path
-    SIGN_TX = 0x02,                  /// sign transaction with BIP32 path
-    SIGN_PERSON_MESSAGE = 0x07,      /// sign person message
-    SIGN_OEP4_TX = 0x08              /// sign OEP4 transaction with BIP32 path
-    SIGN_REGISTER_CANDIDATE = 0x09   ///sign registerCandidate
-    SIGN_WITH_DRAW  = 0x0A           ///sign withdraw
-    SIGN_QUIT_NODE  = 0x0B           ///sign quitNode
-    SIGN_ADD_INIT_POS = 0x0C         ///sign addInitPos
-    SIGN_REDUCE_INIT_POS = 0x0D      ///sign  reduceInitPos
-    SIGN_CHANGE_MAX_AUTHORIZATION = 0x0E  ///sign changeMaxAuthorization
-    SIGN_SET_FEE_PERCENT_AGE  = 0x0F  ///sign setFeePercentage
-    SIGN_AUTHORIZE_FOR_PEER = 0x10    ///sign authorizeForPeer
-    SIGN_UN_AUTHORIZE_FOR_PEER = 0x11  ///sign unAuthorizeForPeer
-    SIGN_WITH_DRAW_ONG  = 0x12         ///sign withdrawOng
-    SIGN_WITH_DRAW_FEE  = 0x13        ///sign withdrawFee
+    GET_VERSION = 0x03,                /// version of the application
+    GET_APP_NAME = 0x04,               /// name of the application
+    GET_PUBLIC_KEY = 0x05,             /// public key of corresponding BIP32 path
+    SIGN_TX = 0x02,                    /// sign transaction with BIP32 path
+    SIGN_PERSON_MESSAGE = 0x07,        /// sign person message
+    SIGN_OEP4_TX = 0x08,                /// sign OEP4 transaction with BIP32 path
+    SIGN_REGISTER_CANDIDATE = 0x09,     ///sign registerCandidate
+    SIGN_WITH_DRAW  = 0x0A,             ///sign withdraw
+    SIGN_QUIT_NODE  = 0x0B,             ///sign quitNode
+    SIGN_ADD_INIT_POS = 0x0C,           ///sign addInitPos
+    SIGN_REDUCE_INIT_POS = 0x0D,        ///sign  reduceInitPos
+    SIGN_CHANGE_MAX_AUTHORIZATION = 0x0E,  ///sign changeMaxAuthorization
+    SIGN_SET_FEE_PERCENT_AGE  = 0x0F,   ///sign setFeePercentage
+    SIGN_AUTHORIZE_FOR_PEER = 0x10,     ///sign authorizeForPeer
+    SIGN_UN_AUTHORIZE_FOR_PEER = 0x11,  ///sign unAuthorizeForPeer
+    SIGN_WITH_DRAW_ONG  = 0x12,         ///sign withdrawOng
+    SIGN_WITH_DRAW_FEE  = 0x13          ///sign withdrawFee
 } command_e;
 /**
  * Enumeration with parsing state.
@@ -68,21 +68,21 @@ typedef enum {
  * Enumeration with user request type.
  */
 typedef enum {
-    CONFIRM_ADDRESS,                    /// confirm address derived from public key
-    CONFIRM_TRANSACTION,                /// confirm transaction information
-    CONFIRM_MESSAGE,                    /// confirm message information
-    CONFIRM_OEP4_TRANSACTION            /// confirm oep4 transaction information
-    CONFIRM_REGISTER_CANDIDATE          ///confirm registerCandidate
-    CONFIRM_WITHDRAW                    ///confirm withdraw
-    CONFIRM_QUIT_NODE                   ///confirm quitNode
-    CONFIRM_ADD_INIT_POS                ///confirm addInitPos
-    CONFIRM_REDUCE_INIT_POS             ///confirm reduceInitPos
-    CONFIRM_CHANGE_MAX_AUTHORIZATION    ///confirm changeMaxAuthorization
-    CONFIRM_SET_FEE_PERCENTAGE          ///confirm setFeePercentage
-    CONFIRM_AUTHORIZE_FOR_PEER          ///confirm authorizeForPeer
-    CONFIRM_UN_AUTHORIZE_FOR_PEER       ///confirm unAuthorizeForPeer
-    CONFIRM_WITHDRAW_ONG                ///confirm withdrawOng
-    CONFIRM_WITHDRAW_FEE                ///confirm withdrawFee
+    CONFIRM_ADDRESS,                     /// confirm address derived from public key
+    CONFIRM_TRANSACTION,                 /// confirm transaction information
+    CONFIRM_MESSAGE,                     /// confirm message information
+    CONFIRM_OEP4_TRANSACTION,            /// confirm oep4 transaction information
+    CONFIRM_REGISTER_CANDIDATE,          ///confirm registerCandidate
+    CONFIRM_WITHDRAW,                    ///confirm withdraw
+    CONFIRM_QUIT_NODE,                   ///confirm quitNode
+    CONFIRM_ADD_INIT_POS,                ///confirm addInitPos
+    CONFIRM_REDUCE_INIT_POS,             ///confirm reduceInitPos
+    CONFIRM_CHANGE_MAX_AUTHORIZATION,    ///confirm changeMaxAuthorization
+    CONFIRM_SET_FEE_PERCENTAGE,          ///confirm setFeePercentage
+    CONFIRM_AUTHORIZE_FOR_PEER,          ///confirm authorizeForPeer
+    CONFIRM_UN_AUTHORIZE_FOR_PEER,       ///confirm unAuthorizeForPeer
+    CONFIRM_WITHDRAW_ONG,                ///confirm withdrawOng
+    CONFIRM_WITHDRAW_FEE                 ///confirm withdrawFee
 } request_type_e;
 
 /**

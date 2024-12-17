@@ -65,6 +65,63 @@ static void ui_action_validate_oep4_transaction(bool choice) {
     ui_menu_main();
 }
 
+static void ui_action_validate_register_candidate_transaction(bool choice) {
+    validate_register_candidate_transaction(choice);
+    ui_menu_main();
+}
+
+static void ui_action_validate_withdraw_transaction(bool choice) {
+    validate_withdraw_transaction(choice);
+    ui_menu_main();
+}
+
+static void ui_action_validate_quit_node_transaction(bool choice) {
+    validate_quit_node_transaction(choice);
+    ui_menu_main();
+}
+
+static void ui_action_validate_add_init_pos_transaction(bool choice) {
+    validate_add_init_pos_transaction(choice);
+    ui_menu_main();
+}
+
+
+static void ui_action_validate_reduce_init_pos_transaction(bool choice) {
+    validate_reduce_init_pos_transaction(choice);
+    ui_menu_main();
+}
+
+static void ui_action_validate_change_max_authorization_transaction(bool choice) {
+    validate_change_max_authorization_transaction(choice);
+    ui_menu_main();
+}
+
+
+static void ui_action_validate_set_fee_percentage_transaction(bool choice) {
+    validate_set_fee_percentage_transaction(choice);
+    ui_menu_main();
+}
+
+static void ui_action_validate_authorize_for_peer_transaction(bool choice) {
+    validate_authorize_for_peer_transaction(choice);
+    ui_menu_main();
+}
+
+static void ui_action_validate_un_authorize_for_peer_transaction(bool choice) {
+    validate_un_authorize_for_peer_transaction(choice);
+    ui_menu_main();
+}
+
+static void ui_action_validate_withdraw_ong_transaction(bool choice) {
+    validate_withdraw_ong_transaction(choice);
+    ui_menu_main();
+}
+
+static void ui_action_validate_withdraw_fee_transaction(bool choice) {
+    validate_withdraw_fee_transaction(choice);
+    ui_menu_main();
+}
+
 // Step with icon and text
 UX_STEP_NOCB(ux_display_confirm_addr_step, pn, {&C_icon_eye, "Confirm Address"});
 // Step with title/text for address
@@ -247,4 +304,390 @@ int ui_display_oep4_transaction() {
     return 0;
 }
 
+//registerCandidate
+UX_FLOW(ux_display_register_candidate_transaction_flow,
+        &ux_display_review_step,
+        &ux_display_address_step,
+        &ux_display_amount_step,
+        &ux_display_approve_step,
+        &ux_display_reject_step);
+
+int ui_display_register_candidate_transaction() {
+    if (G_context.req_type != CONFIRM_REGISTER_CANDIDATE || G_context.state != STATE_PARSED) {
+        G_context.state = STATE_NONE;
+        return io_send_sw(SW_BAD_STATE);
+    }
+
+    memset(g_amount, 0, sizeof(g_amount));
+    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    }
+
+    PRINTF("Amount: %s\n", g_amount);
+
+    memset(g_address, 0, sizeof(g_address));
+
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.transaction.payload.to) ==
+        -1) {
+        return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    }
+
+    g_validate_callback = &ui_action_validate_register_candidate_transaction;
+
+    ux_flow_init(0, ux_display_register_candidate_transaction_flow, NULL);
+
+    return 0;
+}
+
+
+//withdraw
+UX_FLOW(ux_display_withdraw_transaction_flow,
+        &ux_display_review_step,
+        &ux_display_address_step,
+        &ux_display_amount_step,
+        &ux_display_approve_step,
+        &ux_display_reject_step);
+
+int ui_display_withdraw_transaction() {
+    if (G_context.req_type != CONFIRM_WITHDRAW || G_context.state != STATE_PARSED) {
+        G_context.state = STATE_NONE;
+        return io_send_sw(SW_BAD_STATE);
+    }
+
+    memset(g_amount, 0, sizeof(g_amount));
+    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    }
+
+    PRINTF("Amount: %s\n", g_amount);
+
+    memset(g_address, 0, sizeof(g_address));
+
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.transaction.payload.to) ==
+        -1) {
+        return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    }
+
+    g_validate_callback = &ui_action_validate_withdraw_transaction;
+
+    ux_flow_init(0, ux_display_withdraw_transaction_flow, NULL);
+
+    return 0;
+}
+
+//quitNode
+UX_FLOW(ux_display_quit_node_transaction_flow,
+        &ux_display_review_step,
+        &ux_display_address_step,
+        &ux_display_amount_step,
+        &ux_display_approve_step,
+        &ux_display_reject_step);
+
+int ui_display_quit_node_transaction() {
+    if (G_context.req_type != CONFIRM_QUIT_NODE || G_context.state != STATE_PARSED) {
+        G_context.state = STATE_NONE;
+        return io_send_sw(SW_BAD_STATE);
+    }
+
+    memset(g_amount, 0, sizeof(g_amount));
+    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    }
+
+    PRINTF("Amount: %s\n", g_amount);
+
+    memset(g_address, 0, sizeof(g_address));
+
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.transaction.payload.to) ==
+        -1) {
+        return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    }
+
+    g_validate_callback = &ui_action_validate_quit_node_transaction;
+
+    ux_flow_init(0, ux_display_quit_node_transaction_flow, NULL);
+
+    return 0;
+}
+
+
+//addInitPos
+UX_FLOW(ux_display_add_init_pos_transaction_flow,
+        &ux_display_review_step,
+        &ux_display_address_step,
+        &ux_display_amount_step,
+        &ux_display_approve_step,
+        &ux_display_reject_step);
+
+int ui_display_add_init_pos_transaction() {
+    if (G_context.req_type != CONFIRM_ADD_INIT_POS || G_context.state != STATE_PARSED) {
+        G_context.state = STATE_NONE;
+        return io_send_sw(SW_BAD_STATE);
+    }
+
+    memset(g_amount, 0, sizeof(g_amount));
+    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    }
+
+    PRINTF("Amount: %s\n", g_amount);
+
+    memset(g_address, 0, sizeof(g_address));
+
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.transaction.payload.to) ==
+        -1) {
+        return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    }
+
+    g_validate_callback = &ui_action_validate_add_init_pos_transaction;
+
+    ux_flow_init(0, ux_display_add_init_pos_transaction_flow, NULL);
+
+    return 0;
+}
+
+//reduceInitPos
+UX_FLOW(ux_display_reduce_init_pos_transaction_flow,
+        &ux_display_review_step,
+        &ux_display_address_step,
+        &ux_display_amount_step,
+        &ux_display_approve_step,
+        &ux_display_reject_step);
+
+int ui_display_reduce_init_pos_transaction() {
+    if (G_context.req_type != CONFIRM_REDUCE_INIT_POS || G_context.state != STATE_PARSED) {
+        G_context.state = STATE_NONE;
+        return io_send_sw(SW_BAD_STATE);
+    }
+
+    memset(g_amount, 0, sizeof(g_amount));
+    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    }
+
+    PRINTF("Amount: %s\n", g_amount);
+
+    memset(g_address, 0, sizeof(g_address));
+
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.transaction.payload.to) ==
+        -1) {
+        return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    }
+
+    g_validate_callback = &ui_action_validate_reduce_init_pos_transaction;
+
+    ux_flow_init(0, ux_display_reduce_init_pos_transaction_flow, NULL);
+
+    return 0;
+}
+
+//changeMaxAuthorization
+UX_FLOW(ux_display_change_max_authorization_transaction_flow,
+        &ux_display_review_step,
+        &ux_display_address_step,
+        &ux_display_amount_step,
+        &ux_display_approve_step,
+        &ux_display_reject_step);
+
+int ui_display_change_max_authorization_transaction() {
+    if (G_context.req_type != CONFIRM_CHANGE_MAX_AUTHORIZATION || G_context.state != STATE_PARSED) {
+        G_context.state = STATE_NONE;
+        return io_send_sw(SW_BAD_STATE);
+    }
+
+    memset(g_amount, 0, sizeof(g_amount));
+    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    }
+
+    PRINTF("Amount: %s\n", g_amount);
+
+    memset(g_address, 0, sizeof(g_address));
+
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.transaction.payload.to) ==
+        -1) {
+        return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    }
+
+    g_validate_callback = &ui_action_validate_change_max_authorization_transaction;
+
+    ux_flow_init(0, ux_display_change_max_authorization_transaction_flow, NULL);
+
+    return 0;
+}
+
+//setFeePercentage
+UX_FLOW(ux_display_set_fee_percentage_transaction_flow,
+        &ux_display_review_step,
+        &ux_display_address_step,
+        &ux_display_amount_step,
+        &ux_display_approve_step,
+        &ux_display_reject_step);
+
+int ui_display_set_fee_percentage_transaction() {
+    if (G_context.req_type != CONFIRM_SET_FEE_PERCENTAGE || G_context.state != STATE_PARSED) {
+        G_context.state = STATE_NONE;
+        return io_send_sw(SW_BAD_STATE);
+    }
+
+    memset(g_amount, 0, sizeof(g_amount));
+    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    }
+
+    PRINTF("Amount: %s\n", g_amount);
+
+    memset(g_address, 0, sizeof(g_address));
+
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.transaction.payload.to) ==
+        -1) {
+        return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    }
+
+    g_validate_callback = &ui_action_validate_set_fee_percentage_transaction;
+
+    ux_flow_init(0, ux_display_set_fee_percentage_transaction_flow, NULL);
+
+    return 0;
+}
+
+//authorizeForPeer
+UX_FLOW(ux_display_authorize_for_peer_transaction_flow,
+        &ux_display_review_step,
+        &ux_display_address_step,
+        &ux_display_amount_step,
+        &ux_display_approve_step,
+        &ux_display_reject_step);
+
+int ui_display_authorize_for_peer_transaction() {
+    if (G_context.req_type != CONFIRM_AUTHORIZE_FOR_PEER || G_context.state != STATE_PARSED) {
+        G_context.state = STATE_NONE;
+        return io_send_sw(SW_BAD_STATE);
+    }
+
+    memset(g_amount, 0, sizeof(g_amount));
+    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    }
+
+    PRINTF("Amount: %s\n", g_amount);
+
+    memset(g_address, 0, sizeof(g_address));
+
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.transaction.payload.to) ==
+        -1) {
+        return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    }
+
+    g_validate_callback = &ui_action_validate_authorize_for_peer_transaction;
+
+    ux_flow_init(0, ux_display_authorize_for_peer_transaction_flow, NULL);
+
+    return 0;
+}
+
+//unAuthorizeForPeer
+UX_FLOW(ux_display_un_authorize_for_peer_transaction_flow,
+        &ux_display_review_step,
+        &ux_display_address_step,
+        &ux_display_amount_step,
+        &ux_display_approve_step,
+        &ux_display_reject_step);
+
+int ui_display_un_authorize_for_peer_transaction() {
+    if (G_context.req_type != CONFIRM_UN_AUTHORIZE_FOR_PEER || G_context.state != STATE_PARSED) {
+        G_context.state = STATE_NONE;
+        return io_send_sw(SW_BAD_STATE);
+    }
+
+    memset(g_amount, 0, sizeof(g_amount));
+    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    }
+
+    PRINTF("Amount: %s\n", g_amount);
+
+    memset(g_address, 0, sizeof(g_address));
+
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.transaction.payload.to) ==
+        -1) {
+        return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    }
+
+    g_validate_callback = &ui_action_validate_un_authorize_for_peer_transaction;
+
+    ux_flow_init(0, ux_display_un_authorize_for_peer_transaction_flow, NULL);
+
+    return 0;
+}
+
+//unwithdrawOng
+UX_FLOW(ux_display_withdraw_ong_transaction_flow,
+        &ux_display_review_step,
+        &ux_display_address_step,
+        &ux_display_amount_step,
+        &ux_display_approve_step,
+        &ux_display_reject_step);
+
+int ui_display_withdraw_ong_transaction() {
+    if (G_context.req_type != CONFIRM_WITHDRAW_ONG || G_context.state != STATE_PARSED) {
+        G_context.state = STATE_NONE;
+        return io_send_sw(SW_BAD_STATE);
+    }
+
+    memset(g_amount, 0, sizeof(g_amount));
+    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    }
+
+    PRINTF("Amount: %s\n", g_amount);
+
+    memset(g_address, 0, sizeof(g_address));
+
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.transaction.payload.to) ==
+        -1) {
+        return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    }
+
+    g_validate_callback = &ui_action_validate_withdraw_ong_transaction;
+
+    ux_flow_init(0, ux_display_withdraw_ong_transaction_flow, NULL);
+
+    return 0;
+}
+
+//withdrawFee
+UX_FLOW(ux_display_withdraw_fee_transaction_flow,
+        &ux_display_review_step,
+        &ux_display_address_step,
+        &ux_display_amount_step,
+        &ux_display_approve_step,
+        &ux_display_reject_step);
+
+int ui_display_withdraw_fee_transaction() {
+    if (G_context.req_type != CONFIRM_WITHDRAW_FEE || G_context.state != STATE_PARSED) {
+        G_context.state = STATE_NONE;
+        return io_send_sw(SW_BAD_STATE);
+    }
+
+    memset(g_amount, 0, sizeof(g_amount));
+    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    }
+
+    PRINTF("Amount: %s\n", g_amount);
+
+    memset(g_address, 0, sizeof(g_address));
+
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.transaction.payload.to) ==
+        -1) {
+        return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    }
+
+    g_validate_callback = &ui_action_validate_withdraw_fee_transaction;
+
+    ux_flow_init(0, ux_display_withdraw_fee_transaction_flow, NULL);
+
+    return 0;
+}
 #endif

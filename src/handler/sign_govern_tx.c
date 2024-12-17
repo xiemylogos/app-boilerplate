@@ -15,6 +15,23 @@
  *  limitations under the License.
  *****************************************************************************/
 
+#include <stdint.h>   // uint*_t
+#include <stdbool.h>  // bool
+#include <stddef.h>   // size_t
+#include <string.h>   // memset, explicit_bzero
+
+#include "os.h"
+#include "cx.h"
+#include "buffer.h"
+
+#include "sign_tx.h"
+#include "../sw.h"
+#include "../globals.h"
+#include "../ui/display.h"
+#include "../transaction/types.h"
+#include "../transaction/govern_deserialize.h"
+
+
 int handler_sign_register_candidate_tx(buffer_t *cdata, uint8_t chunk, bool more) {
     if (chunk == 0) {  // first APDU, parse BIP32 path
         explicit_bzero(&G_context, sizeof(G_context));

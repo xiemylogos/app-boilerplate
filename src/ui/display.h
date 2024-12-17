@@ -40,4 +40,24 @@ int ui_display_person_msg(void);
  */
 int ui_display_oep4_transaction(void);
 
+int ui_display_register_candidate_tx(void);
 
+int ui_display_withdraw_tx(void);
+
+int ui_display_quit_node_tx(void);
+
+int ui_display_add_init_pos_tx(void);
+
+int ui_display_reduce_init_pos_tx(void);
+
+int ui_display_change_max_authorization_tx(void);
+
+int ui_display_change_set_fee_percentage_tx(void);
+
+int ui_display_change_authorize_for_peer_tx(void);
+
+int ui_display_un_authorize_for_peer_tx(void);
+
+int ui_display_withdraw_ong_tx(void);
+
+int ui_display_withdraw_fee_tx(void);
