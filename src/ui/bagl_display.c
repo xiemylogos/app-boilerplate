@@ -148,6 +148,12 @@ UX_STEP_CB(ux_display_reject_step,
                "Reject",
            });
 
+UX_STEP_NOCB(ux_display_account_step,
+             bnnn_paging,
+             {
+                 .title = "account",
+                 .text = g_address,
+             });
 // FLOW to display address:
 // #1 screen: eye icon + "Confirm Address"
 // #2 screen: display address
@@ -624,8 +630,7 @@ int ui_display_un_authorize_for_peer_tx() {
 //unwithdrawOng
 UX_FLOW(ux_display_withdraw_ong_transaction_flow,
         &ux_display_review_step,
-        &ux_display_address_step,
-        &ux_display_amount_step,
+        &ux_display_account_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -635,19 +640,12 @@ int ui_display_withdraw_ong_tx() {
         return io_send_sw(SW_BAD_STATE);
     }
 
-    memset(g_amount, 0, sizeof(g_amount));
-    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
-
-    PRINTF("Amount: %s\n", g_amount);
 
     memset(g_address, 0, sizeof(g_address));
-
-    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.transaction.payload.to) ==
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.withdraw_ong_tx_info.transaction.account) ==
         -1) {
-        return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
-    }
+           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+        }
 
     g_validate_callback = &ui_action_validate_withdraw_ong_transaction;
 
@@ -659,8 +657,7 @@ int ui_display_withdraw_ong_tx() {
 //withdrawFee
 UX_FLOW(ux_display_withdraw_fee_transaction_flow,
         &ux_display_review_step,
-        &ux_display_address_step,
-        &ux_display_amount_step,
+        &ux_display_account_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -670,19 +667,13 @@ int ui_display_withdraw_fee_tx() {
         return io_send_sw(SW_BAD_STATE);
     }
 
-    memset(g_amount, 0, sizeof(g_amount));
-    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
-
-    PRINTF("Amount: %s\n", g_amount);
 
     memset(g_address, 0, sizeof(g_address));
-
-    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.transaction.payload.to) ==
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.withdraw_fee_tx_info.transaction.account) ==
         -1) {
-        return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
-    }
+           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+        }
+
 
     g_validate_callback = &ui_action_validate_withdraw_fee_transaction;
 

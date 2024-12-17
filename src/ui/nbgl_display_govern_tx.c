@@ -38,6 +38,18 @@
 #include "../menu.h"
 #include "../utils.h"
 
+// Buffer where the transaction address string is written
+static char g_addr[40];
+static char g_peerPubkeyLength[40];
+static char g_peerPubkey[200]
+static char g_posListLength[40]
+static char g_posList[200]
+
+#define MAX_PAIRS        50
+
+static nbgl_contentTagValue_t pairs[MAX_PAIRS];
+static nbgl_contentTagValueList_t pairsList
+
 //registerCandidate
 // called when long press button on 3rd page is long-touched or when reject footer is touched
 static void register_candidate_tx_review_choice(bool confirm) {
@@ -301,6 +313,45 @@ static void un_authorize_for_peer_tx_review_choice(bool confirm) {
     }
 }
 
+static uint8_t setunAuthorizeForPeerTagValuePairs(void) {
+    uint8_t nbPairs = 0;
+    explicit_bzero(pairs, sizeof(pairs));
+    //account
+    memset(g_addr, 0, sizeof(g_addr));
+    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.un_authorize_for_peer_tx_info.transaction.account) ==
+        -1) {
+           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+        }
+    pairs[nbPairs].item = "account";
+    pairs[nbPairs].value = g_addr;
+    nbPairs++;
+
+    memset(g_peerPubkeyLength, 0, sizeof(g_peerPubkeyLength));
+    if (!format_u64(g_peerPubkeyLength,sizeof(g_peerPubkeyLength),G_context.un_authorize_for_peer_tx_info.transaction.peer_pubkey_length)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    }
+    pairs[nbPairs].item = "peerPubkeyLength";
+    pairs[nbPairs].value = g_peerPubkeyLength;
+    nbPairs++;
+
+    memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+    memcpy(g_peerPubkey, un_authorize_for_peer_tx_info.transaction.peer_pubkey, G_context.un_authorize_for_peer_tx_info.transaction.peer_pubkey_length*65);
+    pairs[nbPairs].item = "peerPubkey";
+    pairs[nbPairs].value = g_peerPubkey;
+    nbPairs++;
+
+    memset(g_posListLength,0,sizeof(g_posListLength));
+    if (!format_u64(g_posListLength,sizeof(g_posListLength),G_context.un_authorize_for_peer_tx_info.transaction.pos_list_length)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    }
+
+    pairs[nbPairs].item = "posListLength";
+    pairs[nbPairs].value = g_posListLength;
+    nbPairs++;
+
+    return nbPairs;
+}
+
 // Public function to start the transaction review
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
@@ -311,6 +362,16 @@ int ui_display_un_authorize_for_peer_tx_bs_choice() {
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
+
+    pairsList.nbPairs = setunAuthorizeForPeerTagValuePairs();
+    pairsList.pairs = pairs;
+    nbgl_useCaseReview(TYPE_TRANSACTION,
+                           &pairsList,
+                           &C_icon_ont_64px,
+                           "Review unAuthorizeForPeer transaction",
+                           NULL,
+                           "Sign unAuthorizeForPeer transaction",
+                           un_authorize_for_peer_tx_review_choice);
 
     return 0;
 }
@@ -333,6 +394,20 @@ static void withdraw_ong_tx_review_choice(bool confirm) {
     }
 }
 
+static uint8_t setwithdrawOngTagValuePairs(void) {
+    uint8_t nbPairs = 0;
+    explicit_bzero(pairs, sizeof(pairs));
+    //account
+    memset(g_addr, 0, sizeof(g_addr));
+    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.withdraw_fee_tx_info.transaction.account) ==
+        -1) {
+           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+        }
+    pairs[nbPairs].item = "account";
+    pairs[nbPairs].value = g_addr;
+    nbPairs++;
+    return nbPairs;
+}
 // Public function to start the transaction review
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
@@ -343,6 +418,16 @@ int ui_display_withdraw_ong_tx_bs_choice() {
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
+
+    airsList.nbPairs = setwithdrawOngTagValuePairs();
+    pairsList.pairs = pairs;
+    nbgl_useCaseReview(TYPE_TRANSACTION,
+                           &pairsList,
+                           &C_icon_ont_64px,
+                           "Review withdrawOng transaction",
+                           NULL,
+                           "Sign withdrawOng transaction",
+                           withdraw_ong_tx_review_choice);
 
     return 0;
 }
@@ -395,6 +480,20 @@ static void withdraw_fee_tx_review_choice(bool confirm) {
     }
 }
 
+static uint8_t setwithdrawFeeTagValuePairs(void) {
+    uint8_t nbPairs = 0;
+    explicit_bzero(pairs, sizeof(pairs));
+    //account
+    memset(g_addr, 0, sizeof(g_addr));
+    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.withdraw_fee_tx_info.transaction.account) ==
+        -1) {
+           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+        }
+    pairs[nbPairs].item = "account";
+    pairs[nbPairs].value = g_addr;
+    nbPairs++;
+    return nbPairs;
+}
 // Public function to start the transaction review
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
@@ -406,6 +505,15 @@ int ui_display_withdraw_fee_tx_bs_choice() {
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
 
+    pairsList.nbPairs = setwithdrawFeeTagValuePairs();
+    pairsList.pairs = pairs;
+    nbgl_useCaseReview(TYPE_TRANSACTION,
+                           &pairsList,
+                           &C_icon_ont_64px,
+                           "Review withdrawFee transaction",
+                           NULL,
+                           "Sign withdrawFee transaction",
+                           withdraw_fee_tx_review_choice);
     return 0;
 }
 

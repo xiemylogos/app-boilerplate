@@ -31,6 +31,7 @@ typedef enum {
     FROM_PARSING_ERROR = -18,
     CONTRACT_ADDR_PARSING_ERROR = -19,
     BUFFER_OFFSET_MOVE_ERROR = -20
+
 } parser_status_e;
 
 /**
