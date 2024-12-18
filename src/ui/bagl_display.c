@@ -41,6 +41,16 @@ static action_validate_cb g_validate_callback;
 static char g_amount[40];
 static char g_address[43];
 
+static char g_peerPubkey[200];
+static char g_posList[200];
+static char g_peerCost[30];
+static char g_stakeCost[30];
+static char g_maxAuthorize[30];
+static char g_pos[30];
+static char g_withdrawList[200];
+static char g_initPost[30];
+static char g_ontId[100];
+static char g_keyNo[30];
 // Validate/Invalidate public key and go back to home
 static void ui_action_validate_pubkey(bool choice) {
     validate_pubkey(choice);
@@ -154,6 +164,76 @@ UX_STEP_NOCB(ux_display_account_step,
                  .title = "account",
                  .text = g_address,
              });
+UX_STEP_NOCB(ux_display_peer_pubkey_step,
+             bnnn_paging,
+             {
+                 .title = "peerPubkey",
+                 .text = g_peerPubkey,
+             });
+
+UX_STEP_NOCB(ux_display_pos_list_step,
+             bnnn_paging,
+             {
+                 .title = "posList",
+                 .text = g_posList,
+             });
+
+UX_STEP_NOCB(ux_display_peer_cost_step,
+             bnnn_paging,
+             {
+                 .title = "peerCost",
+                 .text = g_peerCost,
+             });
+
+UX_STEP_NOCB(ux_display_stake_cost_step,
+             bnnn_paging,
+             {
+                 .title = "stakeCost",
+                 .text = g_stakeCost,
+             });
+
+UX_STEP_NOCB(ux_display_max_authorize_step,
+             bnnn_paging,
+             {
+                 .title = "maxAuthorize",
+                 .text = g_maxAuthorize,
+             });
+
+UX_STEP_NOCB(ux_display_pos_step,
+             bnnn_paging,
+             {
+                 .title = "pos",
+                 .text = g_pos,
+             });
+
+UX_STEP_NOCB(ux_display_with_draw_step,
+             bnnn_paging,
+             {
+                 .title = "withdrawList",
+                 .text = g_withdrawList,
+             });
+
+UX_STEP_NOCB(ux_display_init_pos_step,
+             bnnn_paging,
+             {
+                 .title = "initPos",
+                 .text = g_initPost,
+             });
+
+UX_STEP_NOCB(ux_display_ont_id_step,
+             bnnn_paging,
+             {
+                 .title = "ontId",
+                 .text = g_ontId,
+             });
+
+UX_STEP_NOCB(ux_display_key_no_step,
+             bnnn_paging,
+             {
+                 .title = "keyNo",
+                 .text = g_keyNo,
+             });
+
 // FLOW to display address:
 // #1 screen: eye icon + "Confirm Address"
 // #2 screen: display address
@@ -222,22 +302,18 @@ int ui_display_transaction() {
         return io_send_sw(SW_BAD_STATE);
     }
 
-    memset(g_amount, 0, sizeof(g_amount));
-
-    if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONT_ADDR,20) == 0) {
-        format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value,9);
-    } else if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONG_ADDR,20) == 0) {
-        format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value,18);
-    }
-
-    PRINTF("Amount: %s\n", g_amount);
-
     memset(g_address, 0, sizeof(g_address));
 
-    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.transaction.payload.to) ==
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.withdraw_tx_info.transaction.account) ==
         -1) {
         return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
+
+    memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+    memcpy(g_peerPubkey, G_context.withdraw_tx_info.transaction.peer_pubkey, G_context.withdraw_tx_info.transaction.peer_pubkey_length*65);
+
+    memset(g_posList,0,sizeof(g_posList));
+    memcpy(g_posList, G_context.withdraw_tx_info.transaction.withdraw_list, G_context.withdraw_tx_info.transaction.withdraw_list_length*4);
 
     g_validate_callback = &ui_action_validate_transaction;
 
@@ -313,8 +389,11 @@ int ui_display_oep4_transaction() {
 //registerCandidate
 UX_FLOW(ux_display_register_candidate_transaction_flow,
         &ux_display_review_step,
+        &ux_display_peer_pubkey_step,
         &ux_display_address_step,
-        &ux_display_amount_step,
+        &ux_display_init_pos_step,
+        &ux_display_ont_id_step,
+        &ux_display_key_no_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -324,18 +403,28 @@ int ui_display_register_candidate_tx() {
         return io_send_sw(SW_BAD_STATE);
     }
 
-    memset(g_amount, 0, sizeof(g_amount));
-    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
-
-    PRINTF("Amount: %s\n", g_amount);
 
     memset(g_address, 0, sizeof(g_address));
 
-    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.transaction.payload.to) ==
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.register_candidate_tx_info.transaction.account) ==
         -1) {
         return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    }
+
+    memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+    memcpy(g_peerPubkey, G_context.register_candidate_tx_info.transaction.peer_pubkey, G_context.register_candidate_tx_info.transaction.peer_pubkey_length*65);
+
+     memset(g_initPost,0,sizeof(g_initPost));
+    if (!format_u64(g_initPost,sizeof(g_initPost),G_context.register_candidate_tx_info.transaction.init_pos)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    }
+
+    memset(g_ontId,0,sizeof(g_ontId));
+    memcpy(g_ontId, G_context.register_candidate_tx_info.transaction.ont_id, G_context.register_candidate_tx_info.transaction.ont_id_len*4);
+
+     memset(g_keyNo,0,sizeof(g_keyNo));
+    if (!format_u64(g_keyNo,sizeof(g_keyNo),G_context.register_candidate_tx_info.transaction.key_no)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
 
     g_validate_callback = &ui_action_validate_register_candidate_transaction;
@@ -350,7 +439,8 @@ int ui_display_register_candidate_tx() {
 UX_FLOW(ux_display_withdraw_transaction_flow,
         &ux_display_review_step,
         &ux_display_address_step,
-        &ux_display_amount_step,
+        &ux_display_peer_pubkey_step,
+        &ux_display_with_draw_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -384,8 +474,8 @@ int ui_display_withdraw_tx() {
 //quitNode
 UX_FLOW(ux_display_quit_node_transaction_flow,
         &ux_display_review_step,
+        &ux_display_peer_pubkey_step,
         &ux_display_address_step,
-        &ux_display_amount_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -395,16 +485,11 @@ int ui_display_quit_node_tx() {
         return io_send_sw(SW_BAD_STATE);
     }
 
-    memset(g_amount, 0, sizeof(g_amount));
-    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
-
-    PRINTF("Amount: %s\n", g_amount);
+    memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+    memcpy(g_peerPubkey, G_context.quit_node_tx_info.transaction.peer_pubkey,65);
 
     memset(g_address, 0, sizeof(g_address));
-
-    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.transaction.payload.to) ==
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.quit_node_tx_info.transaction.account) ==
         -1) {
         return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
@@ -420,8 +505,9 @@ int ui_display_quit_node_tx() {
 //addInitPos
 UX_FLOW(ux_display_add_init_pos_transaction_flow,
         &ux_display_review_step,
+        &ux_display_peer_pubkey_step,
         &ux_display_address_step,
-        &ux_display_amount_step,
+        &ux_display_pos_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -431,18 +517,18 @@ int ui_display_add_init_pos_tx() {
         return io_send_sw(SW_BAD_STATE);
     }
 
-    memset(g_amount, 0, sizeof(g_amount));
-    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
-
-    PRINTF("Amount: %s\n", g_amount);
+   memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+    memcpy(g_peerPubkey, G_context.add_init_pos_tx_info.transaction.peer_pubkey,65);
 
     memset(g_address, 0, sizeof(g_address));
-
-    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.transaction.payload.to) ==
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.add_init_pos_tx_info.transaction.account) ==
         -1) {
         return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    }
+
+     memset(g_pos,0,sizeof(g_pos));
+    if (!format_u64(g_pos,sizeof(g_pos),G_context.add_init_pos_tx_info.transaction.pos)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
 
     g_validate_callback = &ui_action_validate_add_init_pos_transaction;
@@ -455,8 +541,9 @@ int ui_display_add_init_pos_tx() {
 //reduceInitPos
 UX_FLOW(ux_display_reduce_init_pos_transaction_flow,
         &ux_display_review_step,
+        &ux_display_peer_pubkey_step,
         &ux_display_address_step,
-        &ux_display_amount_step,
+        &ux_display_pos_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -466,18 +553,18 @@ int ui_display_reduce_init_pos_tx() {
         return io_send_sw(SW_BAD_STATE);
     }
 
-    memset(g_amount, 0, sizeof(g_amount));
-    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
-
-    PRINTF("Amount: %s\n", g_amount);
+    memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+    memcpy(g_peerPubkey, G_context.reduce_init_pos_tx_info.transaction.peer_pubkey,65);
 
     memset(g_address, 0, sizeof(g_address));
-
-    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.transaction.payload.to) ==
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.reduce_init_pos_tx_info.transaction.account) ==
         -1) {
         return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    }
+
+     memset(g_pos,0,sizeof(g_pos));
+    if (!format_u64(g_pos,sizeof(g_pos),G_context.reduce_init_pos_tx_info.transaction.pos)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
 
     g_validate_callback = &ui_action_validate_reduce_init_pos_transaction;
@@ -490,8 +577,9 @@ int ui_display_reduce_init_pos_tx() {
 //changeMaxAuthorization
 UX_FLOW(ux_display_change_max_authorization_transaction_flow,
         &ux_display_review_step,
+        &ux_display_peer_pubkey_step,
         &ux_display_address_step,
-        &ux_display_amount_step,
+        &ux_display_max_authorize_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -501,18 +589,20 @@ int ui_display_change_max_authorization_tx() {
         return io_send_sw(SW_BAD_STATE);
     }
 
-    memset(g_amount, 0, sizeof(g_amount));
-    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
+    memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+    memcpy(g_peerPubkey, G_context.change_max_authorization_tx_info.transaction.peer_pubkey,65);
 
-    PRINTF("Amount: %s\n", g_amount);
 
     memset(g_address, 0, sizeof(g_address));
 
-    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.transaction.payload.to) ==
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.change_max_authorization_tx_info.transaction.account) ==
         -1) {
         return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    }
+
+    memset(g_maxAuthorize,0,sizeof(g_maxAuthorize));
+    if (!format_u64(g_maxAuthorize,sizeof(g_maxAuthorize),G_context.change_max_authorization_tx_info.transaction.max_authorize)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
 
     g_validate_callback = &ui_action_validate_change_max_authorization_transaction;
@@ -525,8 +615,10 @@ int ui_display_change_max_authorization_tx() {
 //setFeePercentage
 UX_FLOW(ux_display_set_fee_percentage_transaction_flow,
         &ux_display_review_step,
+        &ux_display_peer_pubkey_step,
         &ux_display_address_step,
-        &ux_display_amount_step,
+        &ux_display_peer_cost_step,
+        &ux_display_stake_cost_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -536,18 +628,24 @@ int ui_display_set_fee_percentage_tx() {
         return io_send_sw(SW_BAD_STATE);
     }
 
-    memset(g_amount, 0, sizeof(g_amount));
-    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value)) {
+    memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+    memcpy(g_peerPubkey, G_context.set_fee_percentage_tx_info.transaction.peer_pubkey,65);
+
+
+    memset(g_address, 0, sizeof(g_address));
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.set_fee_percentage_tx_info.transaction.account) ==
+        -1) {
+        return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    }
+
+    memset(g_peerCost,0,sizeof(g_peerCost));
+    if (!format_u64(g_peerCost,sizeof(g_peerCost),G_context.set_fee_percentage_tx_info.transaction.peer_cost)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
 
-    PRINTF("Amount: %s\n", g_amount);
-
-    memset(g_address, 0, sizeof(g_address));
-
-    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.transaction.payload.to) ==
-        -1) {
-        return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    memset(g_stakeCost,0,sizeof(g_stakeCost));
+    if (!format_u64(g_stakeCost,sizeof(g_stakeCost),G_context.set_fee_percentage_tx_info.transaction.stake_cost)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
 
     g_validate_callback = &ui_action_validate_set_fee_percentage_transaction;
@@ -561,7 +659,8 @@ int ui_display_set_fee_percentage_tx() {
 UX_FLOW(ux_display_authorize_for_peer_transaction_flow,
         &ux_display_review_step,
         &ux_display_address_step,
-        &ux_display_amount_step,
+        &ux_display_peer_pubkey_step,
+        &ux_display_pos_list_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -571,19 +670,17 @@ int ui_display_authorize_for_peer_tx() {
         return io_send_sw(SW_BAD_STATE);
     }
 
-    memset(g_amount, 0, sizeof(g_amount));
-    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
-
-    PRINTF("Amount: %s\n", g_amount);
-
     memset(g_address, 0, sizeof(g_address));
-
-    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.transaction.payload.to) ==
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.authorize_for_peer_tx_info.transaction.account) ==
         -1) {
         return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
+    memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+    memcpy(g_peerPubkey, G_context.authorize_for_peer_tx_info.transaction.peer_pubkey, G_context.authorize_for_peer_tx_info.transaction.peer_pubkey_length*65);
+
+    memset(g_posList,0,sizeof(g_posList));
+    memcpy(g_posList, G_context.authorize_for_peer_tx_info.transaction.pos_list, G_context.authorize_for_peer_tx_info.transaction.peer_pubkey_length*4);
+
 
     g_validate_callback = &ui_action_validate_authorize_for_peer_transaction;
 
@@ -596,7 +693,8 @@ int ui_display_authorize_for_peer_tx() {
 UX_FLOW(ux_display_un_authorize_for_peer_transaction_flow,
         &ux_display_review_step,
         &ux_display_address_step,
-        &ux_display_amount_step,
+        &ux_display_peer_pubkey_step,
+        &ux_display_pos_list_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -606,19 +704,16 @@ int ui_display_un_authorize_for_peer_tx() {
         return io_send_sw(SW_BAD_STATE);
     }
 
-    memset(g_amount, 0, sizeof(g_amount));
-    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
-
-    PRINTF("Amount: %s\n", g_amount);
-
     memset(g_address, 0, sizeof(g_address));
-
-    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.transaction.payload.to) ==
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.un_authorize_for_peer_tx_info.transaction.account) ==
         -1) {
         return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
+    memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+    memcpy(g_peerPubkey, G_context.un_authorize_for_peer_tx_info.transaction.peer_pubkey, G_context.un_authorize_for_peer_tx_info.transaction.peer_pubkey_length*65);
+
+    memset(g_posList,0,sizeof(g_posList));
+    memcpy(g_posList, G_context.un_authorize_for_peer_tx_info.transaction.pos_list, G_context.un_authorize_for_peer_tx_info.transaction.peer_pubkey_length*4);
 
     g_validate_callback = &ui_action_validate_un_authorize_for_peer_transaction;
 

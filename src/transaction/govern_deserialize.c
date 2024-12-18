@@ -360,7 +360,7 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf, un_authorize
         return GASPRICE_PARSING_ERROR;
     }
     tx->peer_pubkey = (uint8_t*)(buf->ptr+buf->offset);
-    if (!buffer_seek_cur(buf, PUBKEY_LEN*tx->peer_pubkey_length)) {
+    if (!buffer_seek_cur(buf, 65*tx->peer_pubkey_length)) {
         return FROM_PARSING_ERROR;
     }
     if(!buffer_read_u64(buf,&tx->pos_list_length,LE)) {

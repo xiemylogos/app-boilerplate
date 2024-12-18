@@ -9,7 +9,6 @@
 #define PAYLOAD_MIN_LENGTH_LIMIT 44
 #define PAYLOAD_TRANSFER_V2_LEN  54
 #define PAYLOAD_TRANSFER_FROM_V2_LEN  58
-#define PUBKEY_LEN 65
 
 #define ONG_ADDR ("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02")
 #define ONT_ADDR ("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01")
@@ -76,7 +75,6 @@ typedef struct {
     uint64_t gas_price;
     uint64_t gas_limit;
     uint8_t *payer;
-    uint64_t peer_pubkey_length;
     uint8_t *peer_pubkey;
     uint8_t *account;
 }quit_node_t;
@@ -88,7 +86,6 @@ typedef struct {
     uint64_t gas_price;
     uint64_t gas_limit;
     uint8_t *payer;
-    uint64_t peer_pubkey_length;
     uint8_t *peer_pubkey;
     uint8_t *account;
     uint64_t pos;
@@ -101,7 +98,6 @@ typedef struct {
     uint64_t gas_price;
     uint64_t gas_limit;
     uint8_t *payer;
-    uint64_t peer_pubkey_length;
     uint8_t *peer_pubkey;
     uint8_t *account;
     uint64_t pos;
@@ -114,7 +110,6 @@ typedef struct {
     uint64_t gas_price;
     uint64_t gas_limit;
     uint8_t *payer;
-    uint64_t peer_pubkey_length;
     uint8_t *peer_pubkey;
     uint8_t *account;
     uint64_t max_authorize;
@@ -127,11 +122,10 @@ typedef struct {
     uint64_t gas_price;
     uint64_t gas_limit;
     uint8_t *payer;
-    uint64_t peer_pubkey_length;
     uint8_t *peer_pubkey;
     uint8_t *account;
     uint64_t peer_cost;
-    uint64_t stakeCost;
+    uint64_t stake_cost;
 }set_fee_percentage_t;
 
 typedef struct {
