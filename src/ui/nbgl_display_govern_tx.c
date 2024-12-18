@@ -73,7 +73,7 @@ static uint8_t registerCandidateTagValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.register_candidate_tx_info.transaction.peer_pubkey, G_context.register_candidate_tx_info.transaction.peer_pubkey_length*65);
+    memcpy(g_peerPubkey, G_context.register_candidate_tx_info.transaction.peer_pubkey, G_context.register_candidate_tx_info.transaction.peer_pubkey_length*66);
     pairs[nbPairs].item = "peerPubkey";
     pairs[nbPairs].value = g_peerPubkey;
     nbPairs++;
@@ -165,7 +165,7 @@ static uint8_t withdrawTagValuePairs(void) {
     nbPairs++;
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.withdraw_tx_info.transaction.peer_pubkey, G_context.withdraw_tx_info.transaction.peer_pubkey_length*65);
+    memcpy(g_peerPubkey, G_context.withdraw_tx_info.transaction.peer_pubkey, G_context.withdraw_tx_info.transaction.peer_pubkey_length*66);
     pairs[nbPairs].item = "peerPubkey";
     pairs[nbPairs].value = g_peerPubkey;
     nbPairs++;
@@ -226,7 +226,7 @@ static uint8_t quitNodeTagValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.quit_node_tx_info.transaction.peer_pubkey,65);
+    memcpy(g_peerPubkey, G_context.quit_node_tx_info.transaction.peer_pubkey,66);
     pairs[nbPairs].item = "peerPubkey";
     pairs[nbPairs].value = g_peerPubkey;
     nbPairs++;
@@ -289,7 +289,7 @@ static uint8_t addInitPosTagValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.add_init_pos_tx_info.transaction.peer_pubkey,65);
+    memcpy(g_peerPubkey, G_context.add_init_pos_tx_info.transaction.peer_pubkey,66);
     pairs[nbPairs].item = "peerPubkey";
     pairs[nbPairs].value = g_peerPubkey;
     nbPairs++;
@@ -360,7 +360,7 @@ static uint8_t reduceInitPosTagValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.reduce_init_pos_tx_info.transaction.peer_pubkey,65);
+    memcpy(g_peerPubkey, G_context.reduce_init_pos_tx_info.transaction.peer_pubkey,66);
     pairs[nbPairs].item = "peerPubkey";
     pairs[nbPairs].value = g_peerPubkey;
     nbPairs++;
@@ -431,7 +431,7 @@ static uint8_t changeMaxAuthorizationTagValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.change_max_authorization_tx_info.transaction.peer_pubkey,65);
+    memcpy(g_peerPubkey, G_context.change_max_authorization_tx_info.transaction.peer_pubkey,66);
     pairs[nbPairs].item = "peerPubkey";
     pairs[nbPairs].value = g_peerPubkey;
     nbPairs++;
@@ -513,7 +513,7 @@ static uint8_t setFeePercentageTagValuePairs(void) {
     nbPairs++;
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.set_fee_percentage_tx_info.transaction.peer_pubkey,65);
+    memcpy(g_peerPubkey, G_context.set_fee_percentage_tx_info.transaction.peer_pubkey,66);
     pairs[nbPairs].item = "peerPubkey";
     pairs[nbPairs].value = g_peerPubkey;
     nbPairs++;
@@ -593,7 +593,7 @@ static uint8_t setAuthorizeForPeerTagValuePairs(void) {
     nbPairs++;
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.authorize_for_peer_tx_info.transaction.peer_pubkey, G_context.authorize_for_peer_tx_info.transaction.peer_pubkey_length*65);
+    memcpy(g_peerPubkey, G_context.authorize_for_peer_tx_info.transaction.peer_pubkey, G_context.authorize_for_peer_tx_info.transaction.peer_pubkey_length*66);
     pairs[nbPairs].item = "peerPubkey";
     pairs[nbPairs].value = g_peerPubkey;
     nbPairs++;
@@ -663,7 +663,7 @@ static uint8_t setunAuthorizeForPeerTagValuePairs(void) {
     nbPairs++;
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.un_authorize_for_peer_tx_info.transaction.peer_pubkey, G_context.un_authorize_for_peer_tx_info.transaction.peer_pubkey_length*65);
+    memcpy(g_peerPubkey, G_context.un_authorize_for_peer_tx_info.transaction.peer_pubkey, G_context.un_authorize_for_peer_tx_info.transaction.peer_pubkey_length*66);
     pairs[nbPairs].item = "peerPubkey";
     pairs[nbPairs].value = g_peerPubkey;
     nbPairs++;

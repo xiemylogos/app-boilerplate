@@ -315,7 +315,7 @@ int handler_sign_add_init_pos_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                 return io_send_sw(SW_TX_HASH_FAIL);
             }
 
-            memcpy(G_context.tx_info.m_hash, second_hash, 32);
+            memcpy(G_context.add_init_pos_tx_info.m_hash, second_hash, 32);
 
             if (cx_sha256_hash(G_context.add_init_pos_tx_info.m_hash, 32, second_hash) != CX_OK) {
                 return io_send_sw(SW_TX_HASH_FAIL);
@@ -392,7 +392,7 @@ int handler_sign_reduce_init_pos_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                 return io_send_sw(SW_TX_HASH_FAIL);
             }
 
-            memcpy(G_context.tx_info.m_hash, second_hash, 32);
+            memcpy(G_context.reduce_init_pos_tx_info.m_hash, second_hash, 32);
 
             if (cx_sha256_hash(G_context.reduce_init_pos_tx_info.m_hash, 32, second_hash) != CX_OK) {
                 return io_send_sw(SW_TX_HASH_FAIL);
@@ -467,7 +467,7 @@ int handler_sign_change_max_authorization_tx(buffer_t *cdata, uint8_t chunk, boo
                 return io_send_sw(SW_TX_HASH_FAIL);
             }
 
-            memcpy(G_context.tx_info.m_hash, second_hash, 32);
+            memcpy(G_context.change_max_authorization_tx_info.m_hash, second_hash, 32);
 
             if (cx_sha256_hash(G_context.change_max_authorization_tx_info.m_hash, 32, second_hash) != CX_OK) {
                 return io_send_sw(SW_TX_HASH_FAIL);
@@ -843,7 +843,7 @@ int handler_sign_withdraw_fee_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                 return io_send_sw(SW_TX_HASH_FAIL);
             }
 
-            memcpy(G_context.tx_info.m_hash, second_hash, 32);
+            memcpy(G_context.withdraw_fee_tx_info.m_hash, second_hash, 32);
 
             if (cx_sha256_hash(G_context.withdraw_fee_tx_info.m_hash, 32, second_hash) != CX_OK) {
                 return io_send_sw(SW_TX_HASH_FAIL);

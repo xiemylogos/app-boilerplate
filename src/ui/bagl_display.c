@@ -310,7 +310,7 @@ int ui_display_transaction() {
     }
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.withdraw_tx_info.transaction.peer_pubkey, G_context.withdraw_tx_info.transaction.peer_pubkey_length*65);
+    memcpy(g_peerPubkey, G_context.withdraw_tx_info.transaction.peer_pubkey, G_context.withdraw_tx_info.transaction.peer_pubkey_length*66);
 
     memset(g_posList,0,sizeof(g_posList));
     memcpy(g_posList, G_context.withdraw_tx_info.transaction.withdraw_list, G_context.withdraw_tx_info.transaction.withdraw_list_length*4);
@@ -412,7 +412,7 @@ int ui_display_register_candidate_tx() {
     }
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.register_candidate_tx_info.transaction.peer_pubkey, G_context.register_candidate_tx_info.transaction.peer_pubkey_length*65);
+    memcpy(g_peerPubkey, G_context.register_candidate_tx_info.transaction.peer_pubkey, G_context.register_candidate_tx_info.transaction.peer_pubkey_length*66);
 
      memset(g_initPost,0,sizeof(g_initPost));
     if (!format_u64(g_initPost,sizeof(g_initPost),G_context.register_candidate_tx_info.transaction.init_pos)) {
@@ -486,7 +486,7 @@ int ui_display_quit_node_tx() {
     }
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.quit_node_tx_info.transaction.peer_pubkey,65);
+    memcpy(g_peerPubkey, G_context.quit_node_tx_info.transaction.peer_pubkey,66);
 
     memset(g_address, 0, sizeof(g_address));
     if (script_hash_to_address(g_address,sizeof(g_address),G_context.quit_node_tx_info.transaction.account) ==
@@ -518,7 +518,7 @@ int ui_display_add_init_pos_tx() {
     }
 
    memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.add_init_pos_tx_info.transaction.peer_pubkey,65);
+    memcpy(g_peerPubkey, G_context.add_init_pos_tx_info.transaction.peer_pubkey,66);
 
     memset(g_address, 0, sizeof(g_address));
     if (script_hash_to_address(g_address,sizeof(g_address),G_context.add_init_pos_tx_info.transaction.account) ==
@@ -554,7 +554,7 @@ int ui_display_reduce_init_pos_tx() {
     }
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.reduce_init_pos_tx_info.transaction.peer_pubkey,65);
+    memcpy(g_peerPubkey, G_context.reduce_init_pos_tx_info.transaction.peer_pubkey,66);
 
     memset(g_address, 0, sizeof(g_address));
     if (script_hash_to_address(g_address,sizeof(g_address),G_context.reduce_init_pos_tx_info.transaction.account) ==
@@ -590,7 +590,7 @@ int ui_display_change_max_authorization_tx() {
     }
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.change_max_authorization_tx_info.transaction.peer_pubkey,65);
+    memcpy(g_peerPubkey, G_context.change_max_authorization_tx_info.transaction.peer_pubkey,66);
 
 
     memset(g_address, 0, sizeof(g_address));
@@ -629,7 +629,7 @@ int ui_display_set_fee_percentage_tx() {
     }
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.set_fee_percentage_tx_info.transaction.peer_pubkey,65);
+    memcpy(g_peerPubkey, G_context.set_fee_percentage_tx_info.transaction.peer_pubkey,66);
 
 
     memset(g_address, 0, sizeof(g_address));
@@ -676,7 +676,7 @@ int ui_display_authorize_for_peer_tx() {
         return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.authorize_for_peer_tx_info.transaction.peer_pubkey, G_context.authorize_for_peer_tx_info.transaction.peer_pubkey_length*65);
+    memcpy(g_peerPubkey, G_context.authorize_for_peer_tx_info.transaction.peer_pubkey, G_context.authorize_for_peer_tx_info.transaction.peer_pubkey_length*66);
 
     memset(g_posList,0,sizeof(g_posList));
     memcpy(g_posList, G_context.authorize_for_peer_tx_info.transaction.pos_list, G_context.authorize_for_peer_tx_info.transaction.peer_pubkey_length*4);
@@ -710,7 +710,7 @@ int ui_display_un_authorize_for_peer_tx() {
         return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.un_authorize_for_peer_tx_info.transaction.peer_pubkey, G_context.un_authorize_for_peer_tx_info.transaction.peer_pubkey_length*65);
+    memcpy(g_peerPubkey, G_context.un_authorize_for_peer_tx_info.transaction.peer_pubkey, G_context.un_authorize_for_peer_tx_info.transaction.peer_pubkey_length*66);
 
     memset(g_posList,0,sizeof(g_posList));
     memcpy(g_posList, G_context.un_authorize_for_peer_tx_info.transaction.pos_list, G_context.un_authorize_for_peer_tx_info.transaction.peer_pubkey_length*4);

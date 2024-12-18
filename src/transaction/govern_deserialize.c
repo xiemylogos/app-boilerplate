@@ -61,6 +61,26 @@ parser_status_e register_candidate_tx_deserialize(buffer_t *buf, register_candid
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return PAYER_PARSING_ERROR;
     }
+    if (!buffer_seek_cur(buf,4)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    tx->peer_pubkey = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf,66)) {
+        return FROM_PARSING_ERROR;
+    }
+    if (!buffer_seek_cur(buf,4)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    tx->account = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+        return FROM_PARSING_ERROR;
+    }
+    if (!buffer_seek_cur(buf,3)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    if(!buffer_read_varint(buf,&tx->init_pos)) {
+        return GASLIMIT_PARSING_ERROR;
+    }
     return PARSING_OK;
 }
 
@@ -132,6 +152,21 @@ parser_status_e quit_node_tx_deserialize(buffer_t *buf, quit_node_t *tx) {
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return PAYER_PARSING_ERROR;
     }
+
+    if (!buffer_seek_cur(buf,5)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    tx->peer_pubkey = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf,66)) {
+        return FROM_PARSING_ERROR;
+    }
+    if (!buffer_seek_cur(buf,4)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    tx->account = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+        return FROM_PARSING_ERROR;
+    }
     return PARSING_OK;
 }
 
@@ -167,6 +202,27 @@ parser_status_e add_init_pos_tx_deserialize(buffer_t *buf, add_init_pos_t *tx) {
     tx->payer = (uint8_t *) (buf->ptr + buf->offset);
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return PAYER_PARSING_ERROR;
+    }
+
+    if (!buffer_seek_cur(buf,5)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    tx->peer_pubkey = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf,66)) {
+        return FROM_PARSING_ERROR;
+    }
+    if (!buffer_seek_cur(buf,4)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    tx->account = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+        return FROM_PARSING_ERROR;
+    }
+    if (!buffer_seek_cur(buf,3)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    if(!buffer_read_varint(buf,&tx->pos)) { //todo by
+        return GASLIMIT_PARSING_ERROR;
     }
     return PARSING_OK;
 }
@@ -204,6 +260,27 @@ parser_status_e reduce_init_pos_tx_deserialize(buffer_t *buf, reduce_init_pos_t 
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return PAYER_PARSING_ERROR;
     }
+
+    if (!buffer_seek_cur(buf,5)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    tx->peer_pubkey = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf,66)) {
+        return FROM_PARSING_ERROR;
+    }
+    if (!buffer_seek_cur(buf,4)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    tx->account = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+        return FROM_PARSING_ERROR;
+    }
+    if (!buffer_seek_cur(buf,4)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    if(!buffer_read_u64(buf,&tx->pos,LE)) {
+        return GASLIMIT_PARSING_ERROR;
+    }
     return PARSING_OK;
 }
 
@@ -240,6 +317,27 @@ parser_status_e  change_max_authorization_tx_deserialize(buffer_t *buf, change_m
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return PAYER_PARSING_ERROR;
     }
+
+    if (!buffer_seek_cur(buf,5)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    tx->peer_pubkey = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf,66)) {
+        return FROM_PARSING_ERROR;
+    }
+    if (!buffer_seek_cur(buf,4)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    tx->account = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+        return FROM_PARSING_ERROR;
+    }
+    if (!buffer_seek_cur(buf,4)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    if(!buffer_read_u64(buf,&tx->max_authorize,LE)) {
+        return GASLIMIT_PARSING_ERROR;
+    }
     return PARSING_OK;
 }
 
@@ -275,6 +373,32 @@ parser_status_e  set_fee_percentage_tx_deserialize(buffer_t *buf, set_fee_percen
     tx->payer = (uint8_t *) (buf->ptr + buf->offset);
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return PAYER_PARSING_ERROR;
+    }
+    if (!buffer_seek_cur(buf,5)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    tx->peer_pubkey = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf,66)) {
+        return FROM_PARSING_ERROR;
+    }
+    if (!buffer_seek_cur(buf,4)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    tx->account = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+        return FROM_PARSING_ERROR;
+    }
+    if (!buffer_seek_cur(buf,4)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    if(!buffer_read_varint(buf,&tx->peer_cost)) {
+        return GASLIMIT_PARSING_ERROR;
+    }
+    if (!buffer_seek_cur(buf,3)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    if(!buffer_read_varint(buf,&tx->stake_cost)) {
+        return GASLIMIT_PARSING_ERROR;
     }
     return PARSING_OK;
 }
@@ -407,7 +531,7 @@ parser_status_e withdraw_ong_tx_deserialize(buffer_t *buf, withdraw_ong_t *tx) {
         return PAYER_PARSING_ERROR;
     }
 
-    if (!buffer_seek_cur(buf,4)) { //todo size
+    if (!buffer_seek_cur(buf,5)) {
         return BUFFER_OFFSET_MOVE_ERROR;
     }
     tx->account = (uint8_t*)(buf->ptr+buf->offset);
@@ -449,7 +573,7 @@ parser_status_e withdraw_fee_tx_deserialize(buffer_t *buf, withdraw_fee_t *tx) {
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return PAYER_PARSING_ERROR;
     }
-    if (!buffer_seek_cur(buf,4)) { //todo size
+    if (!buffer_seek_cur(buf,5)) {
         return BUFFER_OFFSET_MOVE_ERROR;
     }
     tx->account = (uint8_t*)(buf->ptr+buf->offset);
