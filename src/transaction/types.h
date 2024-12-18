@@ -46,11 +46,10 @@ typedef struct {
     uint64_t gas_limit;
     uint8_t *payer;        /// pointer to address (20 bytes)
     uint8_t *peer_pubkey;
-    uint64_t peer_pubkey_length;
     uint8_t *account;
     uint64_t init_pos;
+    uint8_t ont_id_len;
     uint8_t *ont_id;
-    uint64_t ont_id_len;
     uint64_t key_no;
 }register_candidate_t;
 

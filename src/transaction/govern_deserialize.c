@@ -61,7 +61,7 @@ parser_status_e register_candidate_tx_deserialize(buffer_t *buf, register_candid
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return PAYER_PARSING_ERROR;
     }
-    if (!buffer_seek_cur(buf,4)) {
+    if (!buffer_seek_cur(buf,5)) {
         return BUFFER_OFFSET_MOVE_ERROR;
     }
     tx->peer_pubkey = (uint8_t*)(buf->ptr+buf->offset);
@@ -78,7 +78,42 @@ parser_status_e register_candidate_tx_deserialize(buffer_t *buf, register_candid
     if (!buffer_seek_cur(buf,3)) {
         return BUFFER_OFFSET_MOVE_ERROR;
     }
-    if(!buffer_read_varint(buf,&tx->init_pos)) {
+    uint8_t init_pos_len;
+    if(!buffer_read_u8(buf,&init_pos_len)) {
+        return VERSION_PARSING_ERROR;
+    }
+    if (init_pos_len == 1) {
+        if(!buffer_read_u8(buf,&tx->init_pos)) {
+        return NONCE_PARSING_ERROR;
+        }
+    } else if (init_pos_len == 2) {
+         if(!buffer_read_u16(buf,&tx->init_pos,LE)) {
+        return NONCE_PARSING_ERROR;
+        }
+    } else if (init_pos_len == 4) { 
+         if(!buffer_read_u32(buf,&tx->init_pos,LE)) {
+        return NONCE_PARSING_ERROR;
+        }
+    } else if (init_pos_len == 8) { 
+         if(!buffer_read_u64(buf,&tx->init_pos,LE)) {
+        return NONCE_PARSING_ERROR;
+         }
+    } 
+
+    if (!buffer_seek_cur(buf,3)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    if(!buffer_read_u8(buf,&tx->ont_id_len)) {
+        return VERSION_PARSING_ERROR;
+    }
+    tx->ont_id = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf, tx->ont_id_len)) {
+        return FROM_PARSING_ERROR;
+    }
+    if (!buffer_seek_cur(buf,3)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    if(!buffer_read_varint(buf,&tx->key_no)) {
         return GASLIMIT_PARSING_ERROR;
     }
     return PARSING_OK;
@@ -221,8 +256,26 @@ parser_status_e add_init_pos_tx_deserialize(buffer_t *buf, add_init_pos_t *tx) {
     if (!buffer_seek_cur(buf,3)) {
         return BUFFER_OFFSET_MOVE_ERROR;
     }
-    if(!buffer_read_varint(buf,&tx->pos)) { //todo by
-        return GASLIMIT_PARSING_ERROR;
+    uint8_t pos_len;
+    if(!buffer_read_u8(buf,&pos_len)) {
+        return VERSION_PARSING_ERROR;
+    }
+    if (pos_len == 1) {
+        if(!buffer_read_u8(buf,&tx->pos)) {
+        return NONCE_PARSING_ERROR;
+        }
+    } else if (pos_len == 2) {
+         if(!buffer_read_u16(buf,&tx->pos,LE)) {
+        return NONCE_PARSING_ERROR;
+        }
+    } else if (pos_len == 4) { 
+         if(!buffer_read_u32(buf,&tx->pos,LE)) {
+        return NONCE_PARSING_ERROR;
+        }
+    } else if (pos_len == 8) { 
+         if(!buffer_read_u64(buf,&tx->pos,LE)) {
+        return NONCE_PARSING_ERROR;
+         }
     }
     return PARSING_OK;
 }

@@ -73,7 +73,7 @@ static uint8_t registerCandidateTagValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.register_candidate_tx_info.transaction.peer_pubkey, G_context.register_candidate_tx_info.transaction.peer_pubkey_length*66);
+    memcpy(g_peerPubkey, G_context.register_candidate_tx_info.transaction.peer_pubkey,66);
     pairs[nbPairs].item = "peerPubkey";
     pairs[nbPairs].value = g_peerPubkey;
     nbPairs++;
@@ -96,7 +96,7 @@ static uint8_t registerCandidateTagValuePairs(void) {
     nbPairs++;
 
     memset(g_ontId,0,sizeof(g_ontId));
-    memcpy(g_ontId, G_context.register_candidate_tx_info.transaction.ont_id, G_context.register_candidate_tx_info.transaction.ont_id_len*4);
+    memcpy(g_ontId, G_context.register_candidate_tx_info.transaction.ont_id, G_context.register_candidate_tx_info.transaction.ont_id_len);
     pairs[nbPairs].item = "ontId";
     pairs[nbPairs].value = g_ontId;
     nbPairs++;

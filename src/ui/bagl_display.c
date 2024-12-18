@@ -420,8 +420,8 @@ int ui_display_register_candidate_tx() {
     }
 
     memset(g_ontId,0,sizeof(g_ontId));
-    memcpy(g_ontId, G_context.register_candidate_tx_info.transaction.ont_id, G_context.register_candidate_tx_info.transaction.ont_id_len*4);
-
+    memcpy(g_ontId, G_context.register_candidate_tx_info.transaction.ont_id, G_context.register_candidate_tx_info.transaction.ont_id_len);
+   
      memset(g_keyNo,0,sizeof(g_keyNo));
     if (!format_u64(g_keyNo,sizeof(g_keyNo),G_context.register_candidate_tx_info.transaction.key_no)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
