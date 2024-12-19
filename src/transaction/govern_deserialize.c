@@ -84,22 +84,21 @@ parser_status_e register_candidate_tx_deserialize(buffer_t *buf, register_candid
     }
     if (init_pos_len == 1) {
         if(!buffer_read_u8(buf,&tx->init_pos)) {
-        return NONCE_PARSING_ERROR;
+            return NONCE_PARSING_ERROR;
         }
     } else if (init_pos_len == 2) {
-         if(!buffer_read_u16(buf,&tx->init_pos,LE)) {
-        return NONCE_PARSING_ERROR;
+        if(!buffer_read_u16(buf,&tx->init_pos,LE)) {
+            return NONCE_PARSING_ERROR;
         }
-    } else if (init_pos_len == 4) { 
-         if(!buffer_read_u32(buf,&tx->init_pos,LE)) {
-        return NONCE_PARSING_ERROR;
+    } else if (init_pos_len == 4) {
+        if(!buffer_read_u32(buf,&tx->init_pos,LE)) {
+            return NONCE_PARSING_ERROR;
         }
-    } else if (init_pos_len == 8) { 
-         if(!buffer_read_u64(buf,&tx->init_pos,LE)) {
-        return NONCE_PARSING_ERROR;
-         }
-    } 
-
+    } else if (init_pos_len == 8) {
+        if(!buffer_read_u64(buf,&tx->init_pos,LE)) {
+            return NONCE_PARSING_ERROR;
+        }
+    }
     if (!buffer_seek_cur(buf,3)) {
         return BUFFER_OFFSET_MOVE_ERROR;
     }
@@ -262,20 +261,20 @@ parser_status_e add_init_pos_tx_deserialize(buffer_t *buf, add_init_pos_t *tx) {
     }
     if (pos_len == 1) {
         if(!buffer_read_u8(buf,&tx->pos)) {
-        return NONCE_PARSING_ERROR;
+            return NONCE_PARSING_ERROR;
         }
     } else if (pos_len == 2) {
-         if(!buffer_read_u16(buf,&tx->pos,LE)) {
-        return NONCE_PARSING_ERROR;
+        if(!buffer_read_u16(buf,&tx->pos,LE)) {
+            return NONCE_PARSING_ERROR;
         }
-    } else if (pos_len == 4) { 
-         if(!buffer_read_u32(buf,&tx->pos,LE)) {
-        return NONCE_PARSING_ERROR;
+    } else if (pos_len == 4) {
+        if(!buffer_read_u32(buf,&tx->pos,LE)) {
+            return NONCE_PARSING_ERROR;
         }
-    } else if (pos_len == 8) { 
-         if(!buffer_read_u64(buf,&tx->pos,LE)) {
-        return NONCE_PARSING_ERROR;
-         }
+    } else if (pos_len == 8) {
+        if(!buffer_read_u64(buf,&tx->pos,LE)) {
+            return NONCE_PARSING_ERROR;
+        }
     }
     return PARSING_OK;
 }
