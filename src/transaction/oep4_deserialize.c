@@ -35,6 +35,7 @@ parser_status_e oep4_transaction_deserialize(buffer_t *buf, ont_transaction_t *t
     if (buf->size > MAX_TRANSACTION_LEN) {
         return WRONG_LENGTH_ERROR;
     }
+    /*
     //version
     if(!buffer_read_u8(buf,&tx->version)) {
         return VERSION_PARSING_ERROR;
@@ -43,6 +44,7 @@ parser_status_e oep4_transaction_deserialize(buffer_t *buf, ont_transaction_t *t
     if(!buffer_read_u8(buf,&tx->tx_type)) {
         return TXTYPE_PARSING_ERROR;
     }
+    */
     //nonce
     if(!buffer_read_u32(buf,&tx->nonce,LE)) {
         return NONCE_PARSING_ERROR;

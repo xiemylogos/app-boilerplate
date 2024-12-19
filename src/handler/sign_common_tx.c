@@ -73,8 +73,18 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
             buffer_t buf = {.ptr = G_context.tx_info.raw_tx,
                 .size = G_context.tx_info.raw_tx_len,
                 .offset = 0};
-           //parse transaction
-            //if (memcmp(buf.ptr+1,0xd1,1) ==0) { //InvokeNeo
+             //version
+            uint8_t version;
+            uint8_t tx_type;
+            if(!buffer_read_u8(&buf,&version)) {
+                return VERSION_PARSING_ERROR;
+            }
+            //txType
+            if(!buffer_read_u8(&buf,&tx_type)) {
+                return TXTYPE_PARSING_ERROR;
+            }
+            //parse transaction
+            if (tx_type == 0xd1) { //InvokeNeo
                 if (memcmp(buf.ptr + buf.size - 22 - 1, "Ontology.Native.Invoke", 22) == 0) {
                     if(memcmp(buf.ptr + buf.size - 46 - 10 - 1, "transferV2", 10) == 0) {
                         parser_status_e status =  transaction_deserialize(&buf, &G_context.tx_info.tx_info);
@@ -162,16 +172,17 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                     G_context.tx_type = WITHDRAW_FEE;
                     G_context.state = STATE_PARSED;
                 }
-            /*
-            } else if (memcmp(buf.ptr+1,0xd2,1) == 0) { //InvokeWasm
+
+            } else if (tx_type == 0xd2) { //InvokeWasm
                 parser_status_e status = oep4_transaction_deserialize(&buf, &G_context.tx_info.oep4_tx_info);
                 if (status != PARSING_OK) {
                     return io_send_sw(SW_TX_PARSING_FAIL);
                 }
                 G_context.tx_type = OEP4_TRANSACTION;
                 G_context.state = STATE_PARSED;
+            } else {
+                return TXTYPE_PARSING_ERROR;
             }
-             */
 
             if (cx_sha256_hash(G_context.tx_info.raw_tx,
                                G_context.tx_info.raw_tx_len,

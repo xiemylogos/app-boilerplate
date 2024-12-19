@@ -36,6 +36,7 @@ parser_status_e register_candidate_tx_deserialize(buffer_t *buf, register_candid
     if (buf->size > MAX_TRANSACTION_LEN) {
         return WRONG_LENGTH_ERROR;
     }
+    /*
     //version
     if(!buffer_read_u8(buf,&tx->version)) {
         return VERSION_PARSING_ERROR;
@@ -44,6 +45,7 @@ parser_status_e register_candidate_tx_deserialize(buffer_t *buf, register_candid
     if(!buffer_read_u8(buf,&tx->tx_type)) {
         return TXTYPE_PARSING_ERROR;
     }
+    */
     //nonce
     if(!buffer_read_u32(buf,&tx->nonce,LE)) {
         return NONCE_PARSING_ERROR;
@@ -128,6 +130,7 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
     if (buf->size > MAX_TRANSACTION_LEN) {
         return WRONG_LENGTH_ERROR;
     }
+    /*
     //version
     if(!buffer_read_u8(buf,&tx->version)) {
         return VERSION_PARSING_ERROR;
@@ -136,6 +139,7 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
     if(!buffer_read_u8(buf,&tx->tx_type)) {
         return TXTYPE_PARSING_ERROR;
     }
+    */
     //nonce
     if(!buffer_read_u32(buf,&tx->nonce,LE)) {
         return NONCE_PARSING_ERROR;
@@ -204,6 +208,7 @@ parser_status_e quit_node_tx_deserialize(buffer_t *buf, quit_node_t *tx) {
     if (buf->size > MAX_TRANSACTION_LEN) {
         return WRONG_LENGTH_ERROR;
     }
+    /*
     //version
     if(!buffer_read_u8(buf,&tx->version)) {
         return VERSION_PARSING_ERROR;
@@ -212,6 +217,7 @@ parser_status_e quit_node_tx_deserialize(buffer_t *buf, quit_node_t *tx) {
     if(!buffer_read_u8(buf,&tx->tx_type)) {
         return TXTYPE_PARSING_ERROR;
     }
+    */
     //nonce
     if(!buffer_read_u32(buf,&tx->nonce,LE)) {
         return NONCE_PARSING_ERROR;
@@ -255,6 +261,7 @@ parser_status_e add_init_pos_tx_deserialize(buffer_t *buf, add_init_pos_t *tx) {
     if (buf->size > MAX_TRANSACTION_LEN) {
         return WRONG_LENGTH_ERROR;
     }
+    /*
     //version
     if(!buffer_read_u8(buf,&tx->version)) {
         return VERSION_PARSING_ERROR;
@@ -263,6 +270,7 @@ parser_status_e add_init_pos_tx_deserialize(buffer_t *buf, add_init_pos_t *tx) {
     if(!buffer_read_u8(buf,&tx->tx_type)) {
         return TXTYPE_PARSING_ERROR;
     }
+    */
     //nonce
     if(!buffer_read_u32(buf,&tx->nonce,LE)) {
         return NONCE_PARSING_ERROR;
@@ -330,6 +338,7 @@ parser_status_e reduce_init_pos_tx_deserialize(buffer_t *buf, reduce_init_pos_t 
     if (buf->size > MAX_TRANSACTION_LEN) {
         return WRONG_LENGTH_ERROR;
     }
+    /*
     //version
     if(!buffer_read_u8(buf,&tx->version)) {
         return VERSION_PARSING_ERROR;
@@ -338,6 +347,7 @@ parser_status_e reduce_init_pos_tx_deserialize(buffer_t *buf, reduce_init_pos_t 
     if(!buffer_read_u8(buf,&tx->tx_type)) {
         return TXTYPE_PARSING_ERROR;
     }
+    */
     //nonce
     if(!buffer_read_u32(buf,&tx->nonce,LE)) {
         return NONCE_PARSING_ERROR;
@@ -387,6 +397,7 @@ parser_status_e  change_max_authorization_tx_deserialize(buffer_t *buf, change_m
     if (buf->size > MAX_TRANSACTION_LEN) {
         return WRONG_LENGTH_ERROR;
     }
+    /*
     //version
     if(!buffer_read_u8(buf,&tx->version)) {
         return VERSION_PARSING_ERROR;
@@ -395,6 +406,7 @@ parser_status_e  change_max_authorization_tx_deserialize(buffer_t *buf, change_m
     if(!buffer_read_u8(buf,&tx->tx_type)) {
         return TXTYPE_PARSING_ERROR;
     }
+    */
     //nonce
     if(!buffer_read_u32(buf,&tx->nonce,LE)) {
         return NONCE_PARSING_ERROR;
@@ -444,6 +456,7 @@ parser_status_e  set_fee_percentage_tx_deserialize(buffer_t *buf, set_fee_percen
     if (buf->size > MAX_TRANSACTION_LEN) {
         return WRONG_LENGTH_ERROR;
     }
+    /*
     //version
     if(!buffer_read_u8(buf,&tx->version)) {
         return VERSION_PARSING_ERROR;
@@ -452,6 +465,7 @@ parser_status_e  set_fee_percentage_tx_deserialize(buffer_t *buf, set_fee_percen
     if(!buffer_read_u8(buf,&tx->tx_type)) {
         return TXTYPE_PARSING_ERROR;
     }
+    */
     //nonce
     if(!buffer_read_u32(buf,&tx->nonce,LE)) {
         return NONCE_PARSING_ERROR;
@@ -506,6 +520,7 @@ parser_status_e authorize_for_peer_tx_deserialize(buffer_t *buf, authorize_for_p
     if (buf->size > MAX_TRANSACTION_LEN) {
         return WRONG_LENGTH_ERROR;
     }
+    /*
     //version
     if(!buffer_read_u8(buf,&tx->version)) {
         return VERSION_PARSING_ERROR;
@@ -514,6 +529,7 @@ parser_status_e authorize_for_peer_tx_deserialize(buffer_t *buf, authorize_for_p
     if(!buffer_read_u8(buf,&tx->tx_type)) {
         return TXTYPE_PARSING_ERROR;
     }
+    */
     //nonce
     if(!buffer_read_u32(buf,&tx->nonce,LE)) {
         return NONCE_PARSING_ERROR;
@@ -583,6 +599,7 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf, un_authorize
     if (buf->size > MAX_TRANSACTION_LEN) {
         return WRONG_LENGTH_ERROR;
     }
+    /*
     //version
     if(!buffer_read_u8(buf,&tx->version)) {
         return VERSION_PARSING_ERROR;
@@ -591,6 +608,7 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf, un_authorize
     if(!buffer_read_u8(buf,&tx->tx_type)) {
         return TXTYPE_PARSING_ERROR;
     }
+    */
     //nonce
     if(!buffer_read_u32(buf,&tx->nonce,LE)) {
         return NONCE_PARSING_ERROR;
@@ -659,6 +677,7 @@ parser_status_e withdraw_ong_tx_deserialize(buffer_t *buf, withdraw_ong_t *tx) {
     if (buf->size > MAX_TRANSACTION_LEN) {
         return WRONG_LENGTH_ERROR;
     }
+    /*
     //version
     if(!buffer_read_u8(buf,&tx->version)) {
         return VERSION_PARSING_ERROR;
@@ -667,6 +686,7 @@ parser_status_e withdraw_ong_tx_deserialize(buffer_t *buf, withdraw_ong_t *tx) {
     if(!buffer_read_u8(buf,&tx->tx_type)) {
         return TXTYPE_PARSING_ERROR;
     }
+    */
     //nonce
     if(!buffer_read_u32(buf,&tx->nonce,LE)) {
         return NONCE_PARSING_ERROR;
@@ -702,6 +722,7 @@ parser_status_e withdraw_fee_tx_deserialize(buffer_t *buf, withdraw_fee_t *tx) {
     if (buf->size > MAX_TRANSACTION_LEN) {
         return WRONG_LENGTH_ERROR;
     }
+    /*
     //version
     if(!buffer_read_u8(buf,&tx->version)) {
         return VERSION_PARSING_ERROR;
@@ -710,6 +731,7 @@ parser_status_e withdraw_fee_tx_deserialize(buffer_t *buf, withdraw_fee_t *tx) {
     if(!buffer_read_u8(buf,&tx->tx_type)) {
         return TXTYPE_PARSING_ERROR;
     }
+    */
     //nonce
     if(!buffer_read_u32(buf,&tx->nonce,LE)) {
         return NONCE_PARSING_ERROR;
