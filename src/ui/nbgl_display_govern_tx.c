@@ -172,10 +172,11 @@ static uint8_t withdrawTagValuePairs(void) {
     nbPairs++;
 
     memset(g_withdrawList,0,sizeof(g_withdrawList));
-    memcpy(g_withdrawList, G_context.tx_info.withdraw_tx_info.withdraw_list, G_context.tx_info.withdraw_tx_info.withdraw_list_length*4);
+    memcpy(g_withdrawList, G_context.tx_info.withdraw_tx_info.withdraw_list, G_context.tx_info.withdraw_tx_info.withdraw_list_length*1);
     pairs[nbPairs].item = "withdrawList";
     pairs[nbPairs].value = g_withdrawList;
     nbPairs++;
+
     return nbPairs;
 }
 
@@ -591,14 +592,14 @@ static uint8_t setAuthorizeForPeerTagValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
     //account
     memset(g_addr, 0, sizeof(g_addr));
-    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.tx_info.un_authorize_for_peer_tx_info.account) ==
+    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.tx_info.authorize_for_peer_tx_info.account) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
     pairs[nbPairs].item = "account";
     pairs[nbPairs].value = g_addr;
     nbPairs++;
-    /*
+
     memset(g_maxAuthorize,0,sizeof(g_maxAuthorize));
     if (!format_u64(g_maxAuthorize,sizeof(g_maxAuthorize),G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey_length)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
@@ -626,7 +627,7 @@ static uint8_t setAuthorizeForPeerTagValuePairs(void) {
     pairs[nbPairs].item = "posList";
     pairs[nbPairs].value = g_posList;
     nbPairs++;
-*/
+
     return nbPairs;
 }
 
@@ -646,12 +647,12 @@ int ui_display_authorize_for_peer_tx_bs_choice() {
     pairsList.nbPairs = setAuthorizeForPeerTagValuePairs();
     pairsList.pairs = pairs;
     nbgl_useCaseReview(TYPE_TRANSACTION,
-                           &pairsList,
-                           &C_icon_ont_64px,
-                           "Review AuthorizeForPeer transaction",
-                           NULL,
-                           "Sign AuthorizeForPeer transaction",
-                           authorize_for_peer_tx_review_choice);
+                       &pairsList,
+                       &C_icon_ont_64px,
+                       "Review AuthorizeForPeer transaction",
+                       NULL,
+                       "Sign AuthorizeForPeer transaction",
+                       authorize_for_peer_tx_review_choice);
 
     return 0;
 }
@@ -724,7 +725,7 @@ static uint8_t setunAuthorizeForPeerTagValuePairs(void) {
 // - Display the first screen of the transaction review
 int ui_display_un_authorize_for_peer_tx_bs_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
-        | G_context.tx_type != UN_AUTHORIZE_FOR_PEER) {
+        || G_context.tx_type != UN_AUTHORIZE_FOR_PEER) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }

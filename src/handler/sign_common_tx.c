@@ -212,7 +212,7 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                 return ui_display_change_max_authorization_tx();
             } else if (G_context.tx_type == SET_FEE_PERCENTAGE) {
                 return ui_display_set_fee_percentage_tx();
-            } else if (G_context.tx_type == SET_FEE_PERCENTAGE) {
+            } else if (G_context.tx_type == AUTHORIZE_FOR_PEER) {
                 return ui_display_authorize_for_peer_tx();
             } else if (G_context.tx_type == UN_AUTHORIZE_FOR_PEER) {
                 return ui_display_un_authorize_for_peer_tx();

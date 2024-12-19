@@ -539,6 +539,7 @@ parser_status_e authorize_for_peer_tx_deserialize(buffer_t *buf, authorize_for_p
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return FROM_PARSING_ERROR;
     }
+
     if (!buffer_seek_cur(buf,3)) {
         return BUFFER_OFFSET_MOVE_ERROR;
     }
