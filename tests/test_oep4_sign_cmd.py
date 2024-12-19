@@ -31,7 +31,7 @@ def test_sign_oep4_tx_short_tx(backend, scenario_navigator):
     # Send the sign device instruction.
     # As it requires on-screen validation, the function is asynchronous.
     # It will yield the result when the navigation is done
-    with client.sign_oep4_tx(path=path, oep4_transaction=ope4_transaction):
+    with client.sign_tx(path=path, oep4_transaction=ope4_transaction):
         # Validate the on-screen request by performing the navigation appropriate for this device
         scenario_navigator.review_approve()
 
@@ -58,7 +58,7 @@ def test_sign_oep4_tx_refused(backend, scenario_navigator):
     ).serialize()
 
     with pytest.raises(ExceptionRAPDU) as e:
-        with client.sign_oep4_tx(path=path, oep4_transaction=oep4_transaction):
+        with client.sign_tx(path=path, oep4_transaction=oep4_transaction):
             scenario_navigator.review_reject()
 
     # Assert that we have received a refusal

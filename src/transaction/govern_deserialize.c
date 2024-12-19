@@ -554,11 +554,12 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf, un_authorize
     if (tx->pos_list_length >= 81) {
         tx->pos_list_length = tx->pos_list_length -80;
     }
+    /*
     tx->pos_list = (uint8_t*)(buf->ptr+buf->offset);
     if (!buffer_seek_cur(buf, 2*tx->pos_list_length)) {
         return FROM_PARSING_ERROR;
     }
-
+    */
     return PARSING_OK;
 }
 

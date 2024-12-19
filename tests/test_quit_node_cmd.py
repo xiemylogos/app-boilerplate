@@ -40,7 +40,7 @@ def test_sign_quit_node_tx_short_tx(backend, scenario_navigator):
     # As it requires on-screen validation, the function is asynchronous.
     # It will yield the result when the navigation is done
     logger.debug("tx:%s", transaction.hex())
-    with client.sign_quit_node_tx(path=path, transaction=transaction):
+    with client.sign_tx(path=path, transaction=transaction):
         # Validate the on-screen request by performing the navigation appropriate for this device
         scenario_navigator.review_approve()
 
@@ -69,7 +69,7 @@ def test_sign_quit_node_tx_refused(backend, scenario_navigator):
     ).serialize()
 
     with pytest.raises(ExceptionRAPDU) as e:
-        with client.sign_quit_node_tx(path=path, transaction=transaction):
+        with client.sign_tx(path=path, transaction=transaction):
             scenario_navigator.review_reject()
 
     # Assert that we have received a refusal

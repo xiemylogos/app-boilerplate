@@ -50,37 +50,3 @@ int helper_tx_send_response_sig(void);
  *
  */
 int helper_person_msg_send_response_sig(void);
-/**
- * Helper to send APDU response with signature and v (parity of
- * y-coordinate of R).
- *
- * response = G_context.oep4_tx_info.signature_len (1) ||
- *            G_context.oep4_tx_info.signature (G_context.oep4_tx_info.signature_len) ||
- *            G_context.oep4_tx_info.v (1)
- *
- * @return zero or positive integer if success, -1 otherwise.
- *
- */
-int helper_oep4_tx_send_response_sig(void);
-
-int helper_register_candidate_tx_send_response_sig(void);
-
-int helper_withdraw_tx_send_response_sig(void);
-
-int helper_quit_node_tx_send_response_sig(void);
-
-int helper_add_init_pos_tx_send_response_sig(void);
-
-int helper_reduce_init_pos_tx_send_response_sig(void);
-
-int helper_change_max_authorization_tx_send_response_sig(void);
-
-int helper_set_fee_percentage_tx_send_response_sig(void);
-
-int helper_authorize_for_peer_tx_send_response_sig(void);
-
-int helper_un_authorize_for_peer_tx_send_response_sig(void);
-
-int helper_withdraw_ong_tx_send_response_sig(void);
-
-int helper_withdraw_fee_tx_send_response_sig(void);

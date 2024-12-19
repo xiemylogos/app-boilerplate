@@ -69,7 +69,7 @@ static uint8_t setTagValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
      // Format amount and address to g_amount and g_address buffers
     memset(g_amount, 0, sizeof(g_amount));
-    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value)) {
+    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.oep4_tx_info.payload.value)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[0].item = "Oep4 Amount";
@@ -77,7 +77,7 @@ static uint8_t setTagValuePairs(void) {
     nbPairs++;
     //fromAddr
     memset(g_fromAddr, 0, sizeof(g_fromAddr));
-    if (script_hash_to_address(g_fromAddr,sizeof(g_fromAddr),G_context.tx_info.transaction.payload.from) ==
+    if (script_hash_to_address(g_fromAddr,sizeof(g_fromAddr),G_context.tx_info.oep4_tx_info.payload.from) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
@@ -86,7 +86,7 @@ static uint8_t setTagValuePairs(void) {
     nbPairs++;
      //toAddr
     memset(g_toAddr, 0, sizeof(g_toAddr));
-    if (script_hash_to_address(g_toAddr,sizeof(g_toAddr),G_context.tx_info.transaction.payload.to) ==
+    if (script_hash_to_address(g_toAddr,sizeof(g_toAddr),G_context.tx_info.oep4_tx_info.payload.to) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
@@ -95,13 +95,13 @@ static uint8_t setTagValuePairs(void) {
     nbPairs++;
     //fee
     memset(g_fee, 0, sizeof(g_fee));
-    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.transaction.gas_price*G_context.tx_info.transaction.gas_limit,9);
+    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.oep4_tx_info.gas_price*G_context.tx_info.oep4_tx_info.gas_limit,9);
     pairs[nbPairs].item = "Fee:Ong";
     pairs[nbPairs].value = g_fee;
     nbPairs++;
     //gasPrice
     memset(g_gasPrice, 0, sizeof(g_gasPrice));
-    if (!format_u64(g_gasPrice,sizeof(g_gasPrice),G_context.tx_info.transaction.gas_price)) {
+    if (!format_u64(g_gasPrice,sizeof(g_gasPrice),G_context.tx_info.oep4_tx_info.gas_price)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = "gasPrice";
@@ -109,7 +109,7 @@ static uint8_t setTagValuePairs(void) {
     nbPairs++;
     //gasLimit
     memset(g_gasLimit, 0, sizeof(g_gasLimit));
-    if (!format_u64(g_gasLimit,sizeof(g_gasLimit),G_context.tx_info.transaction.gas_limit)) {
+    if (!format_u64(g_gasLimit,sizeof(g_gasLimit),G_context.tx_info.oep4_tx_info.gas_limit)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = "gasLimit";
@@ -123,7 +123,8 @@ static uint8_t setTagValuePairs(void) {
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the oep4 transaction review
 int ui_display_oep4_transaction_bs_choice() {
-    if (G_context.req_type != CONFIRM_OEP4_TRANSACTION || G_context.state != STATE_PARSED) {
+    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
+        || G_context.tx_type != OEP4_TRANSACTION) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }

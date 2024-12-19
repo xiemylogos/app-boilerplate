@@ -16,7 +16,6 @@ class PersonMsg:
 
     def serialize(self) -> bytes:
         return b"".join([
-            write_varint(len(self.personmsg)),
             self.personmsg
         ])
 

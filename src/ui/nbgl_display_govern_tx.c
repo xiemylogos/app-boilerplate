@@ -73,13 +73,13 @@ static uint8_t registerCandidateTagValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.register_candidate_tx_info.transaction.peer_pubkey,66);
+    memcpy(g_peerPubkey, G_context.tx_info.register_candidate_tx_info.peer_pubkey,66);
     pairs[nbPairs].item = "peerPubkey";
     pairs[nbPairs].value = g_peerPubkey;
     nbPairs++;
 
     memset(g_addr, 0, sizeof(g_addr));
-    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.register_candidate_tx_info.transaction.account) ==
+    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.tx_info.register_candidate_tx_info.account) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
@@ -88,7 +88,7 @@ static uint8_t registerCandidateTagValuePairs(void) {
     nbPairs++;
 
     memset(g_initPost,0,sizeof(g_initPost));
-    if (!format_u64(g_initPost,sizeof(g_initPost),G_context.register_candidate_tx_info.transaction.init_pos)) {
+    if (!format_u64(g_initPost,sizeof(g_initPost),G_context.tx_info.register_candidate_tx_info.init_pos)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = "init_pos";
@@ -96,13 +96,13 @@ static uint8_t registerCandidateTagValuePairs(void) {
     nbPairs++;
 
     memset(g_ontId,0,sizeof(g_ontId));
-    memcpy(g_ontId, G_context.register_candidate_tx_info.transaction.ont_id, G_context.register_candidate_tx_info.transaction.ont_id_len);
+    memcpy(g_ontId, G_context.tx_info.register_candidate_tx_info.ont_id, G_context.tx_info.register_candidate_tx_info.ont_id_len);
     pairs[nbPairs].item = "ontId";
     pairs[nbPairs].value = g_ontId;
     nbPairs++;
 
     memset(g_keyNo,0,sizeof(g_keyNo));
-    if (!format_u64(g_keyNo,sizeof(g_keyNo),G_context.register_candidate_tx_info.transaction.key_no)) {
+    if (!format_u64(g_keyNo,sizeof(g_keyNo),G_context.tx_info.register_candidate_tx_info.key_no)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = "key_no";
@@ -116,7 +116,8 @@ static uint8_t registerCandidateTagValuePairs(void) {
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
 int ui_display_register_candidate_tx_bs_choice() {
-    if (G_context.req_type != CONFIRM_REGISTER_CANDIDATE || G_context.state != STATE_PARSED) {
+    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
+        || G_context.tx_type != REGISTER_CANDIDATE) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
@@ -156,7 +157,7 @@ static uint8_t withdrawTagValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
     //account
     memset(g_addr, 0, sizeof(g_addr));
-    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.withdraw_tx_info.transaction.account) ==
+    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.tx_info.withdraw_tx_info.account) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
@@ -165,13 +166,13 @@ static uint8_t withdrawTagValuePairs(void) {
     nbPairs++;
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.withdraw_tx_info.transaction.peer_pubkey, G_context.withdraw_tx_info.transaction.peer_pubkey_length*66);
+    memcpy(g_peerPubkey, G_context.tx_info.withdraw_tx_info.peer_pubkey, G_context.tx_info.withdraw_tx_info.peer_pubkey_length*66);
     pairs[nbPairs].item = "peerPubkey";
     pairs[nbPairs].value = g_peerPubkey;
     nbPairs++;
 
     memset(g_withdrawList,0,sizeof(g_withdrawList));
-    memcpy(g_withdrawList, G_context.withdraw_tx_info.transaction.withdraw_list, G_context.withdraw_tx_info.transaction.withdraw_list_length*4);
+    memcpy(g_withdrawList, G_context.tx_info.withdraw_tx_info.withdraw_list, G_context.tx_info.withdraw_tx_info.withdraw_list_length*4);
     pairs[nbPairs].item = "withdrawList";
     pairs[nbPairs].value = g_withdrawList;
     nbPairs++;
@@ -184,7 +185,8 @@ static uint8_t withdrawTagValuePairs(void) {
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
 int ui_display_withdraw_tx_bs_choice() {
-    if (G_context.req_type != CONFIRM_WITHDRAW || G_context.state != STATE_PARSED) {
+    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
+        || G_context.tx_type != WITHDRAW) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
@@ -226,13 +228,13 @@ static uint8_t quitNodeTagValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.quit_node_tx_info.transaction.peer_pubkey,66);
+    memcpy(g_peerPubkey, G_context.tx_info.quit_node_tx_info.peer_pubkey,66);
     pairs[nbPairs].item = "peerPubkey";
     pairs[nbPairs].value = g_peerPubkey;
     nbPairs++;
 
     memset(g_addr, 0, sizeof(g_addr));
-    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.quit_node_tx_info.transaction.account) ==
+    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.tx_info.quit_node_tx_info.account) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
@@ -248,7 +250,8 @@ static uint8_t quitNodeTagValuePairs(void) {
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
 int ui_display_quit_node_tx_bs_choice() {
-    if (G_context.req_type != CONFIRM_QUIT_NODE || G_context.state != STATE_PARSED) {
+    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
+        || G_context.tx_type != QUIT_NODE) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
@@ -289,13 +292,13 @@ static uint8_t addInitPosTagValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.add_init_pos_tx_info.transaction.peer_pubkey,66);
+    memcpy(g_peerPubkey, G_context.tx_info.add_init_pos_tx_info.peer_pubkey,66);
     pairs[nbPairs].item = "peerPubkey";
     pairs[nbPairs].value = g_peerPubkey;
     nbPairs++;
 
     memset(g_addr, 0, sizeof(g_addr));
-    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.add_init_pos_tx_info.transaction.account) ==
+    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.tx_info.add_init_pos_tx_info.account) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
@@ -304,7 +307,7 @@ static uint8_t addInitPosTagValuePairs(void) {
     nbPairs++;
 
     memset(g_pos,0,sizeof(g_pos));
-    if (!format_u64(g_pos,sizeof(g_pos),G_context.add_init_pos_tx_info.transaction.pos)) {
+    if (!format_u64(g_pos,sizeof(g_pos),G_context.tx_info.add_init_pos_tx_info.pos)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = "pos";
@@ -319,7 +322,8 @@ static uint8_t addInitPosTagValuePairs(void) {
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
 int ui_display_add_init_pos_tx_bs_choice() {
-    if (G_context.req_type != CONFIRM_ADD_INIT_POS || G_context.state != STATE_PARSED) {
+    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
+        | G_context.tx_type != ADD_INIT_POS) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
@@ -360,13 +364,13 @@ static uint8_t reduceInitPosTagValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.reduce_init_pos_tx_info.transaction.peer_pubkey,66);
+    memcpy(g_peerPubkey, G_context.tx_info.reduce_init_pos_tx_info.peer_pubkey,66);
     pairs[nbPairs].item = "peerPubkey";
     pairs[nbPairs].value = g_peerPubkey;
     nbPairs++;
 
     memset(g_addr, 0, sizeof(g_addr));
-    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.reduce_init_pos_tx_info.transaction.account) ==
+    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.tx_info.reduce_init_pos_tx_info.account) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
@@ -375,7 +379,7 @@ static uint8_t reduceInitPosTagValuePairs(void) {
     nbPairs++;
 
     memset(g_pos,0,sizeof(g_pos));
-    if (!format_u64(g_pos,sizeof(g_pos),G_context.reduce_init_pos_tx_info.transaction.pos)) {
+    if (!format_u64(g_pos,sizeof(g_pos),G_context.tx_info.reduce_init_pos_tx_info.pos)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = "pos";
@@ -390,7 +394,8 @@ static uint8_t reduceInitPosTagValuePairs(void) {
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
 int ui_display_reduce_init_pos_tx_bs_choice() {
-    if (G_context.req_type != CONFIRM_REDUCE_INIT_POS || G_context.state != STATE_PARSED) {
+    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
+        || G_context.tx_type != REDUCE_INIT_POS) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
@@ -431,13 +436,13 @@ static uint8_t changeMaxAuthorizationTagValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.change_max_authorization_tx_info.transaction.peer_pubkey,66);
+    memcpy(g_peerPubkey, G_context.tx_info.change_max_authorization_tx_info.peer_pubkey,66);
     pairs[nbPairs].item = "peerPubkey";
     pairs[nbPairs].value = g_peerPubkey;
     nbPairs++;
 
     memset(g_addr, 0, sizeof(g_addr));
-    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.change_max_authorization_tx_info.transaction.account) ==
+    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.tx_info.change_max_authorization_tx_info.account) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
@@ -446,7 +451,7 @@ static uint8_t changeMaxAuthorizationTagValuePairs(void) {
     nbPairs++;
 
     memset(g_maxAuthorize,0,sizeof(g_maxAuthorize));
-    if (!format_u64(g_maxAuthorize,sizeof(g_maxAuthorize),G_context.change_max_authorization_tx_info.transaction.max_authorize)) {
+    if (!format_u64(g_maxAuthorize,sizeof(g_maxAuthorize),G_context.tx_info.change_max_authorization_tx_info.max_authorize)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = "maxAuthorize";
@@ -461,7 +466,8 @@ static uint8_t changeMaxAuthorizationTagValuePairs(void) {
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
 int ui_display_change_max_authorization_tx_bs_choice() {
-    if (G_context.req_type != CONFIRM_CHANGE_MAX_AUTHORIZATION || G_context.state != STATE_PARSED) {
+    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
+        || G_context.tx_type != CHANGE_MAX_AUTHORIZATION) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
@@ -504,7 +510,7 @@ static uint8_t setFeePercentageTagValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
     //account
     memset(g_addr, 0, sizeof(g_addr));
-    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.set_fee_percentage_tx_info.transaction.account) ==
+    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.tx_info.set_fee_percentage_tx_info.account) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
@@ -513,13 +519,13 @@ static uint8_t setFeePercentageTagValuePairs(void) {
     nbPairs++;
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.set_fee_percentage_tx_info.transaction.peer_pubkey,66);
+    memcpy(g_peerPubkey, G_context.tx_info.set_fee_percentage_tx_info.peer_pubkey,66);
     pairs[nbPairs].item = "peerPubkey";
     pairs[nbPairs].value = g_peerPubkey;
     nbPairs++;
 
     memset(g_peerCost,0,sizeof(g_peerCost));
-    if (!format_u64(g_peerCost,sizeof(g_peerCost),G_context.set_fee_percentage_tx_info.transaction.peer_cost)) {
+    if (!format_u64(g_peerCost,sizeof(g_peerCost),G_context.tx_info.set_fee_percentage_tx_info.peer_cost)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = "peerCost";
@@ -527,7 +533,7 @@ static uint8_t setFeePercentageTagValuePairs(void) {
     nbPairs++;
 
     memset(g_stakeCost,0,sizeof(g_stakeCost));
-    if (!format_u64(g_stakeCost,sizeof(g_stakeCost),G_context.set_fee_percentage_tx_info.transaction.stake_cost)) {
+    if (!format_u64(g_stakeCost,sizeof(g_stakeCost),G_context.tx_info.set_fee_percentage_tx_info.stake_cost)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = "stakeCost";
@@ -542,7 +548,8 @@ static uint8_t setFeePercentageTagValuePairs(void) {
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
 int ui_display_set_fee_percentage_tx_bs_choice() {
-    if (G_context.req_type != CONFIRM_SET_FEE_PERCENTAGE || G_context.state != STATE_PARSED) {
+    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
+        || G_context.tx_type != SET_FEE_PERCENTAGE) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
@@ -584,7 +591,7 @@ static uint8_t setAuthorizeForPeerTagValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
     //account
     memset(g_addr, 0, sizeof(g_addr));
-    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.authorize_for_peer_tx_info.transaction.account) ==
+    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.tx_info.authorize_for_peer_tx_info.account) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
@@ -593,13 +600,13 @@ static uint8_t setAuthorizeForPeerTagValuePairs(void) {
     nbPairs++;
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.authorize_for_peer_tx_info.transaction.peer_pubkey, G_context.authorize_for_peer_tx_info.transaction.peer_pubkey_length*66);
+    memcpy(g_peerPubkey, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey_length*66);
     pairs[nbPairs].item = "peerPubkey";
     pairs[nbPairs].value = g_peerPubkey;
     nbPairs++;
 
     memset(g_posList,0,sizeof(g_posList));
-    memcpy(g_posList, G_context.authorize_for_peer_tx_info.transaction.pos_list, G_context.authorize_for_peer_tx_info.transaction.pos_list_length*4);
+    memcpy(g_posList, G_context.tx_info.authorize_for_peer_tx_info.pos_list, G_context.tx_info.authorize_for_peer_tx_info.pos_list_length*4);
     pairs[nbPairs].item = "posList";
     pairs[nbPairs].value = g_posList;
     nbPairs++;
@@ -612,7 +619,8 @@ static uint8_t setAuthorizeForPeerTagValuePairs(void) {
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
 int ui_display_authorize_for_peer_tx_bs_choice() {
-    if (G_context.req_type != CONFIRM_AUTHORIZE_FOR_PEER || G_context.state != STATE_PARSED) {
+    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
+        || G_context.tx_type != UN_AUTHORIZE_FOR_PEER) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
@@ -654,25 +662,26 @@ static uint8_t setunAuthorizeForPeerTagValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
     //account
     memset(g_addr, 0, sizeof(g_addr));
-    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.un_authorize_for_peer_tx_info.transaction.account) ==
+    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.tx_info.un_authorize_for_peer_tx_info.account) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
     pairs[nbPairs].item = "account";
     pairs[nbPairs].value = g_addr;
     nbPairs++;
-
+/*
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.un_authorize_for_peer_tx_info.transaction.peer_pubkey, G_context.un_authorize_for_peer_tx_info.transaction.peer_pubkey_length*66);
+    memcpy(g_peerPubkey, G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey, G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey_length*66);
     pairs[nbPairs].item = "peerPubkey";
     pairs[nbPairs].value = g_peerPubkey;
     nbPairs++;
 
     memset(g_posList,0,sizeof(g_posList));
-    memcpy(g_posList, G_context.un_authorize_for_peer_tx_info.transaction.pos_list, G_context.un_authorize_for_peer_tx_info.transaction.pos_list_length*2);
+    memcpy(g_posList, G_context.tx_info.un_authorize_for_peer_tx_info.pos_list, G_context.tx_info.un_authorize_for_peer_tx_info.pos_list_length*2);
     pairs[nbPairs].item = "posList";
     pairs[nbPairs].value = g_posList;
     nbPairs++;
+     */
     return nbPairs;
 }
 
@@ -681,7 +690,8 @@ static uint8_t setunAuthorizeForPeerTagValuePairs(void) {
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
 int ui_display_un_authorize_for_peer_tx_bs_choice() {
-    if (G_context.req_type != CONFIRM_UN_AUTHORIZE_FOR_PEER || G_context.state != STATE_PARSED) {
+    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
+        | G_context.tx_type != UN_AUTHORIZE_FOR_PEER) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
@@ -723,7 +733,7 @@ static uint8_t setwithdrawOngTagValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
     //account
     memset(g_addr, 0, sizeof(g_addr));
-    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.withdraw_fee_tx_info.transaction.account) ==
+    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.tx_info.withdraw_fee_tx_info.account) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
@@ -737,7 +747,8 @@ static uint8_t setwithdrawOngTagValuePairs(void) {
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
 int ui_display_withdraw_ong_tx_bs_choice() {
-    if (G_context.req_type != CONFIRM_WITHDRAW_ONG || G_context.state != STATE_PARSED) {
+    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
+        || G_context.tx_type != WITHDRAW_ONG) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
@@ -778,7 +789,7 @@ static uint8_t setwithdrawFeeTagValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
     //account
     memset(g_addr, 0, sizeof(g_addr));
-    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.withdraw_fee_tx_info.transaction.account) ==
+    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.tx_info.withdraw_fee_tx_info.account) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
@@ -792,7 +803,8 @@ static uint8_t setwithdrawFeeTagValuePairs(void) {
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
 int ui_display_withdraw_fee_tx_bs_choice() {
-    if (G_context.req_type != CONFIRM_WITHDRAW_FEE || G_context.state != STATE_PARSED) {
+    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
+        || G_context.tx_type != WITHDRAW_FEE) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }

@@ -69,18 +69,18 @@ static uint8_t setTagValuePairs(void) {
      // Format amount and address to g_amount and g_address buffers
     memset(g_amount, 0, sizeof(g_amount));
     // Setup data to display
-    if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONT_ADDR,20) == 0) {
+    if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONT_ADDR,20) == 0) {
         pairs[nbPairs].item = "ONT Amount";
-        format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value,9);
-    } else if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONG_ADDR,20) == 0) {
+        format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.tx_info.payload.value,9);
+    } else if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONG_ADDR,20) == 0) {
         pairs[nbPairs].item = "ONG Amount";
-        format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value,18);
+        format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.tx_info.payload.value,18);
     }
     pairs[nbPairs].value = g_amount;
     nbPairs++;
     //fromAddr
     memset(g_fromAddr, 0, sizeof(g_fromAddr));
-    if (script_hash_to_address(g_fromAddr,sizeof(g_fromAddr),G_context.tx_info.transaction.payload.from) ==
+    if (script_hash_to_address(g_fromAddr,sizeof(g_fromAddr),G_context.tx_info.tx_info.payload.from) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
@@ -89,7 +89,7 @@ static uint8_t setTagValuePairs(void) {
     nbPairs++;
      //toAddr
     memset(g_toAddr, 0, sizeof(g_toAddr));
-    if (script_hash_to_address(g_toAddr,sizeof(g_toAddr),G_context.tx_info.transaction.payload.to) ==
+    if (script_hash_to_address(g_toAddr,sizeof(g_toAddr),G_context.tx_info.tx_info.payload.to) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
@@ -98,13 +98,13 @@ static uint8_t setTagValuePairs(void) {
     nbPairs++;
     //fee
     memset(g_fee, 0, sizeof(g_fee));
-    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.transaction.gas_price*G_context.tx_info.transaction.gas_limit,9);
+    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.tx_info.gas_price*G_context.tx_info.tx_info.gas_limit,9);
     pairs[nbPairs].item = "Fee:Ong";
     pairs[nbPairs].value = g_fee;
     nbPairs++;
     //gasPrice
     memset(g_gasPrice, 0, sizeof(g_gasPrice));
-    if (!format_u64(g_gasPrice,sizeof(g_gasPrice),G_context.tx_info.transaction.gas_price)) {
+    if (!format_u64(g_gasPrice,sizeof(g_gasPrice),G_context.tx_info.tx_info.gas_price)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = "gasPrice";
@@ -112,7 +112,7 @@ static uint8_t setTagValuePairs(void) {
     nbPairs++;
     //gasLimit
     memset(g_gasLimit, 0, sizeof(g_gasLimit));
-    if (!format_u64(g_gasLimit,sizeof(g_gasLimit),G_context.tx_info.transaction.gas_limit)) {
+    if (!format_u64(g_gasLimit,sizeof(g_gasLimit),G_context.tx_info.tx_info.gas_limit)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = "gasLimit";
@@ -126,7 +126,8 @@ static uint8_t setTagValuePairs(void) {
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
 int ui_display_transaction_bs_choice() {
-    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED) {
+    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
+        || G_context.tx_type != TRANSFER_TRANSACTION) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
@@ -135,7 +136,7 @@ int ui_display_transaction_bs_choice() {
     pairsList.nbPairs = setTagValuePairs();
     pairsList.pairs = pairs;
 
-   if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONT_ADDR,20) == 0) {
+   if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONT_ADDR,20) == 0) {
         nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairsList,
                            &C_icon_ont_64px,
@@ -143,7 +144,7 @@ int ui_display_transaction_bs_choice() {
                            NULL,
                            "Sign transaction\nto send ONT",
                            tx_review_choice);
-   } else if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONG_ADDR,20) == 0) {
+   } else if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONG_ADDR,20) == 0) {
          nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairsList,
                            &C_icon_ont_64px,

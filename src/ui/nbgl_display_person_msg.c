@@ -57,12 +57,12 @@ int ui_display_person_msg_bs_choice() {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
-    if(G_context.person_msg_info.msg_info.person_msg_len >= 1024) {
+    if(G_context.person_msg_info.raw_msg_len >= 1024) {
         memcpy(g_msg, G_context.person_msg_info.msg_info.person_msg, 1023);
         g_msg[29] = '\0';
     } else {
-        memcpy(g_msg, G_context.person_msg_info.msg_info.person_msg,G_context.person_msg_info.msg_info.person_msg_len);
-        g_msg[G_context.person_msg_info.msg_info.person_msg_len+1] = '\0';
+        memcpy(g_msg, G_context.person_msg_info.msg_info.person_msg,G_context.person_msg_info.raw_msg_len);
+        g_msg[G_context.person_msg_info.raw_msg_len+1] = '\0';
     }
     // Setup data to display
     pairs[0].item = "msg content:";
