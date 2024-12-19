@@ -115,6 +115,9 @@ parser_status_e register_candidate_tx_deserialize(buffer_t *buf, register_candid
     if(!buffer_read_varint(buf,&tx->key_no)) {
         return GASLIMIT_PARSING_ERROR;
     }
+    if (tx->key_no >= 81) {
+        tx->key_no = tx->key_no -80;
+    }
     return PARSING_OK;
 }
 
@@ -524,28 +527,38 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf, un_authorize
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return PAYER_PARSING_ERROR;
     }
-    if (!buffer_seek_cur(buf,4)) { //todo size
+
+    if (!buffer_seek_cur(buf,5)) {
         return BUFFER_OFFSET_MOVE_ERROR;
     }
     tx->account = (uint8_t*)(buf->ptr+buf->offset);
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return FROM_PARSING_ERROR;
     }
-
-    if(!buffer_read_u64(buf,&tx->peer_pubkey_length,LE)) {
+    if(!buffer_read_varint(buf,&tx->peer_pubkey_length)) {
         return GASPRICE_PARSING_ERROR;
+    }
+    if (tx->peer_pubkey_length >= 81) {
+        tx->peer_pubkey_length = tx->peer_pubkey_length -80;
     }
     tx->peer_pubkey = (uint8_t*)(buf->ptr+buf->offset);
-    if (!buffer_seek_cur(buf, 65*tx->peer_pubkey_length)) {
+    if (!buffer_seek_cur(buf, 66*tx->peer_pubkey_length)) {
         return FROM_PARSING_ERROR;
     }
-    if(!buffer_read_u64(buf,&tx->pos_list_length,LE)) {
+    if (!buffer_seek_cur(buf,3)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    if(!buffer_read_varint(buf,&tx->pos_list_length)) {
         return GASPRICE_PARSING_ERROR;
     }
+    if (tx->pos_list_length >= 81) {
+        tx->pos_list_length = tx->pos_list_length -80;
+    }
     tx->pos_list = (uint8_t*)(buf->ptr+buf->offset);
-    if (!buffer_seek_cur(buf, 4*tx->pos_list_length)) {
+    if (!buffer_seek_cur(buf, 2*tx->pos_list_length)) {
         return FROM_PARSING_ERROR;
     }
+
     return PARSING_OK;
 }
 

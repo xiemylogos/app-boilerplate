@@ -669,7 +669,7 @@ static uint8_t setunAuthorizeForPeerTagValuePairs(void) {
     nbPairs++;
 
     memset(g_posList,0,sizeof(g_posList));
-    memcpy(g_posList, G_context.un_authorize_for_peer_tx_info.transaction.pos_list, G_context.un_authorize_for_peer_tx_info.transaction.pos_list_length*4);
+    memcpy(g_posList, G_context.un_authorize_for_peer_tx_info.transaction.pos_list, G_context.un_authorize_for_peer_tx_info.transaction.pos_list_length*2);
     pairs[nbPairs].item = "posList";
     pairs[nbPairs].value = g_posList;
     nbPairs++;
