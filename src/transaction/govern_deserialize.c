@@ -153,6 +153,46 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return PAYER_PARSING_ERROR;
     }
+
+    if (!buffer_seek_cur(buf,5)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    tx->account = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+        return FROM_PARSING_ERROR;
+    }
+    if (!buffer_seek_cur(buf,3)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    if(!buffer_read_varint(buf,&tx->peer_pubkey_length)) {
+        return GASPRICE_PARSING_ERROR;
+    }
+    if (tx->peer_pubkey_length >= 81) {
+        tx->peer_pubkey_length = tx->peer_pubkey_length -80;
+    }
+    if (!buffer_seek_cur(buf,4)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    tx->peer_pubkey = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf, 66*tx->peer_pubkey_length)) {
+        return FROM_PARSING_ERROR;
+    }
+    if (!buffer_seek_cur(buf,3)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    if(!buffer_read_varint(buf,&tx->withdraw_list_length)) {
+        return GASPRICE_PARSING_ERROR;
+    }
+    if (tx->withdraw_list_length >= 81) {
+        tx->withdraw_list_length = tx->withdraw_list_length -80;
+    }
+    if (!buffer_seek_cur(buf,3)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    tx->withdraw_list = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf, 1*tx->withdraw_list_length)) {
+        return FROM_PARSING_ERROR;
+    }
     return PARSING_OK;
 }
 
@@ -491,6 +531,46 @@ parser_status_e authorize_for_peer_tx_deserialize(buffer_t *buf, authorize_for_p
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return PAYER_PARSING_ERROR;
     }
+
+    if (!buffer_seek_cur(buf,5)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    tx->account = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+        return FROM_PARSING_ERROR;
+    }
+    if (!buffer_seek_cur(buf,3)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    if(!buffer_read_varint(buf,&tx->peer_pubkey_length)) {
+        return GASPRICE_PARSING_ERROR;
+    }
+    if (tx->peer_pubkey_length >= 81) {
+        tx->peer_pubkey_length = tx->peer_pubkey_length -80;
+    }
+    if (!buffer_seek_cur(buf,4)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    tx->peer_pubkey = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf, 66*tx->peer_pubkey_length)) {
+        return FROM_PARSING_ERROR;
+    }
+    if (!buffer_seek_cur(buf,3)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    if(!buffer_read_varint(buf,&tx->pos_list_length)) {
+        return GASPRICE_PARSING_ERROR;
+    }
+    if (tx->pos_list_length >= 81) {
+        tx->pos_list_length = tx->pos_list_length -80;
+    }
+    if (!buffer_seek_cur(buf,3)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    tx->pos_list = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf, 1*tx->pos_list_length)) {
+        return FROM_PARSING_ERROR;
+    }
     return PARSING_OK;
 }
 
@@ -535,11 +615,17 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf, un_authorize
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return FROM_PARSING_ERROR;
     }
+    if (!buffer_seek_cur(buf,3)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
     if(!buffer_read_varint(buf,&tx->peer_pubkey_length)) {
         return GASPRICE_PARSING_ERROR;
     }
     if (tx->peer_pubkey_length >= 81) {
         tx->peer_pubkey_length = tx->peer_pubkey_length -80;
+    }
+    if (!buffer_seek_cur(buf,4)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
     }
     tx->peer_pubkey = (uint8_t*)(buf->ptr+buf->offset);
     if (!buffer_seek_cur(buf, 66*tx->peer_pubkey_length)) {
@@ -554,12 +640,13 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf, un_authorize
     if (tx->pos_list_length >= 81) {
         tx->pos_list_length = tx->pos_list_length -80;
     }
-    /*
+    if (!buffer_seek_cur(buf,3)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
     tx->pos_list = (uint8_t*)(buf->ptr+buf->offset);
-    if (!buffer_seek_cur(buf, 2*tx->pos_list_length)) {
+    if (!buffer_seek_cur(buf, 1*tx->pos_list_length)) {
         return FROM_PARSING_ERROR;
     }
-    */
     return PARSING_OK;
 }
 
