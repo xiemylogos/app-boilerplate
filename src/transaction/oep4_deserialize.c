@@ -134,10 +134,10 @@ parser_status_e oep4_wasm_vm_transaction_deserialize(buffer_t *buf, ont_transact
         return BUFFER_OFFSET_MOVE_ERROR;
     }
     //payload
-    if(memcmp(buf->ptr+buf->size - 56-8, "transfer", 8) != 0) {
+    if(memcmp(buf->ptr+buf->size - 56-8-1, "transfer", 8) != 0) {
         return PARSE_STRING_MATCH_ERROR;
     }
-    if (!buffer_seek_cur(buf,buf->size-buf->offset -56)) {
+    if (!buffer_seek_cur(buf,buf->size-buf->offset -56-1)) {
         return BUFFER_OFFSET_MOVE_ERROR;
     }
     tx->payload.from = (uint8_t*)(buf->ptr+buf->offset);
