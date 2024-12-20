@@ -66,22 +66,34 @@ parser_status_e oep4_neo_vm_transaction_deserialize(buffer_t *buf, ont_transacti
         return BUFFER_OFFSET_MOVE_ERROR;
     }
     //payload  
-    if(memcmp(buf->ptr+buf->size - 56-8-2, "transfer", 8) != 0) {
+    if(memcmp(buf->ptr+buf->size - 21-8, "transfer", 8) != 0) {
         return PARSE_STRING_MATCH_ERROR;
     }
-    if (!buffer_seek_cur(buf,buf->size-buf->offset -56-2)) {
-        return BUFFER_OFFSET_MOVE_ERROR;
+    uint8_t amount_len;
+    if(!buffer_read_u8(buf,&amount_len)) {
+        return VERSION_PARSING_ERROR;
     }
-    tx->payload.from = (uint8_t*)(buf->ptr+buf->offset);
-    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
-        return FROM_PARSING_ERROR;
+    uint8_t *value;
+    value = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf, amount_len)) {
+        return TO_PARSING_ERROR;
+    }
+    for (int i = 0; i < amount_len; i++) {
+        tx->payload.value |= ((int64_t)value[i] << (8 * i));
+    }
+    if (!buffer_seek_cur(buf,1)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
     }
     tx->payload.to = (uint8_t*)(buf->ptr+buf->offset);
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return TO_PARSING_ERROR;
     }
-    if (!buffer_read_u64(buf, &tx->payload.value, LE)) {
-        return VALUE_PARSING_ERROR;
+    if (!buffer_seek_cur(buf,1)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    tx->payload.from = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+        return FROM_PARSING_ERROR;
     }
     /*
     if (!buffer_seek_cur(buf,18)) {

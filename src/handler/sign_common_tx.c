@@ -171,6 +171,13 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                     }
                     G_context.tx_type = WITHDRAW_FEE;
                     G_context.state = STATE_PARSED;
+                } else if(memcmp(buf.ptr+buf.size - 21-8, "transfer", 8) == 0) {
+                    parser_status_e status = oep4_neo_vm_transaction_deserialize(&buf, &G_context.tx_info.oep4_tx_info);
+                    if (status != PARSING_OK) {
+                        return io_send_sw(status);
+                    }
+                    G_context.tx_type = OEP4_TRANSACTION;
+                    G_context.state = STATE_PARSED;
                 }
             } else if (tx_type == 0xd2) { //InvokeWasm
                 parser_status_e status = oep4_wasm_vm_transaction_deserialize(&buf, &G_context.tx_info.oep4_tx_info);

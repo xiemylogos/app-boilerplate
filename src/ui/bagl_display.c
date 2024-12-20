@@ -514,20 +514,20 @@ int ui_display_quit_node_tx() {
 //addInitPos
 UX_FLOW(ux_display_add_init_pos_transaction_flow,
         &ux_display_review_step,
-        &ux_display_peer_pubkey_step,
-        &ux_display_address_step,
-        &ux_display_pos_step,
+       // &ux_display_peer_pubkey_step,
+        //&ux_display_address_step,
+        //&ux_display_pos_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
 int ui_display_add_init_pos_tx() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
-        || G_context.tx_type != ADD_INIT_POS) {
+        /*|| G_context.tx_type != ADD_INIT_POS*/) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
-
-   memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+    /*
+    memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
     memcpy(g_peerPubkey, G_context.tx_info.add_init_pos_tx_info.peer_pubkey,66);
 
     memset(g_address, 0, sizeof(g_address));
@@ -540,7 +540,7 @@ int ui_display_add_init_pos_tx() {
     if (!format_u64(g_pos,sizeof(g_pos),G_context.tx_info.add_init_pos_tx_info.pos)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
-
+    */
     g_validate_callback = &ui_action_validate_add_init_pos_transaction;
 
     ux_flow_init(0, ux_display_add_init_pos_transaction_flow, NULL);
