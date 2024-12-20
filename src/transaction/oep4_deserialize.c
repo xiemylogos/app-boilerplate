@@ -28,7 +28,7 @@
 #include "ledger_assert.h"
 #endif
 
-parser_status_e oep4_transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
+parser_status_e oep4_neo_vm_transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
     LEDGER_ASSERT(buf != NULL, "NULL buf");
     LEDGER_ASSERT(tx != NULL, "NULL oep4 tx");
 
@@ -84,6 +84,74 @@ parser_status_e oep4_transaction_deserialize(buffer_t *buf, ont_transaction_t *t
         return VALUE_PARSING_ERROR;
     }
     /*
+    if (!buffer_seek_cur(buf,18)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    tx->contract_addr = (uint8_t *) (buf->ptr + buf->offset);
+    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+        return CONTRACT_ADDR_PARSING_ERROR;
+    }
+    */
+    return PARSING_OK;
+    //return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
+}
+
+parser_status_e oep4_wasm_vm_transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
+    LEDGER_ASSERT(buf != NULL, "NULL buf");
+    LEDGER_ASSERT(tx != NULL, "NULL oep4 tx");
+
+    if (buf->size > MAX_TRANSACTION_LEN) {
+        return WRONG_LENGTH_ERROR;
+    }
+    /*
+    //version
+    if(!buffer_read_u8(buf,&tx->version)) {
+        return VERSION_PARSING_ERROR;
+    }
+    //txType
+    if(!buffer_read_u8(buf,&tx->tx_type)) {
+        return TXTYPE_PARSING_ERROR;
+    }
+    */
+    //nonce
+    if(!buffer_read_u32(buf,&tx->nonce,LE)) {
+        return NONCE_PARSING_ERROR;
+    }
+    //gasPrice
+    if(!buffer_read_u64(buf,&tx->gas_price,LE)) {
+        return GASPRICE_PARSING_ERROR;
+    }
+    //gasLimit
+    if(!buffer_read_u64(buf,&tx->gas_limit,LE)) {
+        return GASLIMIT_PARSING_ERROR;
+    }
+    //payer
+    tx->payer = (uint8_t *) (buf->ptr + buf->offset);
+    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+        return PAYER_PARSING_ERROR;
+    }
+    if (!buffer_seek_cur(buf,1)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    //payload
+    if(memcmp(buf->ptr+buf->size - 56-8, "transfer", 8) != 0) {
+        return PARSE_STRING_MATCH_ERROR;
+    }
+    if (!buffer_seek_cur(buf,buf->size-buf->offset -56)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    tx->payload.from = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+        return FROM_PARSING_ERROR;
+    }
+    tx->payload.to = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+        return TO_PARSING_ERROR;
+    }
+    /*
+    if (!buffer_read_u64(buf, &tx->payload.value, LE)) {
+        return VALUE_PARSING_ERROR;
+    }
     if (!buffer_seek_cur(buf,18)) {
         return BUFFER_OFFSET_MOVE_ERROR;
     }
