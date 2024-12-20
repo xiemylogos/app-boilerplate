@@ -148,10 +148,10 @@ parser_status_e oep4_wasm_vm_transaction_deserialize(buffer_t *buf, ont_transact
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return TO_PARSING_ERROR;
     }
-    /*
     if (!buffer_read_u64(buf, &tx->payload.value, LE)) {
         return VALUE_PARSING_ERROR;
     }
+    /*
     if (!buffer_seek_cur(buf,18)) {
         return BUFFER_OFFSET_MOVE_ERROR;
     }

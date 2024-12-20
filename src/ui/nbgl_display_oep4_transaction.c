@@ -68,7 +68,7 @@ static uint8_t setTagValuePairs(void) {
     uint8_t nbPairs = 0;
     explicit_bzero(pairs, sizeof(pairs));
      // Format amount and address to g_amount and g_address buffers
-    /*
+
     memset(g_amount, 0, sizeof(g_amount));
     if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.oep4_tx_info.payload.value)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
@@ -76,7 +76,7 @@ static uint8_t setTagValuePairs(void) {
     pairs[0].item = "Oep4 Amount";
     pairs[nbPairs].value = g_amount;
     nbPairs++;
-     */
+
     //fromAddr
     memset(g_fromAddr, 0, sizeof(g_fromAddr));
     if (script_hash_to_address(g_fromAddr,sizeof(g_fromAddr),G_context.tx_info.oep4_tx_info.payload.from) ==
