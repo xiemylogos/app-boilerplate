@@ -30,6 +30,37 @@
 #include "../person-msg/deserialize.h"
 #include "../person-msg/types.h"
 
+
+
+#ifdef TARGET_NANOS
+#define SHARED_CTX_FIELD_1_SIZE 100
+#else
+#ifdef SCREEN_SIZE_WALLET
+#define SHARED_CTX_FIELD_1_SIZE 380
+#else
+#define SHARED_CTX_FIELD_1_SIZE 256
+#endif
+#endif
+#define SHARED_CTX_FIELD_2_SIZE 4
+
+typedef struct strDataTmp_s {
+    char tmp[SHARED_CTX_FIELD_1_SIZE];
+    char tmp2[SHARED_CTX_FIELD_2_SIZE];
+} strDataTmp_t;
+
+typedef union {
+    strDataTmp_t tmp;
+} strings_t;
+
+cx_sha256_t global_sha256;
+strings_t strings;
+
+static const char SIGN_MAGIC[] =
+    "\x19"
+    "Ontology Signed Message:\n";
+
+
+
 int handler_sign_person_msg(buffer_t *cdata, uint8_t chunk, bool more) {
     if (chunk == 0) {  // first APDU, parse BIP32 path
         explicit_bzero(&G_context, sizeof(G_context));
@@ -76,16 +107,55 @@ int handler_sign_person_msg(buffer_t *cdata, uint8_t chunk, bool more) {
             }
 
             G_context.state = STATE_PARSED;
+            cx_err_t error = CX_INTERNAL_ERROR;
 
+            // Initialize message header + length
+            cx_sha256_init(&global_sha256);
+
+            CX_CHECK(cx_hash_no_throw((cx_hash_t *) &global_sha256,
+                                      0,
+                                      (uint8_t *) SIGN_MAGIC,
+                                      sizeof(SIGN_MAGIC) - 1,
+                                      NULL,
+                                      0));
+            snprintf(strings.tmp.tmp2,
+                     sizeof(strings.tmp.tmp2),
+                     "%u",
+                     buf.size);
+
+            CX_CHECK(cx_hash_no_throw((cx_hash_t *) &global_sha256,
+                                      0,
+                                      (uint8_t *) strings.tmp.tmp2,
+                                      strlen(strings.tmp.tmp2),
+                                      NULL,
+                                      0));
+            CX_CHECK(cx_hash_no_throw((cx_hash_t *) &global_sha256,
+                                      0,
+                                      G_context.person_msg_info.raw_msg,
+                                      G_context.person_msg_info.raw_msg_len,
+                                      NULL,
+                                      0));
+
+            CX_CHECK(cx_hash_no_throw((cx_hash_t *) &global_sha256,
+                                      CX_LAST,
+                                      NULL,
+                                      0,
+                                      G_context.person_msg_info.m_hash,
+                                      32));
+
+            /*
             if (cx_sha256_hash(G_context.person_msg_info.raw_msg,
                                    G_context.person_msg_info.raw_msg_len,
                                    G_context.person_msg_info.m_hash) != CX_OK) {
                 return io_send_sw(SW_PERSON_MSG_HASH_FAIL);
             }
-
+            */
             PRINTF("Hash: %.*H\n", sizeof(G_context.person_msg_info.m_hash), G_context.person_msg_info.m_hash);
 
             return ui_display_person_msg();
+        end:
+            //*sw = error;
+            return io_send_sw(error);
         }
     }
     return 0;
