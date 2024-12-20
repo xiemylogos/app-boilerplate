@@ -324,7 +324,7 @@ static uint8_t addInitPosTagValuePairs(void) {
 // - Display the first screen of the transaction review
 int ui_display_add_init_pos_tx_bs_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
-        | G_context.tx_type != ADD_INIT_POS) {
+        || G_context.tx_type != ADD_INIT_POS) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }

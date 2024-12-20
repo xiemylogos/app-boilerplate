@@ -297,17 +297,18 @@ UX_FLOW(ux_display_transaction_flow,
         &ux_display_reject_step);
 
 int ui_display_transaction() {
-    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED) {
+    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
+        || G_context.tx_type != TRANSFER_TRANSACTION) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
 
     memset(g_amount, 0, sizeof(g_amount));
 
-    if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONT_ADDR,20) == 0) {
-        format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value,9);
-    } else if (memcmp(G_context.tx_info.transaction.payload.contract_addr,ONG_ADDR,20) == 0) {
-        format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.transaction.payload.value,18);
+    if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONT_ADDR,20) == 0) {
+        format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.tx_info.payload.value,9);
+    } else if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONG_ADDR,20) == 0) {
+        format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.tx_info.payload.value,18);
     }
 
     PRINTF("Amount: %s\n", g_amount);
@@ -412,13 +413,14 @@ int ui_display_register_candidate_tx() {
 
     memset(g_address, 0, sizeof(g_address));
 
-    if (script_hash_to_address(g_address,sizeof(g_address),G_context.register_candidate_tx_info.transaction.account) ==
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.register_candidate_tx_info.account) ==
         -1) {
         return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.tx_info.register_candidate_tx_info.peer_pubkey, G_context.tx_info.register_candidate_tx_info.peer_pubkey_length*66);
+    memcpy(g_peerPubkey, G_context.tx_info.register_candidate_tx_info.peer_pubkey,66);
+
 
      memset(g_initPost,0,sizeof(g_initPost));
     if (!format_u64(g_initPost,sizeof(g_initPost),G_context.tx_info.register_candidate_tx_info.init_pos)) {
@@ -457,19 +459,18 @@ int ui_display_withdraw_tx() {
         return io_send_sw(SW_BAD_STATE);
     }
 
-    memset(g_amount, 0, sizeof(g_amount));
-    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.withdraw_tx_info.payload.value)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
-    //todo
-    PRINTF("Amount: %s\n", g_amount);
-
     memset(g_address, 0, sizeof(g_address));
-
-    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.transaction.payload.to) ==
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.withdraw_tx_info.account) ==
         -1) {
         return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
+
+    memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+    memcpy(g_peerPubkey, G_context.tx_info.withdraw_tx_info.peer_pubkey, G_context.tx_info.withdraw_tx_info.peer_pubkey_length*66);
+
+    memset(g_withdrawList,0,sizeof(g_withdrawList));
+    memcpy(g_withdrawList, G_context.tx_info.withdraw_tx_info.withdraw_list, G_context.tx_info.withdraw_tx_info.withdraw_list_length*1);
+
 
     g_validate_callback = &ui_action_validate_withdraw_transaction;
 
@@ -493,7 +494,7 @@ int ui_display_quit_node_tx() {
         return io_send_sw(SW_BAD_STATE);
     }
 
-    memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+   memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
     memcpy(g_peerPubkey, G_context.tx_info.quit_node_tx_info.peer_pubkey,66);
 
     memset(g_address, 0, sizeof(g_address));
@@ -527,7 +528,7 @@ int ui_display_add_init_pos_tx() {
     }
 
    memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-   memcpy(g_peerPubkey, G_context.tx_info.add_init_pos_tx_info.peer_pubkey,66);
+    memcpy(g_peerPubkey, G_context.tx_info.add_init_pos_tx_info.peer_pubkey,66);
 
     memset(g_address, 0, sizeof(g_address));
     if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.add_init_pos_tx_info.account) ==
@@ -535,7 +536,7 @@ int ui_display_add_init_pos_tx() {
         return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
 
-     memset(g_pos,0,sizeof(g_pos));
+    memset(g_pos,0,sizeof(g_pos));
     if (!format_u64(g_pos,sizeof(g_pos),G_context.tx_info.add_init_pos_tx_info.pos)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
@@ -572,7 +573,7 @@ int ui_display_reduce_init_pos_tx() {
         return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
 
-     memset(g_pos,0,sizeof(g_pos));
+    memset(g_pos,0,sizeof(g_pos));
     if (!format_u64(g_pos,sizeof(g_pos),G_context.tx_info.reduce_init_pos_tx_info.pos)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
@@ -595,7 +596,7 @@ UX_FLOW(ux_display_change_max_authorization_transaction_flow,
 
 int ui_display_change_max_authorization_tx() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
-        || G_context.tx_type != CHANGE_MAX_AUTHORIZATION) {
+        || G_context.tx_type != REDUCE_INIT_POS) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
@@ -691,8 +692,8 @@ int ui_display_authorize_for_peer_tx() {
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
     memcpy(g_peerPubkey, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey_length*66);
 
-    memset(g_posList,0,sizeof(g_posList));
-    memcpy(g_posList, G_context.tx_info.authorize_for_peer_tx_info.pos_list, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey_length*4);
+   memset(g_posList,0,sizeof(g_posList));
+   memcpy(g_posList, G_context.tx_info.authorize_for_peer_tx_info.pos_list, G_context.tx_info.authorize_for_peer_tx_info.pos_list_length*1);
 
 
     g_validate_callback = &ui_action_validate_authorize_for_peer_transaction;
@@ -712,21 +713,23 @@ UX_FLOW(ux_display_un_authorize_for_peer_transaction_flow,
         &ux_display_reject_step);
 
 int ui_display_un_authorize_for_peer_tx() {
-    if (G_context.req_type != CONFIRM_UN_AUTHORIZE_FOR_PEER || G_context.state != STATE_PARSED) {
+    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
+        || G_context.tx_type != UN_AUTHORIZE_FOR_PEER) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
 
     memset(g_address, 0, sizeof(g_address));
-    if (script_hash_to_address(g_address,sizeof(g_address),G_context.un_authorize_for_peer_tx_info.transaction.account) ==
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.un_authorize_for_peer_tx_info.account) ==
         -1) {
         return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
+
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.un_authorize_for_peer_tx_info.transaction.peer_pubkey, G_context.un_authorize_for_peer_tx_info.transaction.peer_pubkey_length*66);
+    memcpy(g_peerPubkey, G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey, G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey_length*66);
 
     memset(g_posList,0,sizeof(g_posList));
-    memcpy(g_posList, G_context.un_authorize_for_peer_tx_info.transaction.pos_list, G_context.un_authorize_for_peer_tx_info.transaction.peer_pubkey_length*4);
+    memcpy(g_posList, G_context.tx_info.un_authorize_for_peer_tx_info.pos_list, G_context.tx_info.un_authorize_for_peer_tx_info.pos_list_length*1);
 
     g_validate_callback = &ui_action_validate_un_authorize_for_peer_transaction;
 
@@ -743,14 +746,15 @@ UX_FLOW(ux_display_withdraw_ong_transaction_flow,
         &ux_display_reject_step);
 
 int ui_display_withdraw_ong_tx() {
-    if (G_context.req_type != CONFIRM_WITHDRAW_ONG || G_context.state != STATE_PARSED) {
+    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
+        || G_context.tx_type != WITHDRAW_ONG) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
 
 
     memset(g_address, 0, sizeof(g_address));
-    if (script_hash_to_address(g_address,sizeof(g_address),G_context.withdraw_ong_tx_info.transaction.account) ==
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.withdraw_fee_tx_info.account) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
@@ -770,14 +774,15 @@ UX_FLOW(ux_display_withdraw_fee_transaction_flow,
         &ux_display_reject_step);
 
 int ui_display_withdraw_fee_tx() {
-    if (G_context.req_type != CONFIRM_WITHDRAW_FEE || G_context.state != STATE_PARSED) {
+    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
+        || G_context.tx_type != WITHDRAW_ONG) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
 
 
     memset(g_address, 0, sizeof(g_address));
-    if (script_hash_to_address(g_address,sizeof(g_address),G_context.withdraw_fee_tx_info.transaction.account) ==
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.withdraw_fee_tx_info.account) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
