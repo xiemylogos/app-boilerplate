@@ -34,8 +34,9 @@
 #include "../menu.h"
 
 static char g_msg[1024];
+static char g_hash[40];
 
-static nbgl_layoutTagValue_t pairs[1];
+static nbgl_layoutTagValue_t pairs[2];
 static nbgl_layoutTagValueList_t pairList;
 
 static void person_msg_review_choice(bool confirm) {
@@ -57,9 +58,12 @@ int ui_display_person_msg_bs_choice() {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
+
+    explicit_bzero(pairs, sizeof(pairs));
+    memset(g_msg, 0, sizeof(g_msg));
     if(G_context.person_msg_info.raw_msg_len >= 1024) {
         memcpy(g_msg, G_context.person_msg_info.msg_info.person_msg, 1023);
-        g_msg[29] = '\0';
+        g_msg[1024] = '\0';
     } else {
         memcpy(g_msg, G_context.person_msg_info.msg_info.person_msg,G_context.person_msg_info.raw_msg_len);
         g_msg[G_context.person_msg_info.raw_msg_len+1] = '\0';
@@ -68,9 +72,14 @@ int ui_display_person_msg_bs_choice() {
     pairs[0].item = "msg content:";
     pairs[0].value = g_msg;
 
+    memset(g_hash, 0, sizeof(g_hash));
+    memcpy(g_hash, G_context.person_msg_info.m_hash,32);
+
+    pairs[1].item = "msg hash:";
+    pairs[1].value = g_hash;
     // Setup list
     pairList.nbMaxLinesForValue = 0;
-    pairList.nbPairs = 1;
+    pairList.nbPairs = 2;
     pairList.pairs = pairs;
 
     // Start review flow
