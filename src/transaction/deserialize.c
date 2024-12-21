@@ -72,21 +72,52 @@ parser_status_e transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
         if(memcmp(buf->ptr+buf->size - 46 - 10 - 1, "transferV2", 10) != 0) {
             return PARSE_STRING_MATCH_ERROR;
         }
+        uint32_t pre_from;
+        if (!buffer_read_u32(buf, &pre_from, LE)) {
+            return VALUE_PARSING_ERROR;
+        }
+        
+        if (pre_from != 342607360) { //00c66b14
+           return VALUE_PARSING_ERROR; 
+        }
+        
+        /*
         if (!buffer_seek_cur(buf,4)) {
             return BUFFER_OFFSET_MOVE_ERROR;
         }
+        */
         tx->payload.from = (uint8_t*)(buf->ptr+buf->offset);
         if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
             return FROM_PARSING_ERROR;
         }
+        uint32_t pre_to;
+        if (!buffer_read_u32(buf, &pre_to, LE)) { 
+            return VALUE_PARSING_ERROR;
+        }
+        
+        if (pre_to != 348683370) { //6a7cc814
+           return VALUE_PARSING_ERROR; 
+        }
+        
+        /* 
         if (!buffer_seek_cur(buf,4)) {
             return BUFFER_OFFSET_MOVE_ERROR;
         }
+        */
         tx->payload.to = (uint8_t*)(buf->ptr+buf->offset);
         if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
             return TO_PARSING_ERROR;
         }
-        if (!buffer_seek_cur(buf,4)) {
+        uint16_t pre_value;
+        if (!buffer_read_u16(buf, &pre_value, LE)) { 
+            return VALUE_PARSING_ERROR;
+        }
+        
+        if (pre_value != 31850) { //6a7c
+           return VALUE_PARSING_ERROR; 
+        }
+         
+        if (!buffer_seek_cur(buf,2)) {
             return BUFFER_OFFSET_MOVE_ERROR;
         }
         if (!buffer_read_u64(buf, &tx->payload.value, LE)) {

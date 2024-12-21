@@ -81,20 +81,45 @@ parser_status_e oep4_neo_vm_transaction_deserialize(buffer_t *buf, ont_transacti
     for (int i = 0; i < amount_len; i++) {
         tx->payload.value |= ((int64_t)value[i] << (8 * i));
     }
+    uint8_t pre_to;
+   if(!buffer_read_u8(buf,&pre_to)) {
+        return VALUE_PARSING_ERROR;
+    }
+    if (pre_to != 20) { //14
+      return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    /*
     if (!buffer_seek_cur(buf,1)) {
         return BUFFER_OFFSET_MOVE_ERROR;
     }
+    */
     tx->payload.to = (uint8_t*)(buf->ptr+buf->offset);
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return TO_PARSING_ERROR;
     }
+    uint8_t pre_from;
+   if(!buffer_read_u8(buf,&pre_from)) {
+        return VALUE_PARSING_ERROR;
+    }
+    if (pre_from != 20) { //14
+      return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    /*
     if (!buffer_seek_cur(buf,1)) {
         return BUFFER_OFFSET_MOVE_ERROR;
     }
+    */
     tx->payload.from = (uint8_t*)(buf->ptr+buf->offset);
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return FROM_PARSING_ERROR;
     }
+    uint64_t end_value;
+    if (!buffer_read_u64(buf, &end_value, LE)) {
+        return VALUE_PARSING_ERROR;
+    }
+    if (end_value != 8317692706000781651) { //53c1087472616e73
+       return VALUE_PARSING_ERROR; 
+    } 
     /*
     if (!buffer_seek_cur(buf,18)) {
         return BUFFER_OFFSET_MOVE_ERROR;
@@ -162,6 +187,13 @@ parser_status_e oep4_wasm_vm_transaction_deserialize(buffer_t *buf, ont_transact
     }
     if (!buffer_read_u64(buf, &tx->payload.value, LE)) {
         return VALUE_PARSING_ERROR;
+    }
+    uint64_t end_value;
+    if (!buffer_read_u64(buf, &end_value, LE)) {
+        return VALUE_PARSING_ERROR;
+    }
+    if (end_value != 0) {
+       return VALUE_PARSING_ERROR; 
     }
     /*
     if (!buffer_seek_cur(buf,18)) {
