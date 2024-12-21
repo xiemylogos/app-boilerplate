@@ -596,7 +596,7 @@ UX_FLOW(ux_display_change_max_authorization_transaction_flow,
 
 int ui_display_change_max_authorization_tx() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
-        || G_context.tx_type != REDUCE_INIT_POS) {
+        || G_context.tx_type != CHANGE_MAX_AUTHORIZATION) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
@@ -775,7 +775,7 @@ UX_FLOW(ux_display_withdraw_fee_transaction_flow,
 
 int ui_display_withdraw_fee_tx() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
-        || G_context.tx_type != WITHDRAW_ONG) {
+        || G_context.tx_type != WITHDRAW_FEE) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
