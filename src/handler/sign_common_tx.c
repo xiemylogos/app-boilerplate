@@ -208,7 +208,7 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
             }
 
             memcpy(G_context.tx_info.m_hash, second_hash, 32);
-
+            explicit_bzero(&second_hash, sizeof(second_hash));
             PRINTF("Hash: %.*H\n", sizeof(G_context.tx_info.m_hash), G_context.tx_info.m_hash);
 
             if ( G_context.tx_type == TRANSFER_TRANSACTION) {
