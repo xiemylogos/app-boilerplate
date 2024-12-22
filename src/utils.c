@@ -42,3 +42,24 @@ int script_hash_to_address(char* out, size_t out_len, const unsigned char* scrip
 
     return base58_encode(address, sizeof(address), out, out_len);
 }
+
+
+size_t utf8_strlen(const char* str) {
+    size_t len = 0;
+    const unsigned char* ptr = (const unsigned char*)str;
+    while (*ptr) {
+        if ((*ptr & 0x80) == 0) {
+            ptr += 1;
+        } else if ((*ptr & 0xE0) == 0xC0) {
+            ptr += 2;
+        } else if ((*ptr & 0xF0) == 0xE0) {
+            ptr += 3;
+        } else if ((*ptr & 0xF8) == 0xF0) {
+            ptr += 4;
+        } else {
+            ptr += 1; 
+        }
+        len++;
+    }
+    return len;
+}

@@ -6,8 +6,11 @@ from application_client.boilerplate_response_unpacker import unpack_get_public_k
 from ragger.error import ExceptionRAPDU
 from utils import check_signature_validity
 from utils import checkperson_signature_validity
+from utils import utf8_strlen
+from utils import int_byte
 import logging
 
+SIGN_MAGIC = b"\x19Ontology Signed Message:\n"
 # Configure logger
 logger = logging.getLogger("test_logger")
 logger.setLevel(logging.DEBUG)
@@ -39,7 +42,8 @@ def test_sign_person_msg_short_msg(backend, scenario_navigator):
     with client.sign_person_msg(path=path, personmsg=personmsg):
         # Validate the on-screen request by performing the navigation appropriate for this device
         scenario_navigator.review_approve()
-
+    
+    personmsg = SIGN_MAGIC[:-1]+int_byte(utf8_strlen("test message"))+personmsg
     # The device as yielded the result, parse it and ensure that the signature is correct
     response = client.get_async_response().data
     _, der_sig, _ = unpack_sign_person_msg_response(response)

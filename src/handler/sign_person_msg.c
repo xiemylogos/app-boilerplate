@@ -118,10 +118,11 @@ int handler_sign_person_msg(buffer_t *cdata, uint8_t chunk, bool more) {
                                       sizeof(SIGN_MAGIC) - 1,
                                       NULL,
                                       0));
+
             snprintf(strings.tmp.tmp2,
                      sizeof(strings.tmp.tmp2),
                      "%u",
-                     buf.size);
+                     utf8_strlen(G_context.person_msg_info.raw_msg));
 
             CX_CHECK(cx_hash_no_throw((cx_hash_t *) &global_sha256,
                                       0,
