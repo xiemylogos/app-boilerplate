@@ -93,84 +93,84 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                         }
                         G_context.tx_type = TRANSFER_TRANSACTION;
                         G_context.state = STATE_PARSED;
+                    } else if(memcmp(buf.ptr + buf.size-46-17-1,"registerCandidate",17) == 0) {
+                        parser_status_e status =  register_candidate_tx_deserialize(&buf, &G_context.tx_info.register_candidate_tx_info);
+                        if (status != PARSING_OK) {
+                            return io_send_sw(SW_TX_PARSING_FAIL);
+                        }
+                        G_context.tx_type = REGISTER_CANDIDATE;
+                        G_context.state = STATE_PARSED;
+                    }  else if (memcmp(buf.ptr + buf.size-46-8-1,"withdraw",8) == 0) {
+                        parser_status_e status =  withdraw_tx_deserialize(&buf, &G_context.tx_info.withdraw_tx_info);
+                        if (status != PARSING_OK) {
+                            return io_send_sw(SW_TX_PARSING_FAIL);
+                        }
+                        G_context.tx_type = WITHDRAW;
+                        G_context.state = STATE_PARSED;
+                    } else if (memcmp(buf.ptr + buf.size-46-8-1, "quitNode",8) == 0) {
+                        parser_status_e status =  quit_node_tx_deserialize(&buf, &G_context.tx_info.quit_node_tx_info);
+                        if (status != PARSING_OK) {
+                            return io_send_sw(SW_TX_PARSING_FAIL);
+                        }
+                        G_context.tx_type = QUIT_NODE;
+                        G_context.state = STATE_PARSED;
+                    } else if(memcmp(buf.ptr + buf.size-46-10-1,"addInitPos",10) ==0) {
+                        parser_status_e status =  add_init_pos_tx_deserialize(&buf, &G_context.tx_info.add_init_pos_tx_info);
+                        if (status != PARSING_OK) {
+                            return io_send_sw(SW_TX_PARSING_FAIL);
+                        }
+                        G_context.tx_type = ADD_INIT_POS;
+                        G_context.state = STATE_PARSED;
+                    } else if (memcmp(buf.ptr + buf.size-46-13-1,"reduceInitPos",13) ==0) {
+                        parser_status_e status =  reduce_init_pos_tx_deserialize(&buf, &G_context.tx_info.reduce_init_pos_tx_info);
+                        if (status != PARSING_OK) {
+                            return io_send_sw(SW_TX_PARSING_FAIL);
+                        }
+                        G_context.tx_type = REDUCE_INIT_POS;
+                        G_context.state = STATE_PARSED;
+                    } else if(memcmp(buf.ptr + buf.size-46-22-1,"changeMaxAuthorization",22) ==0) {
+                        parser_status_e status =  change_max_authorization_tx_deserialize(&buf, &G_context.tx_info.change_max_authorization_tx_info);
+                        if (status != PARSING_OK) {
+                            return io_send_sw(SW_TX_PARSING_FAIL);
+                        }
+                        G_context.tx_type = CHANGE_MAX_AUTHORIZATION;
+                        G_context.state = STATE_PARSED;
+                    } else if (memcmp(buf.ptr + buf.size-46-16-1,"setFeePercentage",16) ==0) {
+                        parser_status_e status =  set_fee_percentage_tx_deserialize(&buf, &G_context.tx_info.set_fee_percentage_tx_info);
+                        if (status != PARSING_OK) {
+                            return io_send_sw(SW_TX_PARSING_FAIL);
+                        }
+                        G_context.tx_type = SET_FEE_PERCENTAGE;
+                        G_context.state = STATE_PARSED;
+                    } else if(memcmp(buf.ptr + buf.size-46-16-1,"authorizeForPeer",16) == 0) {
+                        parser_status_e status =  authorize_for_peer_tx_deserialize(&buf, &G_context.tx_info.authorize_for_peer_tx_info);
+                        if (status != PARSING_OK) {
+                            return io_send_sw(SW_TX_PARSING_FAIL);
+                        }
+                        G_context.tx_type = AUTHORIZE_FOR_PEER;
+                        G_context.state = STATE_PARSED;
+                    } else if (memcmp(buf.ptr + buf.size-46-18-1,"unAuthorizeForPeer",18) ==0) {
+                        parser_status_e status =  un_authorize_for_peer_tx_deserialize(&buf, &G_context.tx_info.un_authorize_for_peer_tx_info);
+                        if (status != PARSING_OK) {
+                            return io_send_sw(SW_TX_PARSING_FAIL);
+                        }
+                        G_context.tx_type = UN_AUTHORIZE_FOR_PEER;
+                        G_context.state = STATE_PARSED;
+                    } else if (memcmp(buf.ptr + buf.size-46-11-1,"withdrawOng",11) ==0) {
+                        parser_status_e status =  withdraw_ong_tx_deserialize(&buf, &G_context.tx_info.withdraw_ong_tx_info);
+                        if (status != PARSING_OK) {
+                            return io_send_sw(SW_TX_PARSING_FAIL);
+                        }
+                        G_context.tx_type = WITHDRAW_ONG;
+                        G_context.state = STATE_PARSED;
+                    } else if(memcmp(buf.ptr + buf.size-46-11-1,"withdrawFee",11) == 0) {
+                        parser_status_e status = withdraw_fee_tx_deserialize(&buf, &G_context.tx_info.withdraw_fee_tx_info);
+                        if (status != PARSING_OK) {
+                            return io_send_sw(SW_TX_PARSING_FAIL);
+                        }
+                        G_context.tx_type = WITHDRAW_FEE;
+                        G_context.state = STATE_PARSED;
                     }
-                } else if(memcmp(buf.ptr + buf.size-46-17,"registerCandidate",17) == 0) {
-                    parser_status_e status =  register_candidate_tx_deserialize(&buf, &G_context.tx_info.register_candidate_tx_info);
-                    if (status != PARSING_OK) {
-                        return io_send_sw(SW_TX_PARSING_FAIL);
-                    }
-                    G_context.tx_type = REGISTER_CANDIDATE;
-                    G_context.state = STATE_PARSED;
-                }  else if (memcmp(buf.ptr + buf.size-46-8,"withdraw",8) == 0) {
-                    parser_status_e status =  withdraw_tx_deserialize(&buf, &G_context.tx_info.withdraw_tx_info);
-                    if (status != PARSING_OK) {
-                        return io_send_sw(SW_TX_PARSING_FAIL);
-                    }
-                    G_context.tx_type = WITHDRAW;
-                    G_context.state = STATE_PARSED;
-                } else if (memcmp(buf.ptr + buf.size-46-8, "quitNode",8) == 0) {
-                    parser_status_e status =  quit_node_tx_deserialize(&buf, &G_context.tx_info.quit_node_tx_info);
-                    if (status != PARSING_OK) {
-                        return io_send_sw(SW_TX_PARSING_FAIL);
-                    }
-                    G_context.tx_type = QUIT_NODE;
-                    G_context.state = STATE_PARSED;
-                } else if(memcmp(buf.ptr + buf.size-46-10,"addInitPos",10) ==0) {
-                    parser_status_e status =  add_init_pos_tx_deserialize(&buf, &G_context.tx_info.add_init_pos_tx_info);
-                    if (status != PARSING_OK) {
-                        return io_send_sw(SW_TX_PARSING_FAIL);
-                    }
-                    G_context.tx_type = ADD_INIT_POS;
-                    G_context.state = STATE_PARSED;
-                } else if (memcmp(buf.ptr + buf.size-46-13,"reduceInitPos",13) ==0) {
-                    parser_status_e status =  reduce_init_pos_tx_deserialize(&buf, &G_context.tx_info.reduce_init_pos_tx_info);
-                    if (status != PARSING_OK) {
-                        return io_send_sw(SW_TX_PARSING_FAIL);
-                    }
-                    G_context.tx_type = REDUCE_INIT_POS;
-                    G_context.state = STATE_PARSED;
-                } else if(memcmp(buf.ptr + buf.size-46-22,"changeMaxAuthorization",22) ==0) {
-                    parser_status_e status =  change_max_authorization_tx_deserialize(&buf, &G_context.tx_info.change_max_authorization_tx_info);
-                    if (status != PARSING_OK) {
-                        return io_send_sw(SW_TX_PARSING_FAIL);
-                    }
-                    G_context.tx_type = CHANGE_MAX_AUTHORIZATION;
-                    G_context.state = STATE_PARSED;
-                } else if (memcmp(buf.ptr + buf.size-46-16,"setFeePercentage",16) ==0) {
-                    parser_status_e status =  set_fee_percentage_tx_deserialize(&buf, &G_context.tx_info.set_fee_percentage_tx_info);
-                    if (status != PARSING_OK) {
-                        return io_send_sw(SW_TX_PARSING_FAIL);
-                    }
-                    G_context.tx_type = SET_FEE_PERCENTAGE;
-                    G_context.state = STATE_PARSED;
-                } else if(memcmp(buf.ptr + buf.size-46-16,"authorizeForPeer",16) == 0) {
-                    parser_status_e status =  authorize_for_peer_tx_deserialize(&buf, &G_context.tx_info.authorize_for_peer_tx_info);
-                    if (status != PARSING_OK) {
-                        return io_send_sw(SW_TX_PARSING_FAIL);
-                    }
-                    G_context.tx_type = AUTHORIZE_FOR_PEER;
-                    G_context.state = STATE_PARSED;
-                } else if (memcmp(buf.ptr + buf.size-46-18,"unAuthorizeForPeer",18) ==0) {
-                    parser_status_e status =  un_authorize_for_peer_tx_deserialize(&buf, &G_context.tx_info.un_authorize_for_peer_tx_info);
-                    if (status != PARSING_OK) {
-                        return io_send_sw(SW_TX_PARSING_FAIL);
-                    }
-                    G_context.tx_type = UN_AUTHORIZE_FOR_PEER;
-                    G_context.state = STATE_PARSED;
-                } else if (memcmp(buf.ptr + buf.size-46-11,"withdrawOng",11) ==0) {
-                    parser_status_e status =  withdraw_ong_tx_deserialize(&buf, &G_context.tx_info.withdraw_ong_tx_info);
-                    if (status != PARSING_OK) {
-                        return io_send_sw(SW_TX_PARSING_FAIL);
-                    }
-                    G_context.tx_type = WITHDRAW_ONG;
-                    G_context.state = STATE_PARSED;
-                } else if(memcmp(buf.ptr + buf.size-46-11,"withdrawFee",11) == 0) {
-                    parser_status_e status = withdraw_fee_tx_deserialize(&buf, &G_context.tx_info.withdraw_fee_tx_info);
-                    if (status != PARSING_OK) {
-                        return io_send_sw(SW_TX_PARSING_FAIL);
-                    }
-                    G_context.tx_type = WITHDRAW_FEE;
-                    G_context.state = STATE_PARSED;
                 } else if(memcmp(buf.ptr+buf.size - 21-8, "transfer", 8) == 0) {
                     parser_status_e status = oep4_neo_vm_transaction_deserialize(&buf, &G_context.tx_info.oep4_tx_info);
                     if (status != PARSING_OK) {
