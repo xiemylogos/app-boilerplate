@@ -18,6 +18,7 @@
 #include <stdint.h>   // uint*_t
 #include <stdbool.h>  // bool
 #include <string.h>   // memmove
+#include "buffer.h"
 
 #if defined(TEST) || defined(FUZZ)
 #include "assert.h"
@@ -55,4 +56,18 @@ bool transaction_utils_format_memo(const uint8_t *memo,
     dst[memo_len] = '\0';
 
     return true;
+}
+
+//6a7cc8 or 00c66b
+uint64_t getThreeBytesValue(buffer_t *buf) {
+    uint8_t *value;
+    value = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf, 3)) {
+        return 0;
+    }
+    uint64_t pre_value =0;
+    for (int i = 0; i < 3; i++) {
+        pre_value |= ((int64_t)value[i] << (8 * i));
+    }
+    return pre_value;
 }
