@@ -32,6 +32,7 @@
 #include "../sw.h"
 #include "action/validate.h"
 #include "../menu.h"
+#include "utils.h"
 
 static char g_msg[1024];
 static char g_hash[40];
@@ -80,7 +81,7 @@ int ui_display_person_msg_bs_choice() {
     pairs[1].value = g_hash;
 
     memset(g_len,0,sizeof(g_len));
-    if (!format_u64(g_len,sizeof(g_len),G_context.person_msg_info.raw_msg_len)) {
+    if (!format_u64(g_len,sizeof(g_len),utf8_strlen(G_context.person_msg_info.raw_msg))) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[2].item = "msg len:";

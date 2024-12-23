@@ -24,7 +24,7 @@ typedef struct {
 typedef struct {
     uint8_t *from;
     uint8_t *to;
-    uint64_t value;
+    uint8_t *value;
     uint8_t  *contract_addr;
 }state_info_v2;
 
