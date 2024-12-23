@@ -141,7 +141,7 @@ parser_status_e transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
         if(memcmp(buf->ptr+buf->offset, end_data, sizeof(end_data)) != 0) {
             return DATA_END_PARSING_ERROR;
         }
-        if (!buffer_seek_cur(buf,26)) {
+        if (!buffer_seek_cur(buf,sizeof(end_data))) {
             return DATA_END_PARSING_ERROR;
         }
     } else if (buf->size-buf->offset > PAYLOAD_TRANSFER_FROM_V2_LEN) {

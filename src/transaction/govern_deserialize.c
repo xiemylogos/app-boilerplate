@@ -888,16 +888,6 @@ parser_status_e withdraw_fee_tx_deserialize(buffer_t *buf, withdraw_fee_t *tx) {
     if (buf->size > MAX_TRANSACTION_LEN) {
         return WRONG_LENGTH_ERROR;
     }
-    /*
-    //version
-    if(!buffer_read_u8(buf,&tx->version)) {
-        return VERSION_PARSING_ERROR;
-    }
-    //txType
-    if(!buffer_read_u8(buf,&tx->tx_type)) {
-        return TXTYPE_PARSING_ERROR;
-    }
-    */
     //nonce
     if(!buffer_read_u32(buf,&tx->nonce,LE)) {
         return NONCE_PARSING_ERROR;
@@ -915,19 +905,60 @@ parser_status_e withdraw_fee_tx_deserialize(buffer_t *buf, withdraw_fee_t *tx) {
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return PAYER_PARSING_ERROR;
     }
-    if (!buffer_seek_cur(buf,1)) {
-        return BUFFER_OFFSET_MOVE_ERROR;
+    uint8_t  op_code_size;
+    if(!buffer_read_u8(buf,&op_code_size)) {
+        return OPCODE_PARSING_ERROR;
+    }
+    if(!buffer_can_read(buf,op_code_size)) {
+        return DATA_END_PARSING_ERROR;
     }
     if(getThreeBytesValue(buf) != 7063040) { //00c66b
         return VALUE_PARSING_ERROR;
     }
-    if (!buffer_seek_cur(buf,1)) {
+    uint8_t pre_pub;
+    if(!buffer_read_u8(buf,&pre_pub)) {
+        return VALUE_PARSING_ERROR;
+    }
+    if (pre_pub != 20) { //14
         return BUFFER_OFFSET_MOVE_ERROR;
     }
     tx->account = (uint8_t*)(buf->ptr+buf->offset);
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return FROM_PARSING_ERROR;
     }
+    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+        return VALUE_PARSING_ERROR;
+    }
+    uint16_t  pre_code;
+    if(!buffer_read_u16(buf,&pre_code,LE)) {
+        return OPCODE_PARSING_ERROR;
+    }
+    if (pre_code != 2924) { //6c0b
+        return OPCODE_PARSING_ERROR;
+    }
+    if(memcmp(buf->ptr+buf->offset, "withdrawFee", 11) != 0) {
+        return PARSE_STRING_MATCH_ERROR;
+    }
+    if (!buffer_seek_cur(buf,11)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
 
-    return PARSING_OK;
+    uint8_t end_data[] = {
+        0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x68, 0x16,
+        0x4F, 0x6E, 0x74, 0x6F, 0x6C, 0x6F, 0x67, 0x79,
+        0x2E, 0x4E, 0x61, 0x74, 0x69, 0x76, 0x65, 0x2E,
+        0x49, 0x6E, 0x76, 0x6F, 0x6B, 0x65, 0x00
+    };
+    if(!buffer_can_read(buf,sizeof(end_data))) {
+        return DATA_END_PARSING_ERROR;
+    }
+    if(memcmp(buf->ptr+buf->offset, end_data, sizeof(end_data)) != 0) {
+        return DATA_END_PARSING_ERROR;
+    }
+    if (!buffer_seek_cur(buf,sizeof (end_data))) {
+        return DATA_END_PARSING_ERROR;
+    }
+    return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
 }
