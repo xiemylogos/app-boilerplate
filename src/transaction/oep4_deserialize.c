@@ -75,7 +75,7 @@ parser_status_e oep4_neo_vm_transaction_deserialize(buffer_t *buf, ont_transacti
     if(!buffer_read_u8(buf,&pre_to)) {
         return VALUE_PARSING_ERROR;
     }
-    if (pre_to != 20) { //14
+    if (pre_to != ADDRESS_LEN) { //14
         return BUFFER_OFFSET_MOVE_ERROR;
     }
     tx->payload.to = (uint8_t*)(buf->ptr+buf->offset);
@@ -86,7 +86,7 @@ parser_status_e oep4_neo_vm_transaction_deserialize(buffer_t *buf, ont_transacti
     if(!buffer_read_u8(buf,&pre_from)) {
         return VALUE_PARSING_ERROR;
     }
-    if (pre_from != 20) { //14
+    if (pre_from != ADDRESS_LEN) { //14
         return BUFFER_OFFSET_MOVE_ERROR;
     }
     tx->payload.from = (uint8_t*)(buf->ptr+buf->offset);

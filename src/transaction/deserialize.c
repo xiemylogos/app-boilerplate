@@ -52,12 +52,12 @@ parser_status_e transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return PAYER_PARSING_ERROR;
     }
-    uint8_t  op_code;
-    if(!buffer_read_u8(buf,&op_code)) {
+    uint8_t  op_code_size;
+    if(!buffer_read_u8(buf,&op_code_size)) {
         return OPCODE_PARSING_ERROR;
     }
-    if (op_code != 0x7b) {
-        return OPCODE_PARSING_ERROR;
+    if(!buffer_can_read(buf,op_code_size)) {
+        return DATA_END_PARSING_ERROR;
     }
     if (buf->size-buf->offset > PAYLOAD_TRANSFER_V2_LEN) {
         if(memcmp(buf->ptr+buf->size - 46 - 10 - 1, "transferV2", 10) != 0) {
@@ -84,7 +84,7 @@ parser_status_e transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
         if(!buffer_read_u8(buf,&to_op_code)) {
             return OPCODE_PARSING_ERROR;
         }
-        if (to_op_code != 0x14) {
+        if (to_op_code != ADDRESS_LEN) {
             return OPCODE_PARSING_ERROR;
         }
         tx->payload.to = (uint8_t*)(buf->ptr+buf->offset);
@@ -108,28 +108,32 @@ parser_status_e transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
         if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
             return VALUE_PARSING_ERROR;
         }
-        if(getBytesValueByLen(buf,4) != 180441452) { //6c51c10a
+        if(getBytesValueByLen(buf,3) != 12669292) { //6c51c10a
             return VALUE_PARSING_ERROR;
         }
-        if(memcmp(buf->ptr+buf->offset, "transferV2", 10) != 0) {
+        uint8_t  tag_len;
+        if(!buffer_read_u8(buf,&tag_len)) {
+            return OPCODE_PARSING_ERROR;
+        }
+        if(memcmp(buf->ptr+buf->offset, "transferV2", tag_len) != 0) {
             return PARSE_STRING_MATCH_ERROR;
         }
-        if (!buffer_seek_cur(buf,10)) {
+        if (!buffer_seek_cur(buf,tag_len)) {
             return BUFFER_OFFSET_MOVE_ERROR;
         }
         uint8_t  contract_op_code;
         if(!buffer_read_u8(buf,&contract_op_code)) {
             return OPCODE_PARSING_ERROR;
         }
-        if (contract_op_code != 0x14) {
+        if (contract_op_code != ADDRESS_LEN) {
             return OPCODE_PARSING_ERROR;
         }
         tx->payload.contract_addr = (uint8_t *) (buf->ptr + buf->offset);
         if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
             return CONTRACT_ADDR_PARSING_ERROR;
         }
-        if (memcmp(tx->payload.contract_addr,ONG_ADDR,20) != 0 &&
-            memcmp(tx->payload.contract_addr,ONT_ADDR,20) != 0) {
+        if (memcmp(tx->payload.contract_addr,ONG_ADDR,ADDRESS_LEN) != 0 &&
+            memcmp(tx->payload.contract_addr,ONT_ADDR,ADDRESS_LEN) != 0) {
             return CONTRACT_ADDR_PARSING_ERROR;
         }
         uint8_t end_data[] = {
