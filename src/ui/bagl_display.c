@@ -310,19 +310,27 @@ int ui_display_transaction() {
         if (G_context.tx_info.tx_info.payload.value_len <= 8) {
             format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.tx_info.payload.value[0],9);
         } else {
+            char amount[41];
             uint128_t values;
-            values.elements[0] = G_context.tx_info.oep4_tx_info.payload.value[1];
-            values.elements[1] = G_context.tx_info.oep4_tx_info.payload.value[0];
-            tostring128(&values,10,g_amount,sizeof(g_amount));
+            values.elements[0] = G_context.tx_info.tx_info.payload.value[1];
+            values.elements[1] = G_context.tx_info.tx_info.payload.value[0];
+            tostring128(&values,10,amount,sizeof(amount));
+            process_precision(amount,9,g_amount,sizeof(g_amount));
+            explicit_bzero(&amount, sizeof(amount));
+            clear128(&values);
         }
     } else if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONG_ADDR,20) == 0) {
          if (G_context.tx_info.tx_info.payload.value_len <= 8) {
              format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.tx_info.payload.value[0],18);
          } else {
+             char amount[41];
              uint128_t values;
-             values.elements[0] = G_context.tx_info.oep4_tx_info.payload.value[1];
-             values.elements[1] = G_context.tx_info.oep4_tx_info.payload.value[0];
-             tostring128(&values,10,g_amount,sizeof(g_amount));
+             values.elements[0] = G_context.tx_info.tx_info.payload.value[1];
+             values.elements[1] = G_context.tx_info.tx_info.payload.value[0];
+             tostring128(&values,10,amount,sizeof(amount));
+             process_precision(amount,18,g_amount,sizeof(g_amount));
+             explicit_bzero(&amount, sizeof(amount));
+             clear128(&values);
         }
     }
 
