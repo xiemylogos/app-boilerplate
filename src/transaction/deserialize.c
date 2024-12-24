@@ -52,12 +52,15 @@ parser_status_e transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return PAYER_PARSING_ERROR;
     }
-    uint8_t  op_code_size;
-    if(!buffer_read_u8(buf,&op_code_size)) {
+    uint8_t  payload_size;
+    if(!buffer_read_u8(buf,&payload_size)) {
         return OPCODE_PARSING_ERROR;
     }
-    if(!buffer_can_read(buf,op_code_size)) {
-        return DATA_END_PARSING_ERROR;
+    if(!buffer_can_read(buf,payload_size)) {
+        return OPCODE_PARSING_ERROR;
+    }
+    if (buf->size - buf->offset != payload_size +1) {
+        return OPCODE_PARSING_ERROR;
     }
     if (buf->size-buf->offset > PAYLOAD_TRANSFER_V2_LEN) {
         if(memcmp(buf->ptr+buf->size - 46 - 10 - 1, "transferV2", 10) != 0) {
