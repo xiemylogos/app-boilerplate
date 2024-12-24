@@ -44,9 +44,9 @@ int script_hash_to_address(char* out, size_t out_len, const unsigned char* scrip
 }
 
 
-size_t utf8_strlen(const char* str) {
+size_t utf8_strlen(const uint8_t* str) {
     size_t len = 0;
-    const unsigned char* ptr = (const unsigned char*)str;
+    const uint8_t* ptr = str;
     while (*ptr) {
         if ((*ptr & 0x80) == 0) {
             ptr += 1;
@@ -57,7 +57,7 @@ size_t utf8_strlen(const char* str) {
         } else if ((*ptr & 0xF8) == 0xF0) {
             ptr += 4;
         } else {
-            ptr += 1; 
+            ptr += 1;
         }
         len++;
     }

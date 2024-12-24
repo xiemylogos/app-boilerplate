@@ -37,6 +37,7 @@
 #include "../transaction/types.h"
 #include "../menu.h"
 #include "../utils.h"
+#include "../uint128.h"
 
 
 // Buffer where the oep4 transaction amount string is written
@@ -70,8 +71,15 @@ static uint8_t setTagValuePairs(void) {
      // Format amount and address to g_amount and g_address buffers
 
     memset(g_amount, 0, sizeof(g_amount));
-    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.oep4_tx_info.payload.value)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    if (G_context.tx_info.tx_info.payload.value_len <= 8) {
+        if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.oep4_tx_info.payload.value[0])) {
+             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+         }
+    } else {
+        uint128_t values;
+        values.elements[0] = G_context.tx_info.oep4_tx_info.payload.value[1];
+        values.elements[1] = G_context.tx_info.oep4_tx_info.payload.value[0];
+        tostring128(&values,10,g_amount,sizeof(g_amount));
     }
     pairs[0].item = "Oep4 Amount";
     pairs[nbPairs].value = g_amount;

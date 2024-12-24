@@ -14,14 +14,13 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *****************************************************************************/
-
+#include "utils.h"
 #include <stdio.h>
 #include <stdint.h>   // uint*_t
 #include <stdbool.h>  // bool
 #include <string.h>   // memmove
 #include "buffer.h"
-#include <inttypes.h>
-#include <string.h>
+
 
 #if defined(TEST) || defined(FUZZ)
 #include "assert.h"
@@ -86,39 +85,4 @@ uint64_t getBytesValueByLen(buffer_t *buf,uint8_t len) {
         pre_value |= ((int64_t)value[i] << (8 * i));
     }
     return pre_value;
-}
-
-void uint128_to_string(uint64_t value[2], char* output) {
-    snprintf(output, 40, "%" PRIu64 "%" PRIu64, value[1], value[0]);
-}
-
-typedef struct {
-    uint64_t high;  // high 64
-    uint64_t low;   // low 64
-} uint128_t;
-
-void uint128_to_string_with_precision(uint64_t values[2], uint64_t precision, char* output) {
-    uint128_t value;
-    value.high = values[1];
-    value.low = values[0];
-    unsigned long long intPart = (unsigned long long)(value.high);
-    unsigned long long fracPart = value.low;
-
-    char intStr[128];
-    snprintf(intStr, sizeof(intStr), "%llu", intPart);
-
-    double fraction = (double)fracPart / (1ULL << 64);
-    for (uint64_t i = 0; i < precision; i++) {
-        fraction *= 10;
-    }
-
-    unsigned long long fracPartPrecision = (unsigned long long)fraction;
-
-    snprintf(output, 128, "%s", intStr);
-
-    if (precision > 0) {
-        char fracStr[128];
-        snprintf(fracStr, sizeof(fracStr), ".%0*llu", (int)precision, fracPartPrecision);
-        strcat(output, fracStr);
-    }
 }

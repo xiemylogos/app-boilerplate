@@ -69,6 +69,7 @@ static uint8_t setTagValuePairs(void) {
      // Format amount and address to g_amount and g_address buffers
     memset(g_amount, 0, sizeof(g_amount));
     // Setup data to display
+   /*
     if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONT_ADDR,20) == 0) {
         pairs[nbPairs].item = "ONT Amount";
         format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.tx_info.payload.value,9);
@@ -76,6 +77,31 @@ static uint8_t setTagValuePairs(void) {
         pairs[nbPairs].item = "ONG Amount";
         format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.tx_info.payload.value,18);
     }
+   */
+    if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONT_ADDR,20) == 0) {
+         pairs[nbPairs].item = "ONT Amount";
+        if (G_context.tx_info.tx_info.payload.value_len <= 8) {
+            format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.tx_info.payload.value[0],9);
+        } else {
+            uint128_t values;
+            values.elements[0] = G_context.tx_info.oep4_tx_info.payload.value[1];
+            values.elements[1] = G_context.tx_info.oep4_tx_info.payload.value[0];
+            tostring128(&values,10,g_amount,sizeof(g_amount));
+        }
+    } else if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONG_ADDR,20) == 0) {
+        pairs[nbPairs].item = "ONG Amount";
+        if (G_context.tx_info.tx_info.payload.value_len <= 8) {
+             format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.tx_info.payload.value[0],18);
+         } else {
+             uint128_t values;
+             values.elements[0] = G_context.tx_info.oep4_tx_info.payload.value[1];
+             values.elements[1] = G_context.tx_info.oep4_tx_info.payload.value[0];
+             tostring128(&values,10,g_amount,sizeof(g_amount));
+        }
+    }
+
+
+
     pairs[nbPairs].value = g_amount;
     nbPairs++;
     //fromAddr

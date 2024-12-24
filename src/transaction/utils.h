@@ -41,7 +41,3 @@ bool transaction_utils_format_memo(const uint8_t *memo,
 uint64_t getThreeBytesValue(buffer_t *buf);
 
 uint64_t getBytesValueByLen(buffer_t *buf,uint8_t len);
-
-void uint128_to_string(uint64_t value[2], char* output);
-
-void uint128_to_string_with_precision(uint64_t value[2], uint64_t precision, char* output);
