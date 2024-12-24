@@ -18,6 +18,4 @@
  */
 parser_status_e transaction_deserialize(buffer_t *buf, ont_transaction_t *tx);
 
-parser_status_e state_info_deserialize(buffer_t *buf,size_t length, state_info_v2 *tx);
-
 
