@@ -38,7 +38,7 @@
 #include "../utils.h"
 
 static action_validate_cb g_validate_callback;
-static char g_amount[20];
+static char g_amount[140];
 static char g_address[42];
 
 static char g_peerPubkey[66];
@@ -306,9 +306,17 @@ int ui_display_transaction() {
     memset(g_amount, 0, sizeof(g_amount));
 
     if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONT_ADDR,20) == 0) {
-        format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.tx_info.payload.value,9);
+        if (G_context.tx_info.tx_info.payload.value_len <= 8) {
+        format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.tx_info.payload.value[0],9);
+        } else {
+           uint128_to_string_with_precision(G_context.tx_info.tx_info.payload.value,9,g_amount);
+        }
     } else if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONG_ADDR,20) == 0) {
-        format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.tx_info.payload.value,18);
+         if (G_context.tx_info.tx_info.payload.value_len <= 8) {
+        format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.tx_info.payload.value[0],18);
+         } else {
+             uint128_to_string_with_precision(G_context.tx_info.tx_info.payload.value,18,g_amount);
+        }
     }
 
     PRINTF("Amount: %s\n", g_amount);
@@ -372,10 +380,19 @@ int ui_display_oep4_transaction() {
     }
 
     memset(g_amount, 0, sizeof(g_amount));
+
+    if (G_context.tx_info.tx_info.payload.value_len <= 8) {
+        if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.oep4_tx_info.payload.value[0])) {
+             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+         }
+    } else {
+       uint128_to_string_with_precision(G_context.tx_info.oep4_tx_info.payload.value,1,g_amount);
+        }
+    /*
     if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.oep4_tx_info.payload.value)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
-
+    */
     PRINTF("Amount: %s\n", g_amount);
 
     memset(g_address, 0, sizeof(g_address));

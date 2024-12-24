@@ -21,6 +21,3 @@ parser_status_e oep4_wasm_vm_transaction_deserialize(buffer_t *buf, ont_transact
 parser_status_e oep4_neo_vm_transaction_deserialize(buffer_t *buf, ont_transaction_t *tx);
 
 
-parser_status_e oep4_state_info_deserialize(buffer_t *buf,size_t length, state_info_v2 *tx);
-
-

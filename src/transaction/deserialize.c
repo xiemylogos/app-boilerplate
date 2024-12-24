@@ -94,13 +94,16 @@ parser_status_e transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
         if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
             return VALUE_PARSING_ERROR;
         }
-        uint8_t  value_len;
-        if(!buffer_read_u8(buf,&value_len)) {
+        if(!buffer_read_u8(buf,&tx->payload.value_len)) {
             return OPCODE_PARSING_ERROR;
         }
-        tx->payload.value = (uint8_t*)(buf->ptr+buf->offset);
-        if (!buffer_seek_cur(buf, value_len)) {
-            return VALUE_PARSING_ERROR;
+        if (tx->payload.value_len <= 8) {
+            tx->payload.value[0] = getBytesValueByLen(buf,tx->payload.value_len);
+        } else {
+            if(!buffer_read_u64(buf,&tx->payload.value[0],LE)) {
+                return OPCODE_PARSING_ERROR;
+            }
+            tx->payload.value[1] = getBytesValueByLen(buf,tx->payload.value_len-8);
         }
         if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
             return VALUE_PARSING_ERROR;
@@ -153,56 +156,4 @@ parser_status_e transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
         return TO_PARSING_ERROR;
     }
     return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
-}
-
-parser_status_e state_info_deserialize(buffer_t *buf,size_t length, state_info_v2 *tx) {
-    if(!buffer_can_read(buf,length)) {
-        return WRONG_LENGTH_ERROR;
-    }
-    if (length <= PAYLOAD_MIN_LENGTH_LIMIT) {
-        return WRONG_LENGTH_ERROR;
-    }
-    if (memcmp(buf->ptr +buf->offset+ length - 22 - 1, "Ontology.Native.Invoke", 22) != 0) {
-        return PARSE_STRING_MATCH_ERROR;
-    }
-    if (length > PAYLOAD_TRANSFER_V2_LEN) {
-        if(memcmp(buf->ptr+buf->offset + length - 46 - 10 - 1, "transferV2", 10) != 0) {
-            return PARSE_STRING_MATCH_ERROR;
-        }
-        if (!buffer_seek_cur(buf,4)) {
-            return BUFFER_OFFSET_MOVE_ERROR;
-        }
-        tx->from = (uint8_t*)(buf->ptr+buf->offset);
-        if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
-            return FROM_PARSING_ERROR;
-        }
-        if (!buffer_seek_cur(buf,4)) {
-            return BUFFER_OFFSET_MOVE_ERROR;
-        }
-        tx->to = (uint8_t*)(buf->ptr+buf->offset);
-        if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
-            return TO_PARSING_ERROR;
-        }
-        if (!buffer_seek_cur(buf,4)) {
-            return BUFFER_OFFSET_MOVE_ERROR;
-        }
-        if (!buffer_read_u64(buf, &tx->value, LE)) {
-            return VALUE_PARSING_ERROR;
-        }
-        if (!buffer_seek_cur(buf,18)) {
-            return BUFFER_OFFSET_MOVE_ERROR;
-        }
-        tx->contract_addr = (uint8_t *) (buf->ptr + buf->offset);
-        if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
-            return CONTRACT_ADDR_PARSING_ERROR;
-        }
-    } else if (length > PAYLOAD_TRANSFER_FROM_V2_LEN) {
-        if(memcmp(buf->ptr + length - 46 - 14, "transferFromV2", 10) != 0) {
-            return PARSE_STRING_MATCH_ERROR;
-        }
-        return PARSE_STRING_MATCH_ERROR;
-    } else {
-        return TO_PARSING_ERROR;
-    }
-    return PARSING_OK;
 }
