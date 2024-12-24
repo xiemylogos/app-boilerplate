@@ -2,9 +2,8 @@
 #include <string.h>
 #include "read.h"
 #include "uint128.h"
-//#include "uint_common.h"
-//#include "common_utils.h"  // HEXDIGITS
 
+//Adapted from https://github.com/LedgerHQ/app-ethereum/blob/develop/src/uint128.c
 void reverseString(char *const str, uint32_t length) {
     uint32_t i, j;
     for (i = 0, j = length - 1; i < j; i++, j--) {

@@ -37,6 +37,7 @@
 #include "../transaction/types.h"
 #include "../menu.h"
 #include "../utils.h"
+#include "../uint128.h"
 
 // Buffer where the transaction amount string is written
 static char g_amount[40];
