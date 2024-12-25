@@ -610,6 +610,7 @@ static uint8_t setAuthorizeForPeerTagValuePairs(void) {
     pairs[nbPairs].value = g_addr;
     nbPairs++;
 
+    /*
     memset(g_maxAuthorize,0,sizeof(g_maxAuthorize));
     if (!format_u64(g_maxAuthorize,sizeof(g_maxAuthorize),G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey_length)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
@@ -617,6 +618,7 @@ static uint8_t setAuthorizeForPeerTagValuePairs(void) {
     pairs[nbPairs].item = "peer_pubkey_length";
     pairs[nbPairs].value = g_maxAuthorize;
     nbPairs++;
+    */
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
     memcpy(g_peerPubkey, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey_length*66);
@@ -624,6 +626,7 @@ static uint8_t setAuthorizeForPeerTagValuePairs(void) {
     pairs[nbPairs].value = g_peerPubkey;
     nbPairs++;
 
+    /*
     memset(g_stakeCost,0,sizeof(g_stakeCost));
     if (!format_u64(g_stakeCost,sizeof(g_stakeCost),G_context.tx_info.authorize_for_peer_tx_info.pos_list_number)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
@@ -631,6 +634,7 @@ static uint8_t setAuthorizeForPeerTagValuePairs(void) {
     pairs[nbPairs].item = "posListLength";
     pairs[nbPairs].value = g_stakeCost;
     nbPairs++;
+    */
 
     memset(g_posList,0,sizeof(g_posList));
     if (G_context.tx_info.authorize_for_peer_tx_info.pos_list_len < 81) {
@@ -707,6 +711,7 @@ static uint8_t setunAuthorizeForPeerTagValuePairs(void) {
     pairs[nbPairs].value = g_addr;
     nbPairs++;
 
+    /*
     memset(g_maxAuthorize,0,sizeof(g_maxAuthorize));
     if (!format_u64(g_maxAuthorize,sizeof(g_maxAuthorize),G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey_length)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
@@ -714,6 +719,7 @@ static uint8_t setunAuthorizeForPeerTagValuePairs(void) {
     pairs[nbPairs].item = "peer_pubkey_length";
     pairs[nbPairs].value = g_maxAuthorize;
     nbPairs++;
+    */
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
     memcpy(g_peerPubkey, G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey, G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey_length*66);
@@ -721,6 +727,7 @@ static uint8_t setunAuthorizeForPeerTagValuePairs(void) {
     pairs[nbPairs].value = g_peerPubkey;
     nbPairs++;
 
+    /*
     memset(g_stakeCost,0,sizeof(g_stakeCost));
     if (!format_u64(g_stakeCost,sizeof(g_stakeCost),G_context.tx_info.un_authorize_for_peer_tx_info.pos_list_number)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
@@ -728,6 +735,7 @@ static uint8_t setunAuthorizeForPeerTagValuePairs(void) {
     pairs[nbPairs].item = "posListLength";
     pairs[nbPairs].value = g_stakeCost;
     nbPairs++;
+    */
 
    memset(g_posList,0,sizeof(g_posList));
    if (G_context.tx_info.un_authorize_for_peer_tx_info.pos_list_len < 81) {
