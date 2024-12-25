@@ -100,18 +100,24 @@ parser_status_e transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
         if(!buffer_read_u8(buf,&tx->payload.value_len)) {
             return OPCODE_PARSING_ERROR;
         }
-        if (tx->payload.value_len <= 8) {
-            tx->payload.value[0] = getBytesValueByLen(buf,tx->payload.value_len);
+        if (tx->payload.value_len >= 81) {
+            tx->payload.value[0] = tx->payload.value_len - 80;
+            tx->payload.value[1] = 0;
         } else {
-            if(!buffer_read_u64(buf,&tx->payload.value[0],LE)) {
-                return OPCODE_PARSING_ERROR;
+            if (tx->payload.value_len <= 8) {
+                tx->payload.value[0] = getBytesValueByLen(buf, tx->payload.value_len);
+                tx->payload.value[1] = 0;
+            } else {
+                if (!buffer_read_u64(buf, &tx->payload.value[0], LE)) {
+                    return OPCODE_PARSING_ERROR;
+                }
+                tx->payload.value[1] = getBytesValueByLen(buf, tx->payload.value_len - 8);
             }
-            tx->payload.value[1] = getBytesValueByLen(buf,tx->payload.value_len-8);
         }
         if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
             return VALUE_PARSING_ERROR;
         }
-        if(getBytesValueByLen(buf,3) != 12669292) { //6c51c10a
+        if(getBytesValueByLen(buf,3) != 12669292) { //6c51c1
             return VALUE_PARSING_ERROR;
         }
         uint8_t  tag_len;
