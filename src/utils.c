@@ -89,15 +89,13 @@ void process_precision(const char *input, int precision, char *output, size_t ou
         output[i++] = input[j++];
     }
     output[i] = '\0';
-    size_t dot_pos = integer_part_len;
-    bool all_zero = true;
-    for (size_t k = dot_pos + 1; k < i - 1; k++) {
-        if (output[k] != '0') {
-            all_zero = false;
-            break;
-        }
+    size_t end = i - 1;
+    while (end > integer_part_len && output[end] == '0') {
+        end--;
     }
-    if (all_zero) {
-        output[dot_pos] = '\0';
+    if (output[end] == '.') {
+        output[end] = '\0';
+    } else {
+        output[end + 1] = '\0';
     }
 }
