@@ -172,9 +172,16 @@ static uint8_t withdrawTagValuePairs(void) {
     nbPairs++;
 
     memset(g_withdrawList,0,sizeof(g_withdrawList));
-    uint64_t value = getValueByLen(G_context.tx_info.withdraw_tx_info.withdraw_list,G_context.tx_info.withdraw_tx_info.withdraw_list_len);
-    if (!format_u64(g_withdrawList,sizeof(g_withdrawList),value)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    if (G_context.tx_info.withdraw_tx_info.withdraw_list_len < 81) {
+        uint64_t value = getValueByLen(G_context.tx_info.withdraw_tx_info.withdraw_list,
+                                       G_context.tx_info.withdraw_tx_info.withdraw_list_len);
+        if (!format_u64(g_withdrawList, sizeof(g_withdrawList), value)) {
+            return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+        }
+    } else {
+         if (!format_u64(g_withdrawList,sizeof(g_withdrawList),G_context.tx_info.withdraw_tx_info.withdraw_list_len-80)) {
+            return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+        }
     }
     pairs[nbPairs].item = "withdrawList";
     pairs[nbPairs].value = g_withdrawList;
@@ -626,10 +633,16 @@ static uint8_t setAuthorizeForPeerTagValuePairs(void) {
     nbPairs++;
 
     memset(g_posList,0,sizeof(g_posList));
+    if (G_context.tx_info.authorize_for_peer_tx_info.pos_list_len < 81) {
     uint64_t value = getValueByLen(G_context.tx_info.authorize_for_peer_tx_info.pos_list,G_context.tx_info.authorize_for_peer_tx_info.pos_list_len);
     if (!format_u64(g_posList,sizeof(g_posList),value)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
+   } else {
+      if (!format_u64(g_posList,sizeof(g_posList),G_context.tx_info.authorize_for_peer_tx_info.pos_list_len-80)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    }
+   }
     pairs[nbPairs].item = "posList";
     pairs[nbPairs].value = g_posList;
     nbPairs++;
@@ -717,10 +730,16 @@ static uint8_t setunAuthorizeForPeerTagValuePairs(void) {
     nbPairs++;
 
    memset(g_posList,0,sizeof(g_posList));
+   if (G_context.tx_info.un_authorize_for_peer_tx_info.pos_list_len < 81) {
     uint64_t value = getValueByLen(G_context.tx_info.un_authorize_for_peer_tx_info.pos_list,G_context.tx_info.un_authorize_for_peer_tx_info.pos_list_len);
     if (!format_u64(g_posList,sizeof(g_posList),value)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
+   } else {
+      if (!format_u64(g_posList,sizeof(g_posList),G_context.tx_info.un_authorize_for_peer_tx_info.pos_list_len-80)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    }
+   }
     pairs[nbPairs].item = "posList";
     pairs[nbPairs].value = g_posList;
     nbPairs++;
