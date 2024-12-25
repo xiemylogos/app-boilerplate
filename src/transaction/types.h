@@ -64,7 +64,8 @@ typedef struct {
     uint8_t *account;
     uint64_t peer_pubkey_length;
     uint8_t *peer_pubkey;
-    uint64_t withdraw_list_length;
+    uint64_t withdraw_list_number;
+    uint8_t  withdraw_list_len;
     uint8_t *withdraw_list;
 }withdraw_t;
 

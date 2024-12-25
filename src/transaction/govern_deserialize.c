@@ -223,21 +223,20 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
     if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }
-    if(!buffer_read_varint(buf,&tx->withdraw_list_length)) {
+    if(!buffer_read_varint(buf,&tx->withdraw_list_number)) {
         return GASPRICE_PARSING_ERROR;
     }
-    if (tx->withdraw_list_length >= 81) {
-        tx->withdraw_list_length = tx->withdraw_list_length -80;
+    if (tx->withdraw_list_number >= 81) {
+        tx->withdraw_list_number = tx->withdraw_list_number - 80;
     }
     if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }
-    uint8_t withdraw_list_len;
-    if(!buffer_read_u8(buf,&withdraw_list_len)) {
+    if(!buffer_read_u8(buf,&tx->withdraw_list_len)) {
         return VALUE_PARSING_ERROR;
     }
     tx->withdraw_list = (uint8_t*)(buf->ptr+buf->offset);
-    if (!buffer_seek_cur(buf,withdraw_list_len*tx->withdraw_list_length)) {
+    if (!buffer_seek_cur(buf,tx->withdraw_list_len*tx->withdraw_list_number)) {
         return FROM_PARSING_ERROR;
     }
     if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
@@ -771,18 +770,17 @@ parser_status_e  set_fee_percentage_tx_deserialize(buffer_t *buf, set_fee_percen
     if(!buffer_read_u8(buf,&cost_len)) {
         return VALUE_PARSING_ERROR;
     }
-    uint64_t cost = getBytesValueByLen(buf,cost_len);
-    if (cost == 0) {
-       return VALUE_PARSING_ERROR; 
-    }
-    tx->peer_cost = cost; 
+    tx->peer_cost = getBytesValueByLen(buf,cost_len);
+
     if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
-    } 
-    if(!buffer_read_varint(buf,&tx->stake_cost)) {
-        return GASLIMIT_PARSING_ERROR;
     }
-     if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+    uint8_t stake_cost_len;
+    if(!buffer_read_u8(buf,&stake_cost_len)) {
+        return VALUE_PARSING_ERROR;
+    }
+    tx->stake_cost = getBytesValueByLen(buf,stake_cost_len);
+    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     } 
     uint16_t  pre_code;

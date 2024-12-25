@@ -496,11 +496,13 @@ int ui_display_withdraw_tx() {
     }
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.tx_info.withdraw_tx_info.peer_pubkey, G_context.tx_info.withdraw_tx_info.peer_pubkey_length*66);
+    memcpy(g_peerPubkey, G_context.tx_info.withdraw_tx_info.peer_pubkey,66);
 
     memset(g_withdrawList,0,sizeof(g_withdrawList));
-    memcpy(g_withdrawList, G_context.tx_info.withdraw_tx_info.withdraw_list, G_context.tx_info.withdraw_tx_info.withdraw_list_length*1);
-
+    uint64_t value = getValueByLen(G_context.tx_info.withdraw_tx_info.withdraw_list,G_context.tx_info.withdraw_tx_info.withdraw_list_len);
+    if (!format_u64(g_withdrawList,sizeof(g_withdrawList),value)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    }
 
     g_validate_callback = &ui_action_validate_withdraw_transaction;
 
@@ -720,11 +722,13 @@ int ui_display_authorize_for_peer_tx() {
         return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey_length*66);
+    memcpy(g_peerPubkey, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey,66);
 
-   memset(g_posList,0,sizeof(g_posList));
-   memcpy(g_posList, G_context.tx_info.authorize_for_peer_tx_info.pos_list, G_context.tx_info.authorize_for_peer_tx_info.pos_list_length*1);
-
+    memset(g_posList,0,sizeof(g_posList));
+    uint64_t value = getValueByLen( G_context.tx_info.authorize_for_peer_tx_info.pos_list,1);
+    if (!format_u64(g_posList,sizeof(g_posList),value-80)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    }
 
     g_validate_callback = &ui_action_validate_authorize_for_peer_transaction;
 
@@ -756,11 +760,13 @@ int ui_display_un_authorize_for_peer_tx() {
     }
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey, G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey_length*66);
+    memcpy(g_peerPubkey, G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey,66);
 
     memset(g_posList,0,sizeof(g_posList));
-    memcpy(g_posList, G_context.tx_info.un_authorize_for_peer_tx_info.pos_list, G_context.tx_info.un_authorize_for_peer_tx_info.pos_list_length*1);
-
+    uint64_t value = getValueByLen( G_context.tx_info.un_authorize_for_peer_tx_info.pos_list,1);
+    if (!format_u64(g_posList,sizeof(g_posList),value-80)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    }
     g_validate_callback = &ui_action_validate_un_authorize_for_peer_transaction;
 
     ux_flow_init(0, ux_display_un_authorize_for_peer_transaction_flow, NULL);
