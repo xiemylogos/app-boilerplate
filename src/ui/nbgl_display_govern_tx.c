@@ -37,6 +37,7 @@
 #include "../transaction/types.h"
 #include "../menu.h"
 #include "../utils.h"
+#include "../transaction/utils.h"
 
 // Buffer where the transaction address string is written
 static char g_addr[40];

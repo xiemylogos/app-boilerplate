@@ -37,6 +37,7 @@
 #include "../menu.h"
 #include "../utils.h"
 #include "../uint128.h"
+#include "../transaction/utils.h"
 
 static action_validate_cb g_validate_callback;
 static char g_amount[41];

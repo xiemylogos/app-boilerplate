@@ -69,7 +69,9 @@ void process_precision(const char *input, int precision, char *output, size_t ou
     while (input[len] != '\0') {
         len++;
     }
-    if (precision == 0 || precision >= len) {
+    size_t precision_unsigned = (size_t)(precision >= 0 ? precision : 0);
+
+    if (precision_unsigned == 0 || precision_unsigned >= len) {
         size_t i = 0;
         while (i < len && i < output_len - 1) {
             output[i] = input[i];
@@ -78,14 +80,15 @@ void process_precision(const char *input, int precision, char *output, size_t ou
         output[i] = '\0';
         return;
     }
-    size_t integer_part_len = len - precision;
+
+    size_t integer_part_len = len - precision_unsigned;
     size_t i = 0, j = 0;
 
     for (; i < integer_part_len && i < output_len - 1; i++) {
         output[i] = input[j++];
     }
     output[i++] = '.';
-    for (size_t k = 0; k < precision && i < output_len - 1; k++) {
+    for (size_t k = 0; k < precision_unsigned && i < output_len - 1; k++) {
         output[i++] = input[j++];
     }
     output[i] = '\0';

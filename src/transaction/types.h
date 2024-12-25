@@ -140,7 +140,7 @@ typedef struct {
     uint8_t *account;
     uint64_t peer_pubkey_length;
     uint8_t *peer_pubkey;
-    uint64_t pos_list_number;
+    uint8_t pos_list_number;
     uint8_t  pos_list_len;
     uint8_t *pos_list;
 }authorize_for_peer_t;
@@ -155,7 +155,7 @@ typedef struct {
     uint8_t *account;
     uint64_t peer_pubkey_length;
     uint8_t *peer_pubkey;
-    uint64_t pos_list_number;
+    uint8_t pos_list_number;
     uint8_t  pos_list_len;
     uint8_t *pos_list;
 }un_authorize_for_peer_t;

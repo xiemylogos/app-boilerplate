@@ -70,15 +70,6 @@ static uint8_t setTagValuePairs(void) {
      // Format amount and address to g_amount and g_address buffers
     memset(g_amount, 0, sizeof(g_amount));
     // Setup data to display
-   /*
-    if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONT_ADDR,20) == 0) {
-        pairs[nbPairs].item = "ONT Amount";
-        format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.tx_info.payload.value,9);
-    } else if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONG_ADDR,20) == 0) {
-        pairs[nbPairs].item = "ONG Amount";
-        format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.tx_info.payload.value,18);
-    }
-   */
     if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONT_ADDR,20) == 0) {
          pairs[nbPairs].item = "ONT Amount";
          if (G_context.tx_info.tx_info.payload.value_len >= 81) {
