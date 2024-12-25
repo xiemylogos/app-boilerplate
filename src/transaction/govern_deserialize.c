@@ -235,9 +235,11 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
     if(!buffer_read_u8(buf,&tx->withdraw_list_len)) {
         return VALUE_PARSING_ERROR;
     }
-    tx->withdraw_list = (uint8_t*)(buf->ptr+buf->offset);
-    if (!buffer_seek_cur(buf,tx->withdraw_list_len*tx->withdraw_list_number)) {
-        return FROM_PARSING_ERROR;
+    if (tx->withdraw_list_len <81) {
+        tx->withdraw_list = (uint8_t *) (buf->ptr + buf->offset);
+        if (!buffer_seek_cur(buf, tx->withdraw_list_len * tx->withdraw_list_number)) {
+            return FROM_PARSING_ERROR;
+        }
     }
     if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
@@ -898,9 +900,11 @@ parser_status_e authorize_for_peer_tx_deserialize(buffer_t *buf, authorize_for_p
     if(!buffer_read_u8(buf,&tx->pos_list_len)) {
         return VALUE_PARSING_ERROR;
     }
-    tx->pos_list = (uint8_t*)(buf->ptr+buf->offset);
-    if (!buffer_seek_cur(buf, tx->pos_list_len*tx->pos_list_number)) {
-        return FROM_PARSING_ERROR;
+    if (tx->pos_list_len < 81) {
+        tx->pos_list = (uint8_t *) (buf->ptr + buf->offset);
+        if (!buffer_seek_cur(buf, tx->pos_list_len * tx->pos_list_number)) {
+            return FROM_PARSING_ERROR;
+        }
     }
     if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
@@ -1020,9 +1024,11 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf, un_authorize
     if(!buffer_read_u8(buf,&tx->pos_list_len)) {
         return VALUE_PARSING_ERROR;
     }
-    tx->pos_list = (uint8_t*)(buf->ptr+buf->offset);
-    if (!buffer_seek_cur(buf, tx->pos_list_len*tx->pos_list_number)) {
-        return FROM_PARSING_ERROR;
+    if (tx->pos_list_len < 81) {
+        tx->pos_list = (uint8_t *) (buf->ptr + buf->offset);
+        if (!buffer_seek_cur(buf, tx->pos_list_len * tx->pos_list_number)) {
+            return FROM_PARSING_ERROR;
+        }
     }
     if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
