@@ -618,7 +618,7 @@ static uint8_t setAuthorizeForPeerTagValuePairs(void) {
     nbPairs++;
 
     memset(g_stakeCost,0,sizeof(g_stakeCost));
-    if (!format_u64(g_stakeCost,sizeof(g_stakeCost),G_context.tx_info.authorize_for_peer_tx_info.pos_list_length)) {
+    if (!format_u64(g_stakeCost,sizeof(g_stakeCost),G_context.tx_info.authorize_for_peer_tx_info.pos_list_number)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = "posListLength";
@@ -626,8 +626,8 @@ static uint8_t setAuthorizeForPeerTagValuePairs(void) {
     nbPairs++;
 
     memset(g_posList,0,sizeof(g_posList));
-    uint64_t value = getValueByLen( G_context.tx_info.authorize_for_peer_tx_info.pos_list,1);
-    if (!format_u64(g_posList,sizeof(g_posList),value-80)) {
+    uint64_t value = getValueByLen(G_context.tx_info.authorize_for_peer_tx_info.pos_list,G_context.tx_info.authorize_for_peer_tx_info.pos_list_len);
+    if (!format_u64(g_posList,sizeof(g_posList),value)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = "posList";
@@ -709,16 +709,16 @@ static uint8_t setunAuthorizeForPeerTagValuePairs(void) {
     nbPairs++;
 
     memset(g_stakeCost,0,sizeof(g_stakeCost));
-    if (!format_u64(g_stakeCost,sizeof(g_stakeCost),G_context.tx_info.un_authorize_for_peer_tx_info.pos_list_length)) {
+    if (!format_u64(g_stakeCost,sizeof(g_stakeCost),G_context.tx_info.un_authorize_for_peer_tx_info.pos_list_number)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = "posListLength";
     pairs[nbPairs].value = g_stakeCost;
     nbPairs++;
 
-    memset(g_posList,0,sizeof(g_posList));
-    uint64_t value = getValueByLen( G_context.tx_info.un_authorize_for_peer_tx_info.pos_list,1);
-    if (!format_u64(g_posList,sizeof(g_posList),value-80)) {
+   memset(g_posList,0,sizeof(g_posList));
+    uint64_t value = getValueByLen(G_context.tx_info.un_authorize_for_peer_tx_info.pos_list,G_context.tx_info.un_authorize_for_peer_tx_info.pos_list_len);
+    if (!format_u64(g_posList,sizeof(g_posList),value)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = "posList";

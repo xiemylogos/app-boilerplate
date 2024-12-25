@@ -855,7 +855,7 @@ parser_status_e authorize_for_peer_tx_deserialize(buffer_t *buf, authorize_for_p
     if(!buffer_read_u8(buf,&pre_pub)) {
         return VALUE_PARSING_ERROR;
     }
-    if (pre_pub != 20) { //14
+    if (pre_pub != ADDRESS_LEN) { //14
         return BUFFER_OFFSET_MOVE_ERROR;
     } 
 
@@ -886,17 +886,20 @@ parser_status_e authorize_for_peer_tx_deserialize(buffer_t *buf, authorize_for_p
     if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     } 
-    if(!buffer_read_varint(buf,&tx->pos_list_length)) {
+    if(!buffer_read_u8(buf,&tx->pos_list_number)) {
         return GASPRICE_PARSING_ERROR;
     }
-    if (tx->pos_list_length >= 81) {
-        tx->pos_list_length = tx->pos_list_length -80;
+    if (tx->pos_list_number >= 81) {
+        tx->pos_list_number = tx->pos_list_number -80;
     } 
     if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
-    }  
+    }
+    if(!buffer_read_u8(buf,&tx->pos_list_len)) {
+        return VALUE_PARSING_ERROR;
+    }
     tx->pos_list = (uint8_t*)(buf->ptr+buf->offset);
-    if (!buffer_seek_cur(buf, 1*tx->pos_list_length)) {
+    if (!buffer_seek_cur(buf, tx->pos_list_len*tx->pos_list_number)) {
         return FROM_PARSING_ERROR;
     }
     if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
@@ -1005,17 +1008,20 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf, un_authorize
     if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     } 
-    if(!buffer_read_varint(buf,&tx->pos_list_length)) {
+    if(!buffer_read_u8(buf,&tx->pos_list_number)) {
         return GASPRICE_PARSING_ERROR;
     }
-    if (tx->pos_list_length >= 81) {
-        tx->pos_list_length = tx->pos_list_length -80;
+    if (tx->pos_list_number >= 81) {
+        tx->pos_list_number = tx->pos_list_number -80;
     }
     if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
-    } 
+    }
+    if(!buffer_read_u8(buf,&tx->pos_list_len)) {
+        return VALUE_PARSING_ERROR;
+    }
     tx->pos_list = (uint8_t*)(buf->ptr+buf->offset);
-    if (!buffer_seek_cur(buf, 1*tx->pos_list_length)) {
+    if (!buffer_seek_cur(buf, tx->pos_list_len*tx->pos_list_number)) {
         return FROM_PARSING_ERROR;
     }
     if(getThreeBytesValue(buf) != 13139050) { //6a7cc8

@@ -725,8 +725,8 @@ int ui_display_authorize_for_peer_tx() {
     memcpy(g_peerPubkey, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey,66);
 
     memset(g_posList,0,sizeof(g_posList));
-    uint64_t value = getValueByLen( G_context.tx_info.authorize_for_peer_tx_info.pos_list,1);
-    if (!format_u64(g_posList,sizeof(g_posList),value-80)) {
+    uint64_t value = getValueByLen(G_context.tx_info.authorize_for_peer_tx_info.pos_list,G_context.tx_info.authorize_for_peer_tx_info.pos_list_len);
+    if (!format_u64(g_posList,sizeof(g_posList),value)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
 
@@ -763,8 +763,8 @@ int ui_display_un_authorize_for_peer_tx() {
     memcpy(g_peerPubkey, G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey,66);
 
     memset(g_posList,0,sizeof(g_posList));
-    uint64_t value = getValueByLen( G_context.tx_info.un_authorize_for_peer_tx_info.pos_list,1);
-    if (!format_u64(g_posList,sizeof(g_posList),value-80)) {
+    uint64_t value = getValueByLen(G_context.tx_info.un_authorize_for_peer_tx_info.pos_list,G_context.tx_info.un_authorize_for_peer_tx_info.pos_list_len);
+    if (!format_u64(g_posList,sizeof(g_posList),value)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     g_validate_callback = &ui_action_validate_un_authorize_for_peer_transaction;
