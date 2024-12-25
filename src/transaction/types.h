@@ -51,6 +51,7 @@ typedef struct {
     uint64_t init_pos;
     uint8_t ont_id_len;
     uint8_t *ont_id;
+    uint8_t  key_no_len;
     uint64_t key_no;
 }register_candidate_t;
 

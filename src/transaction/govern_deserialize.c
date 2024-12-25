@@ -110,11 +110,13 @@ parser_status_e register_candidate_tx_deserialize(buffer_t *buf, register_candid
     if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }
-    if(!buffer_read_varint(buf,&tx->key_no)) {
+    if(!buffer_read_u8(buf,&tx->key_no_len)) {
         return GASLIMIT_PARSING_ERROR;
     }
-    if (tx->key_no >= 81) {
-        tx->key_no = tx->key_no -80;
+    if (tx->key_no_len >= 81) {
+        tx->key_no = tx->key_no_len - 80;
+    } else {
+        tx->key_no = getBytesValueByLen(buf,tx->key_no_len);
     }
     if (getThreeBytesValue(buf) != 13139050) {  // 6a7cc8
         return VALUE_PARSING_ERROR;
