@@ -62,34 +62,43 @@ int ui_display_person_msg_bs_choice(bool is_blind_signed) {
     }
 
     explicit_bzero(pairs, sizeof(pairs));
-    memset(g_msg, 0, sizeof(g_msg));
-    if(G_context.person_msg_info.raw_msg_len >= 1024) {
-        memcpy(g_msg, G_context.person_msg_info.msg_info.person_msg, 1023);
-        g_msg[1023] = '\0';
+    if (!is_blind_signed) {
+        memset(g_msg, 0, sizeof(g_msg));
+        if (G_context.person_msg_info.raw_msg_len >= 1024) {
+            memcpy(g_msg, G_context.person_msg_info.msg_info.person_msg, 1023);
+            g_msg[1023] = '\0';
+        } else {
+            memcpy(g_msg,
+                   G_context.person_msg_info.msg_info.person_msg,
+                   G_context.person_msg_info.raw_msg_len);
+            g_msg[G_context.person_msg_info.raw_msg_len + 1] = '\0';
+        }
+        // Setup data to display
+        pairs[0].item = "msg content:";
+        pairs[0].value = g_msg;
+
+        memset(g_hash, 0, sizeof(g_hash));
+        memcpy(g_hash, G_context.person_msg_info.m_hash, 32);
+
+        pairs[1].item = "msg hash:";
+        pairs[1].value = g_hash;
+
+        memset(g_len, 0, sizeof(g_len));
+        if (!format_u64(g_len, sizeof(g_len), utf8_strlen(G_context.person_msg_info.raw_msg))) {
+            return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+        }
+        pairs[2].item = "msg len:";
+        pairs[2].value = g_len;
+        // Setup list
+        pairList.nbMaxLinesForValue = 0;
+        pairList.nbPairs = 3;
+        pairList.pairs = pairs;
     } else {
-        memcpy(g_msg, G_context.person_msg_info.msg_info.person_msg,G_context.person_msg_info.raw_msg_len);
-        g_msg[G_context.person_msg_info.raw_msg_len+1] = '\0';
+        pairs[0].item = "msg";
+       pairs[0].value = "msg blind signing";
+       pairList.pairs = pairs;
+       pairList.nbPairs = 1;
     }
-    // Setup data to display
-    pairs[0].item = "msg content:";
-    pairs[0].value = g_msg;
-
-    memset(g_hash, 0, sizeof(g_hash));
-    memcpy(g_hash, G_context.person_msg_info.m_hash,32);
-
-    pairs[1].item = "msg hash:";
-    pairs[1].value = g_hash;
-
-    memset(g_len,0,sizeof(g_len));
-    if (!format_u64(g_len,sizeof(g_len),utf8_strlen(G_context.person_msg_info.raw_msg))) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
-    pairs[2].item = "msg len:";
-    pairs[2].value = g_len;
-    // Setup list
-    pairList.nbMaxLinesForValue = 0;
-    pairList.nbPairs = 3;
-    pairList.pairs = pairs;
 
     // Start review flow
     if (is_blind_signed) {
@@ -99,6 +108,7 @@ int ui_display_person_msg_bs_choice(bool is_blind_signed) {
                            "verify the message",
                            NULL,
                            "Sign the message",
+                           NULL,
                            person_msg_review_choice);
     } else {
        nbgl_useCaseReview(TYPE_MESSAGE,
@@ -115,7 +125,7 @@ int ui_display_person_msg_bs_choice(bool is_blind_signed) {
 
 // Flow used to display a clear-signed person msg
 int ui_display_person_msg() {
-    return ui_display_person_msg_bs_choice();
+    return ui_display_person_msg_bs_choice(false);
 }
 
 int ui_display_blind_signed_person_msg() {

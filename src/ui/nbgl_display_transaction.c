@@ -173,10 +173,15 @@ int ui_display_transaction_bs_choice(bool is_blind_signed) {
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
-
-    pairsList.nbPairs = setTagValuePairs();
-    pairsList.pairs = pairs;
-
+    if (!is_blind_signed) {
+        pairsList.nbPairs = setTagValuePairs();
+        pairsList.pairs = pairs;
+    } else {
+       pairs[0].item = "transaction";
+       pairs[0].value = "transaction blind signing";
+       pairsList.pairs = pairs;
+       pairsList.nbPairs = 1;
+    }
    if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONT_ADDR,20) == 0) {
        if (is_blind_signed) {
            nbgl_useCaseReviewBlindSigning(TYPE_TRANSACTION,
@@ -185,6 +190,7 @@ int ui_display_transaction_bs_choice(bool is_blind_signed) {
                               "Review transaction\nto send ONT",
                               NULL,
                               "Sign transaction\nto send ONT",
+                               NULL,
                               tx_review_choice);
        } else {
           nbgl_useCaseReview(TYPE_TRANSACTION,
@@ -203,6 +209,7 @@ int ui_display_transaction_bs_choice(bool is_blind_signed) {
                               "Review transaction\nto send ONG",
                               NULL,
                               "Sign transaction\nto send ONG",
+                               NULL,
                               tx_review_choice);
        } else {
           nbgl_useCaseReview(TYPE_TRANSACTION,
@@ -219,7 +226,7 @@ int ui_display_transaction_bs_choice(bool is_blind_signed) {
 
 // Flow used to display a clear-signed transaction
 int ui_display_transaction() {
-    return ui_display_transaction_bs_choice();
+    return ui_display_transaction_bs_choice(false);
 }
 
 int ui_display_blind_signed_transaction() {

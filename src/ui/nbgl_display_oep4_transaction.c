@@ -140,9 +140,16 @@ int ui_display_oep4_transaction_bs_choice(bool is_blind_signed) {
     }
 
     explicit_bzero(&pairsList, sizeof(pairsList));
+    if (!is_blind_signed) {
+        pairsList.nbPairs = setTagValuePairs();
+        pairsList.pairs = pairs;
+    } else {
+       pairs[0].item = "transaction";
+       pairs[0].value = "transaction blind signing";
+       pairsList.pairs = pairs;
+       pairsList.nbPairs = 1;
+    }
 
-    pairsList.nbPairs = setTagValuePairs();
-    pairsList.pairs = pairs;
     if (is_blind_signed) {
        nbgl_useCaseReviewBlindSigning(TYPE_TRANSACTION,
                            &pairsList,
@@ -150,6 +157,7 @@ int ui_display_oep4_transaction_bs_choice(bool is_blind_signed) {
                            "Review transaction\nto send oep4",
                            NULL,
                            "Sign transaction\nto send oep4",
+                           NULL,
                            oep4_tx_review_choice);
     } else {
         nbgl_useCaseReview(TYPE_TRANSACTION,
@@ -165,7 +173,7 @@ int ui_display_oep4_transaction_bs_choice(bool is_blind_signed) {
 
 // Flow used to display a clear-signed transaction
 int ui_display_oep4_transaction() {
-    return ui_display_oep4_transaction_bs_choice();
+    return ui_display_oep4_transaction_bs_choice(false);
 }
 
 int ui_display_blind_signed_oep4_transaction(){
