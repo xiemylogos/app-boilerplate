@@ -100,10 +100,10 @@ static void controls_callback(int token, uint8_t index, int page) {
     if (token == DUMMY_SWITCH_1_TOKEN) {
         // Dummy 1 switch touched
         // toggle the switch value
-        switch_value = !N_storage.dummy1_allowed;
+        switch_value = !N_storage.blind_signed_allowed;
         switches[DUMMY_SWITCH_1_ID].initState = (nbgl_state_t) switch_value;
         // store the new setting value in NVM
-        nvm_write((void*) &N_storage.dummy1_allowed, &switch_value, 1);
+        nvm_write((void*) &N_storage.blind_signed_allowed, &switch_value, 1);
     } else if (token == DUMMY_SWITCH_2_TOKEN) {
         // Dummy 2 switch touched
 
@@ -130,9 +130,9 @@ static void controls_callback(int token, uint8_t index, int page) {
 // home page definition
 void ui_menu_main(void) {
     // Initialize switches data
-    switches[DUMMY_SWITCH_1_ID].initState = (nbgl_state_t) N_storage.dummy1_allowed;
-    switches[DUMMY_SWITCH_1_ID].text = "Dummy 1";
-    switches[DUMMY_SWITCH_1_ID].subText = "Allow dummy 1\nin transactions";
+    switches[DUMMY_SWITCH_1_ID].initState = (nbgl_state_t) N_storage.blind_signed_allowed;
+    switches[DUMMY_SWITCH_1_ID].text = "Blind signing";
+    switches[DUMMY_SWITCH_1_ID].subText = "Enables transaction or msg blind signing";
     switches[DUMMY_SWITCH_1_ID].token = DUMMY_SWITCH_1_TOKEN;
     switches[DUMMY_SWITCH_1_ID].tuneId = TUNE_TAP_CASUAL;
 

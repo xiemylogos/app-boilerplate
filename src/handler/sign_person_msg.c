@@ -144,16 +144,16 @@ int handler_sign_person_msg(buffer_t *cdata, uint8_t chunk, bool more) {
                                       G_context.person_msg_info.m_hash,
                                       32));
 
-            /*
-            if (cx_sha256_hash(G_context.person_msg_info.raw_msg,
-                                   G_context.person_msg_info.raw_msg_len,
-                                   G_context.person_msg_info.m_hash) != CX_OK) {
-                return io_send_sw(SW_PERSON_MSG_HASH_FAIL);
-            }
-            */
             PRINTF("Hash: %.*H\n", sizeof(G_context.person_msg_info.m_hash), G_context.person_msg_info.m_hash);
-
-            return ui_display_person_msg();
+            if (N_storage.blind_signed_allowed) {
+#ifdef HAVE_NBGL
+                return ui_display_blind_signed_person_msg();
+#else
+                return ui_display_person_msg();
+#endif
+            } else {
+                return ui_display_person_msg();
+            }
         end:
             //*sw = error;
             return io_send_sw(error);

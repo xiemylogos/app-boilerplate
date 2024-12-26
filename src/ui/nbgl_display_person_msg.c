@@ -55,7 +55,7 @@ static void person_msg_review_choice(bool confirm) {
 // Public function to start the person msg review
 // - Check if the app is in the right state for person msg review
 // - Display the first screen of the person msg review
-int ui_display_person_msg_bs_choice() {
+int ui_display_person_msg_bs_choice(bool is_blind_signed) {
     if (G_context.req_type != CONFIRM_MESSAGE || G_context.state != STATE_PARSED) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
@@ -92,13 +92,23 @@ int ui_display_person_msg_bs_choice() {
     pairList.pairs = pairs;
 
     // Start review flow
-    nbgl_useCaseReview(TYPE_MESSAGE,
-                       &pairList,
-                       &C_icon_ont_64px,
-                       "verify the message",
-                       NULL,
-                       "Sign the message",
-                       person_msg_review_choice);
+    if (is_blind_signed) {
+        nbgl_useCaseReviewBlindSigning(TYPE_MESSAGE,
+                           &pairList,
+                           &C_icon_ont_64px,
+                           "verify the message",
+                           NULL,
+                           "Sign the message",
+                           person_msg_review_choice);
+    } else {
+       nbgl_useCaseReview(TYPE_MESSAGE,
+                           &pairList,
+                           &C_icon_ont_64px,
+                           "verify the message",
+                           NULL,
+                           "Sign the message",
+                           person_msg_review_choice);
+    }
     return 0;
 }
 
@@ -107,5 +117,10 @@ int ui_display_person_msg_bs_choice() {
 int ui_display_person_msg() {
     return ui_display_person_msg_bs_choice();
 }
+
+int ui_display_blind_signed_person_msg() {
+    return ui_display_person_msg_bs_choice(true);
+}
+
 
 #endif

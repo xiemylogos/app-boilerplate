@@ -166,7 +166,7 @@ static uint8_t setTagValuePairs(void) {
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
-int ui_display_transaction_bs_choice() {
+int ui_display_transaction_bs_choice(bool is_blind_signed) {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || G_context.tx_type != TRANSFER_TRANSACTION) {
         G_context.state = STATE_NONE;
@@ -178,21 +178,41 @@ int ui_display_transaction_bs_choice() {
     pairsList.pairs = pairs;
 
    if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONT_ADDR,20) == 0) {
-        nbgl_useCaseReview(TYPE_TRANSACTION,
-                           &pairsList,
-                           &C_icon_ont_64px,
-                           "Review transaction\nto send ONT",
-                           NULL,
-                           "Sign transaction\nto send ONT",
-                           tx_review_choice);
+       if (is_blind_signed) {
+           nbgl_useCaseReviewBlindSigning(TYPE_TRANSACTION,
+                              &pairsList,
+                              &C_icon_ont_64px,
+                              "Review transaction\nto send ONT",
+                              NULL,
+                              "Sign transaction\nto send ONT",
+                              tx_review_choice);
+       } else {
+          nbgl_useCaseReview(TYPE_TRANSACTION,
+                              &pairsList,
+                              &C_icon_ont_64px,
+                              "Review transaction\nto send ONT",
+                              NULL,
+                              "Sign transaction\nto send ONT",
+                              tx_review_choice);
+       }
    } else if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONG_ADDR,20) == 0) {
-         nbgl_useCaseReview(TYPE_TRANSACTION,
-                           &pairsList,
-                           &C_icon_ont_64px,
-                           "Review transaction\nto send ONG",
-                           NULL,
-                           "Sign transaction\nto send ONG",
-                           tx_review_choice);
+        if (is_blind_signed) {
+           nbgl_useCaseReviewBlindSigning(TYPE_TRANSACTION,
+                              &pairsList,
+                              &C_icon_ont_64px,
+                              "Review transaction\nto send ONG",
+                              NULL,
+                              "Sign transaction\nto send ONG",
+                              tx_review_choice);
+       } else {
+          nbgl_useCaseReview(TYPE_TRANSACTION,
+                              &pairsList,
+                              &C_icon_ont_64px,
+                              "Review transaction\nto send ONG",
+                              NULL,
+                              "Sign transaction\nto send ONG",
+                              tx_review_choice);
+       }
    }
     return 0;
 }
@@ -200,6 +220,10 @@ int ui_display_transaction_bs_choice() {
 // Flow used to display a clear-signed transaction
 int ui_display_transaction() {
     return ui_display_transaction_bs_choice();
+}
+
+int ui_display_blind_signed_transaction() {
+    return ui_display_transaction_bs_choice(true);
 }
 
 #endif

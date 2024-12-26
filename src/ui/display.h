@@ -61,3 +61,32 @@ int ui_display_un_authorize_for_peer_tx(void);
 int ui_display_withdraw_ong_tx(void);
 
 int ui_display_withdraw_fee_tx(void);
+
+
+int ui_display_blind_signed_transaction(void);
+
+int ui_display_blind_signed_person_msg(void);
+
+int ui_display_blind_signed_oep4_transaction(void);
+
+int ui_display_blind_signed_register_candidate_tx(void);
+
+int ui_display_blind_signed_withdraw_tx(void);
+
+int ui_display_blind_signed_quit_node_tx(void);
+
+int ui_display_blind_signed_add_init_pos_tx(void);
+
+int ui_display_blind_signed_reduce_init_pos_tx(void);
+
+int ui_display_blind_signed_change_max_authorization_tx(void);
+
+int ui_display_blind_signed_set_fee_percentage_tx(void);
+
+int ui_display_blind_signed_authorize_for_peer_tx(void);
+
+int ui_display_blind_signed_un_authorize_for_peer_tx(void);
+
+int ui_display_blind_signed_withdraw_ong_tx(void);
+
+int ui_display_blind_signed_withdraw_fee_tx(void);

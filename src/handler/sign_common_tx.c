@@ -215,31 +215,135 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
             PRINTF("Hash: %.*H\n", sizeof(G_context.tx_info.m_hash), G_context.tx_info.m_hash);
 
             if ( G_context.tx_type == TRANSFER_TRANSACTION) {
-                return ui_display_transaction();
+                if (N_storage.blind_signed_allowed) {
+#ifdef HAVE_NBGL
+                    return ui_display_blind_signed_transaction();
+#else
+                    return ui_display_transaction();
+#endif
+                } else {
+                    return ui_display_transaction();
+                }
             } else if(G_context.tx_type == OEP4_TRANSACTION) {
-                return ui_display_oep4_transaction();
+                if (N_storage.blind_signed_allowed) {
+#ifdef HAVE_NBGL
+                    return ui_display_blind_signed_oep4_transaction();
+#else
+                    return ui_display_oep4_transaction();
+#endif
+                } else {
+                    return ui_display_oep4_transaction();
+                }
             } else if (G_context.tx_type == REGISTER_CANDIDATE) {
-                return ui_display_register_candidate_tx();
+                if (N_storage.blind_signed_allowed) {
+#ifdef HAVE_NBGL
+                    return ui_display_blind_signed_register_candidate_tx();
+#else
+                    return ui_display_register_candidate_tx();
+#endif
+                } else {
+                    return ui_display_register_candidate_tx();
+                }
             } else if (G_context.tx_type == WITHDRAW) {
-                return ui_display_withdraw_tx();
+                if (N_storage.blind_signed_allowed) {
+#ifdef HAVE_NBGL
+                    return ui_display_blind_signed_withdraw_tx();
+#else
+                    return ui_display_withdraw_tx();
+#endif
+                } else {
+                    return ui_display_withdraw_tx();
+                }
             } else if (G_context.tx_type == QUIT_NODE) {
-                return ui_display_quit_node_tx();
+                if (N_storage.blind_signed_allowed) {
+#ifdef HAVE_NBGL
+                    return ui_display_blind_signed_quit_node_tx();
+#else
+                    return ui_display_quit_node_tx();
+#endif
+                } else {
+                    return ui_display_quit_node_tx();
+                }
             } else if (G_context.tx_type == ADD_INIT_POS) {
-                return ui_display_add_init_pos_tx();
+                if (N_storage.blind_signed_allowed) {
+#ifdef HAVE_NBGL
+                    return ui_display_blind_signed_add_init_pos_tx();
+#else
+                    return ui_display_add_init_pos_tx();
+#endif
+                } else {
+                    return ui_display_add_init_pos_tx();
+                }
             } else if (G_context.tx_type == REDUCE_INIT_POS) {
-                return ui_display_reduce_init_pos_tx();
+                if (N_storage.blind_signed_allowed) {
+#ifdef HAVE_NBGL
+                    return ui_display_blind_signed_reduce_init_pos_tx();
+#else
+                    return ui_display_reduce_init_pos_tx();
+#endif
+                } else {
+                    return ui_display_reduce_init_pos_tx();
+                }
             } else if (G_context.tx_type == CHANGE_MAX_AUTHORIZATION) {
-                return ui_display_change_max_authorization_tx();
+                if (N_storage.blind_signed_allowed) {
+#ifdef HAVE_NBGL
+                    return ui_display_blind_signed_change_max_authorization_tx();
+#else
+                    return ui_display_change_max_authorization_tx();
+#endif
+                } else {
+                    return ui_display_change_max_authorization_tx();
+                }
             } else if (G_context.tx_type == SET_FEE_PERCENTAGE) {
-                return ui_display_set_fee_percentage_tx();
+                if (N_storage.blind_signed_allowed) {
+#ifdef HAVE_NBGL
+                    return ui_display_blind_signed_set_fee_percentage_tx();
+#else
+                    return ui_display_set_fee_percentage_tx();
+#endif
+                } else {
+                    return ui_display_set_fee_percentage_tx();
+                }
             } else if (G_context.tx_type == AUTHORIZE_FOR_PEER) {
-                return ui_display_authorize_for_peer_tx();
+                if (N_storage.blind_signed_allowed) {
+#ifdef HAVE_NBGL
+                    return ui_display_blind_signed_authorize_for_peer_tx();
+#else
+                    return ui_display_authorize_for_peer_tx();
+#endif
+                } else {
+                    return ui_display_authorize_for_peer_tx();
+                }
             } else if (G_context.tx_type == UN_AUTHORIZE_FOR_PEER) {
-                return ui_display_un_authorize_for_peer_tx();
+                if (N_storage.blind_signed_allowed) {
+#ifdef HAVE_NBGL
+                    return ui_display_blind_signed_un_authorize_for_peer_tx();
+#else
+                    return ui_display_un_authorize_for_peer_tx();
+#endif
+                } else {
+                    return ui_display_un_authorize_for_peer_tx();
+                }
             } else if (G_context.tx_type == WITHDRAW_ONG) {
-                return ui_display_withdraw_ong_tx();
+                if (N_storage.blind_signed_allowed) {
+#ifdef HAVE_NBGL
+                    return ui_display_blind_signed_withdraw_ong_tx();
+#else
+                    return ui_display_withdraw_ong_tx();
+#endif
+                } else {
+                    return ui_display_withdraw_ong_tx();
+                }
             } else if (G_context.tx_type == WITHDRAW_FEE) {
-                return ui_display_withdraw_fee_tx();
+                if (N_storage.blind_signed_allowed) {
+#ifdef HAVE_NBGL
+                    return ui_display_blind_signed_withdraw_fee_tx();
+#else
+                    return ui_display_withdraw_fee_tx();
+#endif
+                } else {
+                    return ui_display_withdraw_fee_tx();
+                }
             }
         }
     }

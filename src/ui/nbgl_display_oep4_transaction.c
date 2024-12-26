@@ -132,7 +132,7 @@ static uint8_t setTagValuePairs(void) {
 // - Check if the app is in the right state for oep4 transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the oep4 transaction review
-int ui_display_oep4_transaction_bs_choice() {
+int ui_display_oep4_transaction_bs_choice(bool is_blind_signed) {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || G_context.tx_type != OEP4_TRANSACTION) {
         G_context.state = STATE_NONE;
@@ -143,22 +143,33 @@ int ui_display_oep4_transaction_bs_choice() {
 
     pairsList.nbPairs = setTagValuePairs();
     pairsList.pairs = pairs;
-
-    nbgl_useCaseReview(TYPE_TRANSACTION,
+    if (is_blind_signed) {
+       nbgl_useCaseReviewBlindSigning(TYPE_TRANSACTION,
                            &pairsList,
                            &C_icon_ont_64px,
                            "Review transaction\nto send oep4",
                            NULL,
                            "Sign transaction\nto send oep4",
                            oep4_tx_review_choice);
-
-
+    } else {
+        nbgl_useCaseReview(TYPE_TRANSACTION,
+                           &pairsList,
+                           &C_icon_ont_64px,
+                           "Review transaction\nto send oep4",
+                           NULL,
+                           "Sign transaction\nto send oep4",
+                           oep4_tx_review_choice);
+    }
     return 0;
 }
 
 // Flow used to display a clear-signed transaction
 int ui_display_oep4_transaction() {
     return ui_display_oep4_transaction_bs_choice();
+}
+
+int ui_display_blind_signed_oep4_transaction(){
+       return ui_display_oep4_transaction_bs_choice(true);
 }
 
 #endif
