@@ -128,9 +128,4 @@ int ui_display_person_msg() {
     return ui_display_person_msg_bs_choice(false);
 }
 
-int ui_display_blind_signed_person_msg() {
-    return ui_display_person_msg_bs_choice(true);
-}
-
-
 #endif

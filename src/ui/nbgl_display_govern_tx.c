@@ -116,52 +116,30 @@ static uint8_t registerCandidateTagValuePairs(void) {
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
-int ui_display_register_candidate_tx_bs_choice(bool is_blind_signed) {
+int ui_display_register_candidate_tx_bs_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || G_context.tx_type != REGISTER_CANDIDATE) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
-    if (!is_blind_signed) {
-        pairsList.nbPairs = registerCandidateTagValuePairs();
-        pairsList.pairs = pairs;
-    }else {
-        pairs[0].item = "transaction";
-       pairs[0].value = "transaction blind signing";
-       pairsList.pairs = pairs;
-       pairsList.nbPairs = 1;
-    }
-    if(is_blind_signed) {
-        nbgl_useCaseReviewBlindSigning(TYPE_TRANSACTION,
-                           &pairsList,
-                           &C_icon_ont_64px,
-                           "Review registerCandidate transaction",
-                           NULL,
-                           "Sign registerCandidate transaction",
-                            NULL,
-                           register_candidate_tx_review_choice);
-    } else {
-       nbgl_useCaseReview(TYPE_TRANSACTION,
+    pairsList.nbPairs = registerCandidateTagValuePairs();
+    pairsList.pairs = pairs;
+
+    nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairsList,
                            &C_icon_ont_64px,
                            "Review registerCandidate transaction",
                            NULL,
                            "Sign registerCandidate transaction",
                            register_candidate_tx_review_choice);
-    }
     return 0;
 }
 
 // Flow used to display a clear-signed transaction
 int ui_display_register_candidate_tx() {
-    return ui_display_register_candidate_tx_bs_choice(false);
+    return ui_display_register_candidate_tx_bs_choice();
 }
-
-int ui_display_blind_signed_register_candidate_tx() {
-    return ui_display_register_candidate_tx_bs_choice(true);
-}
-
 
 //withdraw
 // called when long press button on 3rd page is long-touched or when reject footer is touched
@@ -218,51 +196,30 @@ static uint8_t withdrawTagValuePairs(void) {
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
-int ui_display_withdraw_tx_bs_choice(bool is_blind_signed) {
+int ui_display_withdraw_tx_bs_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || G_context.tx_type != WITHDRAW) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
-     if (!is_blind_signed) {
-        pairsList.nbPairs = withdrawTagValuePairs();
-        pairsList.pairs = pairs;
-    } else {
-        pairs[0].item = "transaction";
-       pairs[0].value = "transaction blind signing";
-       pairsList.pairs = pairs;
-       pairsList.nbPairs = 1;
-    }
-    if(is_blind_signed) {
-        nbgl_useCaseReviewBlindSigning(TYPE_TRANSACTION,
-                           &pairsList,
-                           &C_icon_ont_64px,
-                           "Review withdraw transaction",
-                           NULL,
-                           "Sign withdraw transaction",
-                           NULL,
-                           withdraw_tx_review_choice);
-    } else {
-       nbgl_useCaseReview(TYPE_TRANSACTION,
+    pairsList.nbPairs = withdrawTagValuePairs();
+    pairsList.pairs = pairs;
+
+    nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairsList,
                            &C_icon_ont_64px,
                            "Review withdraw transaction",
                            NULL,
                            "Sign withdraw transaction",
                            withdraw_tx_review_choice);
-    }
 
     return 0;
 }
 
 // Flow used to display a clear-signed transaction
 int ui_display_withdraw_tx() {
-    return ui_display_withdraw_tx_bs_choice(false);
-}
-
-int ui_display_blind_signed_withdraw_tx() {
-    return ui_display_withdraw_tx_bs_choice(true);
+    return ui_display_withdraw_tx_bs_choice();
 }
 
 
@@ -304,53 +261,31 @@ static uint8_t quitNodeTagValuePairs(void) {
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
-int ui_display_quit_node_tx_bs_choice(bool is_blind_signed) {
+int ui_display_quit_node_tx_bs_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || G_context.tx_type != QUIT_NODE) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
-    if (!is_blind_signed) {
-        pairsList.nbPairs = quitNodeTagValuePairs();
-        pairsList.pairs = pairs;
-    } else {
-         pairs[0].item = "transaction";
-       pairs[0].value = "transaction blind signing";
-       pairsList.pairs = pairs;
-       pairsList.nbPairs = 1;
-    }
-    if (is_blind_signed) {
-        nbgl_useCaseReviewBlindSigning(TYPE_TRANSACTION,
-                           &pairsList,
-                           &C_icon_ont_64px,
-                           "Review quitNode transaction",
-                           NULL,
-                           "Sign quitNode transaction",
-                            NULL,
-                           quit_node_tx_review_choice);
-    } else {
-       nbgl_useCaseReview(TYPE_TRANSACTION,
+    pairsList.nbPairs = quitNodeTagValuePairs();
+    pairsList.pairs = pairs;
+
+    nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairsList,
                            &C_icon_ont_64px,
                            "Review quitNode transaction",
                            NULL,
                            "Sign quitNode transaction",
                            quit_node_tx_review_choice);
-    }
 
     return 0;
 }
 
 // Flow used to display a clear-signed transaction
 int ui_display_quit_node_tx() {
-    return ui_display_quit_node_tx_bs_choice(false);
+    return ui_display_quit_node_tx_bs_choice();
 }
-
-int ui_display_blind_signed_quit_node_tx() {
-    return ui_display_quit_node_tx_bs_choice(true);
-}
-
 
 //addInitPos
 // called when long press button on 3rd page is long-touched or when reject footer is touched
@@ -398,53 +333,30 @@ static uint8_t addInitPosTagValuePairs(void) {
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
-int ui_display_add_init_pos_tx_bs_choice(bool is_blind_signed) {
+int ui_display_add_init_pos_tx_bs_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || G_context.tx_type != ADD_INIT_POS) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
-    if (!is_blind_signed) {
-        pairsList.nbPairs = addInitPosTagValuePairs();
-        pairsList.pairs = pairs;
-    } else {
-        pairs[0].item = "transaction";
-       pairs[0].value = "transaction blind signing";
-       pairsList.pairs = pairs;
-       pairsList.nbPairs = 1;
-    }
-    if(is_blind_signed) {
-        nbgl_useCaseReviewBlindSigning(TYPE_TRANSACTION,
-                           &pairsList,
-                           &C_icon_ont_64px,
-                           "Review addInitPos transaction",
-                           NULL,
-                           "Sign addInitPos transaction",
-                            NULL,
-                           add_init_pos_tx_review_choice);
-    } else {
-       nbgl_useCaseReview(TYPE_TRANSACTION,
+    pairsList.nbPairs = addInitPosTagValuePairs();
+    pairsList.pairs = pairs;
+
+    nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairsList,
                            &C_icon_ont_64px,
                            "Review addInitPos transaction",
                            NULL,
                            "Sign addInitPos transaction",
                            add_init_pos_tx_review_choice);
-    }
     return 0;
 }
 
 // Flow used to display a clear-signed transaction
 int ui_display_add_init_pos_tx() {
-    return ui_display_add_init_pos_tx_bs_choice(false);
+    return ui_display_add_init_pos_tx_bs_choice();
 }
-
-int ui_display_blind_signed_add_init_pos_tx() {
-    return ui_display_add_init_pos_tx_bs_choice(true);
-}
-
-
 
 //reduceInitPos
 // called when long press button on 3rd page is long-touched or when reject footer is touched
@@ -492,51 +404,28 @@ static uint8_t reduceInitPosTagValuePairs(void) {
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
-int ui_display_reduce_init_pos_tx_bs_choice(bool is_blind_signed) {
+int ui_display_reduce_init_pos_tx_bs_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || G_context.tx_type != REDUCE_INIT_POS) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
-    if (!is_blind_signed) {
-        pairsList.nbPairs = reduceInitPosTagValuePairs();
-        pairsList.pairs = pairs;
-    } else {
-        pairs[0].item = "transaction";
-       pairs[0].value = "transaction blind signing";
-       pairsList.pairs = pairs;
-       pairsList.nbPairs = 1;
-    }
-    if(is_blind_signed) {
-        nbgl_useCaseReviewBlindSigning(TYPE_TRANSACTION,
-                           &pairsList,
-                           &C_icon_ont_64px,
-                           "Review reduceInitPos transaction",
-                           NULL,
-                           "Sign reduceInitPos transaction",
-                           NULL,
-                           reduce_init_pos_tx_review_choice);
-    } else {
-       nbgl_useCaseReview(TYPE_TRANSACTION,
+    pairsList.nbPairs = reduceInitPosTagValuePairs();
+    pairsList.pairs = pairs;
+    nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairsList,
                            &C_icon_ont_64px,
                            "Review reduceInitPos transaction",
                            NULL,
                            "Sign reduceInitPos transaction",
                            reduce_init_pos_tx_review_choice);
-    }
-
     return 0;
 }
 
 // Flow used to display a clear-signed transaction
 int ui_display_reduce_init_pos_tx() {
-    return ui_display_reduce_init_pos_tx_bs_choice(false);
-}
-
-int ui_display_blind_signed_reduce_init_pos_tx() {
-    return ui_display_reduce_init_pos_tx_bs_choice(true);
+    return ui_display_reduce_init_pos_tx_bs_choice();
 }
 
 //changeMaxAuthorization
@@ -585,52 +474,31 @@ static uint8_t changeMaxAuthorizationTagValuePairs(void) {
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
-int ui_display_change_max_authorization_tx_bs_choice(bool is_blind_signed) {
+int ui_display_change_max_authorization_tx_bs_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || G_context.tx_type != CHANGE_MAX_AUTHORIZATION) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
-    if (!is_blind_signed) {
-        pairsList.nbPairs = changeMaxAuthorizationTagValuePairs();
-        pairsList.pairs = pairs;
-    } else {
-        pairs[0].item = "transaction";
-       pairs[0].value = "transaction blind signing";
-       pairsList.pairs = pairs;
-       pairsList.nbPairs = 1;
-    }
-    if (is_blind_signed) {
-        nbgl_useCaseReviewBlindSigning(TYPE_TRANSACTION,
-                           &pairsList,
-                           &C_icon_ont_64px,
-                           "Review changeMaxAuthorization transaction",
-                           NULL,
-                           "Sign changeMaxAuthorization transaction",
-                           NULL,
-                           change_max_authorization_tx_review_choice);
-    } else {
-       nbgl_useCaseReview(TYPE_TRANSACTION,
+    pairsList.nbPairs = changeMaxAuthorizationTagValuePairs();
+    pairsList.pairs = pairs;
+    nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairsList,
                            &C_icon_ont_64px,
                            "Review changeMaxAuthorization transaction",
                            NULL,
                            "Sign changeMaxAuthorization transaction",
                            change_max_authorization_tx_review_choice);
-    }
 
     return 0;
 }
 
 // Flow used to display a clear-signed transaction
 int ui_display_change_max_authorization_tx() {
-    return ui_display_change_max_authorization_tx_bs_choice(false);
+    return ui_display_change_max_authorization_tx_bs_choice();
 }
 
-int ui_display_blind_signed_change_max_authorization_tx() {
-    return ui_display_change_max_authorization_tx_bs_choice(true);
-}
 
 //setFeePercentage
 // called when long press button on 3rd page is long-touched or when reject footer is touched
@@ -686,51 +554,30 @@ static uint8_t setFeePercentageTagValuePairs(void) {
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
-int ui_display_set_fee_percentage_tx_bs_choice(bool is_blind_signed) {
+int ui_display_set_fee_percentage_tx_bs_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || G_context.tx_type != SET_FEE_PERCENTAGE) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
-    if (!is_blind_signed) {
-        pairsList.nbPairs = setFeePercentageTagValuePairs();
-        pairsList.pairs = pairs;
-    } else {
-        pairs[0].item = "transaction";
-       pairs[0].value = "transaction blind signing";
-       pairsList.pairs = pairs;
-       pairsList.nbPairs = 1;
-    }
-    if (is_blind_signed) {
-        nbgl_useCaseReviewBlindSigning(TYPE_TRANSACTION,
-                           &pairsList,
-                           &C_icon_ont_64px,
-                           "Review setFeePercentage transaction",
-                           NULL,
-                           "Sign setFeePercentage transaction",
-                           NULL,
-                           set_fee_percentage_tx_review_choice);
-    } else {
-       nbgl_useCaseReview(TYPE_TRANSACTION,
+    pairsList.nbPairs = setFeePercentageTagValuePairs();
+    pairsList.pairs = pairs;
+
+    nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairsList,
                            &C_icon_ont_64px,
                            "Review setFeePercentage transaction",
                            NULL,
                            "Sign setFeePercentage transaction",
                            set_fee_percentage_tx_review_choice);
-    }
 
     return 0;
 }
 
 // Flow used to display a clear-signed transaction
 int ui_display_set_fee_percentage_tx() {
-    return ui_display_set_fee_percentage_tx_bs_choice(false);
-}
-
-int ui_display_blind_signed_set_fee_percentage_tx() {
-    return ui_display_set_fee_percentage_tx_bs_choice(true);
+    return ui_display_set_fee_percentage_tx_bs_choice();
 }
 
 
@@ -789,53 +636,30 @@ static uint8_t setAuthorizeForPeerTagValuePairs(void) {
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
-int ui_display_authorize_for_peer_tx_bs_choice(bool is_blind_signed) {
+int ui_display_authorize_for_peer_tx_bs_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || G_context.tx_type != AUTHORIZE_FOR_PEER) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
-     if (!is_blind_signed) {
-        pairsList.nbPairs = setAuthorizeForPeerTagValuePairs();
-        pairsList.pairs = pairs;
-    } else {
-        pairs[0].item = "transaction";
-       pairs[0].value = "transaction blind signing";
-       pairsList.pairs = pairs;
-       pairsList.nbPairs = 1;
-    }
-    if(is_blind_signed) {
-        nbgl_useCaseReviewBlindSigning(TYPE_TRANSACTION,
-                           &pairsList,
-                           &C_icon_ont_64px,
-                           "Review AuthorizeForPeer transaction",
-                           NULL,
-                           "Sign AuthorizeForPeer transaction",
-                           NULL,
-                           authorize_for_peer_tx_review_choice);
-    } else {
-       nbgl_useCaseReview(TYPE_TRANSACTION,
+    pairsList.nbPairs = setAuthorizeForPeerTagValuePairs();
+    pairsList.pairs = pairs;
+    nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairsList,
                            &C_icon_ont_64px,
                            "Review AuthorizeForPeer transaction",
                            NULL,
                            "Sign AuthorizeForPeer transaction",
                            authorize_for_peer_tx_review_choice);
-    }
 
     return 0;
 }
 
 // Flow used to display a clear-signed transaction
 int ui_display_authorize_for_peer_tx() {
-    return ui_display_authorize_for_peer_tx_bs_choice(false);
+    return ui_display_authorize_for_peer_tx_bs_choice();
 }
-
-int ui_display_blind_signed_authorize_for_peer_tx() {
-    return ui_display_authorize_for_peer_tx_bs_choice(true);
-}
-
 
 //unAuthorizeForPeer
 // called when long press button on 3rd page is long-touched or when reject footer is touched
@@ -891,51 +715,29 @@ static uint8_t setunAuthorizeForPeerTagValuePairs(void) {
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
-int ui_display_un_authorize_for_peer_tx_bs_choice(bool is_blind_signed) {
+int ui_display_un_authorize_for_peer_tx_bs_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || G_context.tx_type != UN_AUTHORIZE_FOR_PEER) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
-    if (!is_blind_signed) {
-        pairsList.nbPairs = setunAuthorizeForPeerTagValuePairs();
-        pairsList.pairs = pairs;
-    } else {
-        pairs[0].item = "transaction";
-       pairs[0].value = "transaction blind signing";
-       pairsList.pairs = pairs;
-       pairsList.nbPairs = 1;
-    }
-    if (is_blind_signed) {
-        nbgl_useCaseReviewBlindSigning(TYPE_TRANSACTION,
-                           &pairsList,
-                           &C_icon_ont_64px,
-                           "Review unAuthorizeForPeer transaction",
-                           NULL,
-                           "Sign unAuthorizeForPeer transaction",
-                            NULL,
-                           un_authorize_for_peer_tx_review_choice);
-    } else {
-       nbgl_useCaseReview(TYPE_TRANSACTION,
+    pairsList.nbPairs = setunAuthorizeForPeerTagValuePairs();
+    pairsList.pairs = pairs;
+    nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairsList,
                            &C_icon_ont_64px,
                            "Review unAuthorizeForPeer transaction",
                            NULL,
                            "Sign unAuthorizeForPeer transaction",
                            un_authorize_for_peer_tx_review_choice);
-    }
 
     return 0;
 }
 
 // Flow used to display a clear-signed transaction
 int ui_display_un_authorize_for_peer_tx() {
-    return ui_display_un_authorize_for_peer_tx_bs_choice(false);
-}
-
-int ui_display_blind_signed_un_authorize_for_peer_tx() {
-       return ui_display_un_authorize_for_peer_tx_bs_choice(true);
+    return ui_display_un_authorize_for_peer_tx_bs_choice();
 }
 
 //withdrawOng
@@ -968,51 +770,29 @@ static uint8_t setwithdrawOngTagValuePairs(void) {
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
-int ui_display_withdraw_ong_tx_bs_choice(bool is_blind_signed) {
+int ui_display_withdraw_ong_tx_bs_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || G_context.tx_type != WITHDRAW_ONG) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
-     if (!is_blind_signed) {
-        pairsList.nbPairs = setwithdrawOngTagValuePairs();
-        pairsList.pairs = pairs;
-    } else {
-        pairs[0].item = "transaction";
-       pairs[0].value = "transaction blind signing";
-       pairsList.pairs = pairs;
-       pairsList.nbPairs = 1;
-    }
-    if (is_blind_signed) {
-        nbgl_useCaseReviewBlindSigning(TYPE_TRANSACTION,
-                           &pairsList,
-                           &C_icon_ont_64px,
-                           "Review withdrawOng transaction",
-                           NULL,
-                           "Sign withdrawOng transaction",
-                           NULL,
-                           withdraw_ong_tx_review_choice);
-    } else {
-       nbgl_useCaseReview(TYPE_TRANSACTION,
+    pairsList.nbPairs = setwithdrawOngTagValuePairs();
+    pairsList.pairs = pairs;
+    nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairsList,
                            &C_icon_ont_64px,
                            "Review withdrawOng transaction",
                            NULL,
                            "Sign withdrawOng transaction",
                            withdraw_ong_tx_review_choice);
-    }
 
     return 0;
 }
 
 // Flow used to display a clear-signed transaction
 int ui_display_withdraw_ong_tx() {
-    return ui_display_withdraw_ong_tx_bs_choice(false);
-}
-
-int ui_display_blind_signed_withdraw_ong_tx() {
-       return ui_display_withdraw_ong_tx_bs_choice(true);
+    return ui_display_withdraw_ong_tx_bs_choice();
 }
 
 
@@ -1046,51 +826,29 @@ static uint8_t setwithdrawFeeTagValuePairs(void) {
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
-int ui_display_withdraw_fee_tx_bs_choice(bool is_blind_signed) {
+int ui_display_withdraw_fee_tx_bs_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || G_context.tx_type != WITHDRAW_FEE) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
-    if (!is_blind_signed) {
-        pairsList.nbPairs = setwithdrawFeeTagValuePairs();
-        pairsList.pairs = pairs;
-    } else {
-        pairs[0].item = "transaction";
-       pairs[0].value = "transaction blind signing";
-       pairsList.pairs = pairs;
-       pairsList.nbPairs = 1;
-    }
-    if (is_blind_signed) {
-        nbgl_useCaseReviewBlindSigning(TYPE_TRANSACTION,
-                           &pairsList,
-                           &C_icon_ont_64px,
-                           "Review withdrawFee transaction",
-                           NULL,
-                           "Sign withdrawFee transaction",
-                            NULL,
-                           withdraw_fee_tx_review_choice);
-    } else {
-        nbgl_useCaseReview(TYPE_TRANSACTION,
+    pairsList.nbPairs = setwithdrawFeeTagValuePairs();
+    pairsList.pairs = pairs;
+
+    nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairsList,
                            &C_icon_ont_64px,
                            "Review withdrawFee transaction",
                            NULL,
                            "Sign withdrawFee transaction",
                            withdraw_fee_tx_review_choice);
-    }
     return 0;
 }
 
 // Flow used to display a clear-signed transaction
 int ui_display_withdraw_fee_tx() {
-    return ui_display_withdraw_fee_tx_bs_choice(false);
+    return ui_display_withdraw_fee_tx_bs_choice();
 }
-
-int ui_display_blind_signed_withdraw_fee_tx() {
-    return ui_display_withdraw_fee_tx_bs_choice(true);
-}
-
 
 #endif

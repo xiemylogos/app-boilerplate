@@ -33,7 +33,8 @@ typedef enum {
     BUFFER_OFFSET_MOVE_ERROR = -20,
     OPCODE_PARSING_ERROR = -21,
     VALUE_LEN_PARSING_ERROR = -22,
-    DATA_END_PARSING_ERROR = -23
+    DATA_END_PARSING_ERROR = -23,
+    TX_PARSING_ERROR = 24
 } parser_status_e;
 
 /**
