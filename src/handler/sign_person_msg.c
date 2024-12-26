@@ -146,11 +146,7 @@ int handler_sign_person_msg(buffer_t *cdata, uint8_t chunk, bool more) {
 
             PRINTF("Hash: %.*H\n", sizeof(G_context.person_msg_info.m_hash), G_context.person_msg_info.m_hash);
             if (N_storage.blind_signed_allowed) {
-#ifdef HAVE_NBGL
                 return ui_display_blind_signed_person_msg();
-#else
-                return ui_display_person_msg();
-#endif
             } else {
                 return ui_display_person_msg();
             }
