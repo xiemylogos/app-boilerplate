@@ -39,6 +39,8 @@
 #include "../uint128.h"
 #include "../transaction/utils.h"
 
+#define BLIND_SIGN_TX "Blind signing Transaction"
+#define BLIND_SIGN_MSG "Blind signing Msg"
 static action_validate_cb g_validate_callback;
 static char g_amount[41];
 static char g_address[42];
@@ -293,19 +295,17 @@ UX_STEP_NOCB(ux_display_amount_step,
              });
 
 UX_STEP_NOCB(ux_display_review_blind_signed_step,
-             pnn,
+              bnnn_paging,
              {
-                 &C_icon_eye,
-                 "Blind signing Review",
-                 "Blind signing Tx",
+                 .title = "blind siging",
+                 .text = g_peerPubkey,
              });
 
 UX_STEP_NOCB(ux_display_review_blind_msg_signed_step,
-             pnn,
+             bnnn_paging,
              {
-                 &C_icon_eye,
-                 "Blind signing Review",
-                 "Blind signing msg",
+                 .title = "blind siging",
+                 .text = g_peerPubkey,
              });
 
 // FLOW to display transaction information:
@@ -395,6 +395,8 @@ int ui_bagl_display_transaction_bs_choice(bool is_blind_signed) {
     }
     g_validate_callback = &ui_action_validate_transaction;
     if (is_blind_signed) {
+        memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+        memcpy(g_peerPubkey, BLIND_SIGN_TX, sizeof(BLIND_SIGN_TX));
         ux_flow_init(0, ux_display_blind_signed_transaction_flow, NULL);
     } else {
         ux_flow_init(0, ux_display_transaction_flow, NULL);
@@ -442,6 +444,8 @@ int ui_display_bagl_person_msg_bs_choice(bool is_blind_signed) {
 
     g_validate_callback = &ui_action_validate_person_msg;
     if(is_blind_signed) {
+        memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+        memcpy(g_peerPubkey, BLIND_SIGN_MSG, sizeof(BLIND_SIGN_TX));
         ux_flow_init(0, ux_display_blind_signed_person_msg_flow, NULL);
     } else {
         ux_flow_init(0, ux_display_person_msg_flow, NULL);
@@ -508,6 +512,8 @@ int ui_bagl_display_oep4_transaction_bs_choice(bool is_blind_signed) {
     }
     g_validate_callback = &ui_action_validate_oep4_transaction;
     if (is_blind_signed) {
+        memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+        memcpy(g_peerPubkey, BLIND_SIGN_TX, sizeof(BLIND_SIGN_TX));
         ux_flow_init(0, ux_display_blind_signed_oep4_transaction_flow, NULL);
     } else {
         ux_flow_init(0, ux_display_oep4_transaction_flow, NULL);
@@ -579,6 +585,8 @@ int ui_bagl_display_register_candidate_tx_bs_choice(bool is_blind_signed) {
 
     g_validate_callback = &ui_action_validate_register_candidate_transaction;
     if(is_blind_signed) {
+        memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+        memcpy(g_peerPubkey, BLIND_SIGN_TX, sizeof(BLIND_SIGN_TX));
         ux_flow_init(0, ux_display_blind_signed_register_candidate_transaction_flow, NULL);
     } else {
         ux_flow_init(0, ux_display_register_candidate_transaction_flow, NULL);
@@ -644,6 +652,8 @@ int ui_bagl_display_withdraw_tx_bs_choice(bool is_blind_signed) {
 
     g_validate_callback = &ui_action_validate_withdraw_transaction;
     if (is_blind_signed) {
+        memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+        memcpy(g_peerPubkey, BLIND_SIGN_TX, sizeof(BLIND_SIGN_TX));
         ux_flow_init(0, ux_display_blind_signed_withdraw_transaction_flow, NULL);
     } else {
         ux_flow_init(0, ux_display_withdraw_transaction_flow, NULL);
@@ -691,6 +701,8 @@ int ui_bagl_display_quit_node_tx_bs_choice(bool is_blind_signed) {
     }
     g_validate_callback = &ui_action_validate_quit_node_transaction;
     if(is_blind_signed) {
+        memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+        memcpy(g_peerPubkey, BLIND_SIGN_TX, sizeof(BLIND_SIGN_TX));
         ux_flow_init(0, ux_display_blind_signed_quit_node_transaction_flow, NULL);
     } else {
         ux_flow_init(0, ux_display_quit_node_transaction_flow, NULL);
@@ -745,6 +757,8 @@ int ui_bagl_display_add_init_pos_tx_bs_choice(bool is_blind_signed) {
 
     g_validate_callback = &ui_action_validate_add_init_pos_transaction;
     if(is_blind_signed) {
+        memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+        memcpy(g_peerPubkey, BLIND_SIGN_TX, sizeof(BLIND_SIGN_TX));
         ux_flow_init(0, ux_display_blind_signed_add_init_pos_transaction_flow, NULL);
     } else {
         ux_flow_init(0, ux_display_add_init_pos_transaction_flow, NULL);
@@ -798,6 +812,8 @@ int ui_bagl_display_reduce_init_pos_tx_bs_choice(bool is_blind_signed) {
     }
     g_validate_callback = &ui_action_validate_reduce_init_pos_transaction;
     if(is_blind_signed) {
+        memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+        memcpy(g_peerPubkey, BLIND_SIGN_TX, sizeof(BLIND_SIGN_TX));
         ux_flow_init(0, ux_display_blind_signed_reduce_init_pos_transaction_flow, NULL);
     } else {
         ux_flow_init(0, ux_display_reduce_init_pos_transaction_flow, NULL);
@@ -856,6 +872,8 @@ int ui_display_bagl_change_max_authorization_tx_bs_choice(bool is_blind_signed) 
     }
     g_validate_callback = &ui_action_validate_change_max_authorization_transaction;
     if(is_blind_signed) {
+        memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+        memcpy(g_peerPubkey, BLIND_SIGN_TX, sizeof(BLIND_SIGN_TX));
         ux_flow_init(0, ux_display_blind_signed_change_max_authorization_transaction_flow, NULL);
     } else  {
         ux_flow_init(0, ux_display_change_max_authorization_transaction_flow, NULL);
@@ -920,6 +938,8 @@ int ui_display_bagl_set_fee_percentage_tx_bs_choice(bool is_blind_signed) {
     }
     g_validate_callback = &ui_action_validate_set_fee_percentage_transaction;
     if(is_blind_signed) {
+        memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+        memcpy(g_peerPubkey, BLIND_SIGN_TX, sizeof(BLIND_SIGN_TX));
         ux_flow_init(0, ux_display_blind_signed_set_fee_percentage_transaction_flow, NULL);
     } else {
         ux_flow_init(0, ux_display_set_fee_percentage_transaction_flow, NULL);
@@ -974,6 +994,8 @@ int ui_display_bagl_authorize_for_peer_tx_bs_choice(bool is_blind_signed) {
     }
     g_validate_callback = &ui_action_validate_authorize_for_peer_transaction;
     if(is_blind_signed) {
+        memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+        memcpy(g_peerPubkey, BLIND_SIGN_TX, sizeof(BLIND_SIGN_TX));
         ux_flow_init(0, ux_display_blind_signed_authorize_for_peer_transaction_flow, NULL);
     } else {
         ux_flow_init(0, ux_display_authorize_for_peer_transaction_flow, NULL);
@@ -1038,6 +1060,8 @@ int ui_display_bagl_un_authorize_for_peer_tx_bs_choice(bool is_blind_signed) {
     }
     g_validate_callback = &ui_action_validate_un_authorize_for_peer_transaction;
     if(is_blind_signed) {
+        memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+        memcpy(g_peerPubkey, BLIND_SIGN_TX, sizeof(BLIND_SIGN_TX));
         ux_flow_init(0, ux_display_blind_signed_un_authorize_for_peer_transaction_flow, NULL);
     } else {
         ux_flow_init(0, ux_display_un_authorize_for_peer_transaction_flow, NULL);
@@ -1082,6 +1106,8 @@ int ui_display_bagl_withdraw_ong_tx_bs_choice(bool is_blind_signed) {
     }
     g_validate_callback = &ui_action_validate_withdraw_ong_transaction;
     if(is_blind_signed) {
+        memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+        memcpy(g_peerPubkey, BLIND_SIGN_TX, sizeof(BLIND_SIGN_TX));
         ux_flow_init(0, ux_display_blind_signed_withdraw_ong_transaction_flow, NULL);
     } else {
         ux_flow_init(0, ux_display_withdraw_ong_transaction_flow, NULL);
@@ -1125,6 +1151,8 @@ int ui_display_bagl_withdraw_fee_tx_bs_choice(bool is_blind_signed) {
     }
     g_validate_callback = &ui_action_validate_withdraw_fee_transaction;
     if(is_blind_signed) {
+        memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+        memcpy(g_peerPubkey, BLIND_SIGN_TX, sizeof(BLIND_SIGN_TX));
         ux_flow_init(0, ux_display_blind_signed_withdraw_fee_transaction_flow, NULL);
     } else {
         ux_flow_init(0, ux_display_withdraw_fee_transaction_flow, NULL);
