@@ -44,6 +44,7 @@
 static action_validate_cb g_validate_callback;
 static char g_amount[41];
 static char g_address[42];
+static char g_fromAddr[42];
 
 static char g_peerPubkey[66];
 static char g_posList[60];
@@ -139,6 +140,14 @@ static void ui_action_validate_withdraw_fee_transaction(bool choice) {
 // Step with icon and text
 UX_STEP_NOCB(ux_display_confirm_addr_step, pn, {&C_icon_eye, "Confirm Address"});
 // Step with title/text for address
+UX_STEP_NOCB(ux_display_from_address_step,
+             bnnn_paging,
+             {
+                 .title = "fromAddr",
+                 .text = g_fromAddr,
+             });
+
+
 UX_STEP_NOCB(ux_display_address_step,
              bnnn_paging,
              {
@@ -316,6 +325,7 @@ UX_STEP_NOCB(ux_display_review_blind_msg_signed_step,
 // #5 screen : reject button
 UX_FLOW(ux_display_transaction_flow,
         &ux_display_review_step,
+        &ux_display_from_address_step,
         &ux_display_address_step,
         &ux_display_amount_step,
         &ux_display_approve_step,
@@ -385,6 +395,14 @@ int ui_bagl_display_transaction_bs_choice() {
     if (script_hash_to_address(g_address,
                                    sizeof(g_address),
                                    G_context.tx_info.tx_info.payload.to) == -1) {
+            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    }
+
+    memset(g_fromAddr, 0, sizeof(g_fromAddr));
+
+    if (script_hash_to_address(g_fromAddr,
+                                   sizeof(g_fromAddr),
+                                   G_context.tx_info.tx_info.payload.from) == -1) {
             return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
 
@@ -460,6 +478,7 @@ int ui_display_person_msg() {
 // #5 screen : reject button
 UX_FLOW(ux_display_oep4_transaction_flow,
         &ux_display_review_step,
+        &ux_display_from_address_step,
         &ux_display_address_step,
         &ux_display_amount_step,
         &ux_display_approve_step,
@@ -491,6 +510,14 @@ int ui_bagl_display_oep4_transaction_bs_choice() {
         tostring128(&values, 10, g_amount, sizeof(g_amount));
     }
     PRINTF("Amount: %s\n", g_amount);
+
+    memset(g_fromAddr, 0, sizeof(g_fromAddr));
+
+    if (script_hash_to_address(g_fromAddr,
+                                   sizeof(g_fromAddr),
+                                   G_context.tx_info.oep4_tx_info.payload.from) == -1) {
+            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    }
 
     memset(g_address, 0, sizeof(g_address));
 
