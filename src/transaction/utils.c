@@ -60,31 +60,13 @@ bool transaction_utils_format_memo(const uint8_t *memo,
     return true;
 }
 
-//6a7cc8 or 00c66b
-uint64_t getThreeBytesValue(buffer_t *buf) {
-    uint8_t *value;
-    value = (uint8_t*)(buf->ptr+buf->offset);
-    if (!buffer_seek_cur(buf, 3)) {
-        return 0;
-    }
-    uint64_t pre_value =0;
-    for (int i = 0; i < 3; i++) {
-        pre_value |= ((int64_t)value[i] << (8 * i));
-    }
-    return pre_value;
-}
-
 uint64_t getBytesValueByLen(buffer_t *buf,uint8_t len) {
     uint8_t *value;
     value = (uint8_t*)(buf->ptr+buf->offset);
     if (!buffer_seek_cur(buf, len)) {
         return 0;
     }
-    uint64_t pre_value =0;
-    for (int i = 0; i < len; i++) {
-        pre_value |= ((int64_t)value[i] << (8 * i));
-    }
-    return pre_value;
+    return getValueByLen(value,len); 
 }
 
 uint64_t getValueByLen(uint8_t *value,uint8_t len) {

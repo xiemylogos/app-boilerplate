@@ -29,6 +29,47 @@
 #include "ledger_assert.h"
 #endif
 
+
+parser_status_e check_govern_end_data(buffer_t *buf,const char* param_name ) {
+    if (getBytesValueByLen(buf,3) != 13139050) {  // 6a7cc8
+        return VALUE_PARSING_ERROR;
+    }
+    uint8_t  pre_code;
+    if(!buffer_read_u8(buf,&pre_code)) {
+        return OPCODE_PARSING_ERROR;
+    }
+    if (pre_code != 108) { //6c
+        return OPCODE_PARSING_ERROR;
+    }
+    uint8_t tag_len;
+    if (!buffer_read_u8(buf, &tag_len)) {
+        return OPCODE_PARSING_ERROR;
+    }
+    if (tag_len == 0) {
+        return OPCODE_PARSING_ERROR;
+    }
+    if (memcmp(buf->ptr + buf->offset, param_name, tag_len) != 0) {
+        return PARSE_STRING_MATCH_ERROR;
+    }
+    if (!buffer_seek_cur(buf, tag_len)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+   uint8_t end_data[] = {0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x68, 0x16,
+                          0x4F, 0x6E, 0x74, 0x6F, 0x6C, 0x6F, 0x67, 0x79, 0x2E, 0x4E, 0x61, 0x74,
+                          0x69, 0x76, 0x65, 0x2E, 0x49, 0x6E, 0x76, 0x6F, 0x6B, 0x65, 0x00};
+    if (!buffer_can_read(buf, sizeof(end_data))) {
+        return DATA_END_PARSING_ERROR;
+    }
+    if (memcmp(buf->ptr + buf->offset, end_data, sizeof(end_data)) != 0) {
+        return DATA_END_PARSING_ERROR;
+    }
+    if (!buffer_seek_cur(buf, sizeof(end_data))) {
+        return DATA_END_PARSING_ERROR;
+    }
+    return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR; 
+}
+
 parser_status_e register_candidate_tx_deserialize(buffer_t *buf, register_candidate_t *tx) {
     LEDGER_ASSERT(buf != NULL, "NULL buf");
     LEDGER_ASSERT(tx != NULL, "NULL tx");
@@ -60,7 +101,7 @@ parser_status_e register_candidate_tx_deserialize(buffer_t *buf, register_candid
     if (!buffer_can_read(buf, op_code_size)) {
         return DATA_END_PARSING_ERROR;
     }
-    if(getThreeBytesValue(buf) != 7063040) { //00c66b
+    if(getBytesValueByLen(buf,3) != 7063040) { //00c66b
         return VALUE_PARSING_ERROR;
     }
     uint8_t pre_pub_len;
@@ -71,7 +112,7 @@ parser_status_e register_candidate_tx_deserialize(buffer_t *buf, register_candid
     if (!buffer_seek_cur(buf,pre_pub_len)) {
         return FROM_PARSING_ERROR;
     }
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }
     uint8_t addr_len;
@@ -85,7 +126,7 @@ parser_status_e register_candidate_tx_deserialize(buffer_t *buf, register_candid
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return FROM_PARSING_ERROR;
     }
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }
     uint8_t init_pos_len;
@@ -97,7 +138,7 @@ parser_status_e register_candidate_tx_deserialize(buffer_t *buf, register_candid
         return VALUE_PARSING_ERROR;
     }
     tx->init_pos = value;
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }
     if(!buffer_read_u8(buf,&tx->ont_id_len)) {
@@ -107,7 +148,7 @@ parser_status_e register_candidate_tx_deserialize(buffer_t *buf, register_candid
     if (!buffer_seek_cur(buf, tx->ont_id_len)) {
         return FROM_PARSING_ERROR;
     }
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }
     if(!buffer_read_u8(buf,&tx->key_no_len)) {
@@ -118,43 +159,7 @@ parser_status_e register_candidate_tx_deserialize(buffer_t *buf, register_candid
     } else {
         tx->key_no = getBytesValueByLen(buf,tx->key_no_len);
     }
-    if (getThreeBytesValue(buf) != 13139050) {  // 6a7cc8
-        return VALUE_PARSING_ERROR;
-    }
-    uint8_t pre_code;
-    if (!buffer_read_u8(buf, &pre_code)) {
-        return OPCODE_PARSING_ERROR;
-    }
-    if (pre_code != 108) {  // 6c
-        return OPCODE_PARSING_ERROR;
-    }
-    uint8_t tag_len;
-    if (!buffer_read_u8(buf, &tag_len)) {
-        return OPCODE_PARSING_ERROR;
-    }
-    if (tag_len == 0) {
-        return OPCODE_PARSING_ERROR;
-    }
-    if (memcmp(buf->ptr + buf->offset, "registerCandidate", tag_len) != 0) {
-        return PARSE_STRING_MATCH_ERROR;
-    }
-    if (!buffer_seek_cur(buf, tag_len)) {
-        return BUFFER_OFFSET_MOVE_ERROR;
-    }
-    uint8_t end_data[] = {0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x68, 0x16,
-                          0x4F, 0x6E, 0x74, 0x6F, 0x6C, 0x6F, 0x67, 0x79, 0x2E, 0x4E, 0x61, 0x74,
-                          0x69, 0x76, 0x65, 0x2E, 0x49, 0x6E, 0x76, 0x6F, 0x6B, 0x65, 0x00};
-    if (!buffer_can_read(buf, sizeof(end_data))) {
-        return DATA_END_PARSING_ERROR;
-    }
-    if (memcmp(buf->ptr + buf->offset, end_data, sizeof(end_data)) != 0) {
-        return DATA_END_PARSING_ERROR;
-    }
-    if (!buffer_seek_cur(buf, sizeof(end_data))) {
-        return DATA_END_PARSING_ERROR;
-    }
-    return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
+    return check_govern_end_data(buf,RegisterCandidate);
 }
 
 parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
@@ -188,7 +193,7 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
     if (!buffer_can_read(buf, op_code_size)) {
         return DATA_END_PARSING_ERROR;
     } 
-    if(getThreeBytesValue(buf) != 7063040) { //00c66b
+    if(getBytesValueByLen(buf,3) != 7063040) { //00c66b
         return VALUE_PARSING_ERROR;
     }
     uint8_t addr_len;
@@ -202,7 +207,7 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return FROM_PARSING_ERROR;
     }
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }
     if(!buffer_read_varint(buf,&tx->peer_pubkey_length)) {
@@ -211,7 +216,7 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
     if (tx->peer_pubkey_length >= 81) {
         tx->peer_pubkey_length = tx->peer_pubkey_length -80;
     }
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }
     uint8_t pre_pub_len;
@@ -222,7 +227,7 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
     if (!buffer_seek_cur(buf, pre_pub_len*tx->peer_pubkey_length)) {
         return FROM_PARSING_ERROR;
     }
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }
     if(!buffer_read_varint(buf,&tx->withdraw_list_number)) {
@@ -231,7 +236,7 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
     if (tx->withdraw_list_number >= 81) {
         tx->withdraw_list_number = tx->withdraw_list_number - 80;
     }
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }
     if(!buffer_read_u8(buf,&tx->withdraw_list_len)) {
@@ -243,43 +248,7 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
             return FROM_PARSING_ERROR;
         }
     }
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
-        return VALUE_PARSING_ERROR;
-    }
-    uint8_t pre_code;
-    if (!buffer_read_u8(buf, &pre_code)) {
-        return OPCODE_PARSING_ERROR;
-    }
-    if (pre_code != 108) {  // 6c
-        return OPCODE_PARSING_ERROR;
-    }
-    uint8_t tag_len;
-    if (!buffer_read_u8(buf, &tag_len)) {
-        return OPCODE_PARSING_ERROR;
-    }
-    if (tag_len == 0) {
-        return OPCODE_PARSING_ERROR;
-    }
-    if (memcmp(buf->ptr + buf->offset, "withdraw", tag_len) != 0) {
-        return PARSE_STRING_MATCH_ERROR;
-    }
-    if (!buffer_seek_cur(buf, tag_len)) {
-        return BUFFER_OFFSET_MOVE_ERROR;
-    }
-    uint8_t end_data[] = {0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x68, 0x16,
-                          0x4F, 0x6E, 0x74, 0x6F, 0x6C, 0x6F, 0x67, 0x79, 0x2E, 0x4E, 0x61, 0x74,
-                          0x69, 0x76, 0x65, 0x2E, 0x49, 0x6E, 0x76, 0x6F, 0x6B, 0x65, 0x00};
-    if (!buffer_can_read(buf, sizeof(end_data))) {
-        return DATA_END_PARSING_ERROR;
-    }
-    if (memcmp(buf->ptr + buf->offset, end_data, sizeof(end_data)) != 0) {
-        return DATA_END_PARSING_ERROR;
-    }
-    if (!buffer_seek_cur(buf, sizeof(end_data))) {
-        return DATA_END_PARSING_ERROR;
-    }
-    return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
+    return check_govern_end_data(buf,Withdraw);
 }
 
 
@@ -314,7 +283,7 @@ parser_status_e quit_node_tx_deserialize(buffer_t *buf, quit_node_t *tx) {
     if (!buffer_can_read(buf, op_code_size)) {
         return DATA_END_PARSING_ERROR;
     }
-    if(getThreeBytesValue(buf) != 7063040) { //00c66b
+    if(getBytesValueByLen(buf,3) != 7063040) { //00c66b
         return VALUE_PARSING_ERROR;
     }
     uint8_t pre_pub_len;
@@ -325,7 +294,7 @@ parser_status_e quit_node_tx_deserialize(buffer_t *buf, quit_node_t *tx) {
     if (!buffer_seek_cur(buf,pre_pub_len)) {
         return FROM_PARSING_ERROR;
     }
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }
     uint8_t addr_len;
@@ -339,43 +308,7 @@ parser_status_e quit_node_tx_deserialize(buffer_t *buf, quit_node_t *tx) {
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return FROM_PARSING_ERROR;
     }
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
-        return VALUE_PARSING_ERROR;
-    }
-    uint8_t pre_code;
-    if (!buffer_read_u8(buf, &pre_code)) {
-        return OPCODE_PARSING_ERROR;
-    }
-    if (pre_code != 108) {  // 6c
-        return OPCODE_PARSING_ERROR;
-    }
-    uint8_t tag_len;
-    if (!buffer_read_u8(buf, &tag_len)) {
-        return OPCODE_PARSING_ERROR;
-    }
-    if (tag_len == 0) {
-        return OPCODE_PARSING_ERROR;
-    }
-    if (memcmp(buf->ptr + buf->offset, "quitNode", tag_len) != 0) {
-        return PARSE_STRING_MATCH_ERROR;
-    }
-    if (!buffer_seek_cur(buf, tag_len)) {
-        return BUFFER_OFFSET_MOVE_ERROR;
-    }
-    uint8_t end_data[] = {0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x68, 0x16,
-                          0x4F, 0x6E, 0x74, 0x6F, 0x6C, 0x6F, 0x67, 0x79, 0x2E, 0x4E, 0x61, 0x74,
-                          0x69, 0x76, 0x65, 0x2E, 0x49, 0x6E, 0x76, 0x6F, 0x6B, 0x65, 0x00};
-    if (!buffer_can_read(buf, sizeof(end_data))) {
-        return DATA_END_PARSING_ERROR;
-    }
-    if (memcmp(buf->ptr + buf->offset, end_data, sizeof(end_data)) != 0) {
-        return DATA_END_PARSING_ERROR;
-    }
-    if (!buffer_seek_cur(buf, sizeof(end_data))) {
-        return DATA_END_PARSING_ERROR;
-    }
-    return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
+    return check_govern_end_data(buf,QuitNode);
 }
 
 
@@ -410,7 +343,7 @@ parser_status_e add_init_pos_tx_deserialize(buffer_t *buf, add_init_pos_t *tx) {
     if (!buffer_can_read(buf, op_code_size)) {
         return DATA_END_PARSING_ERROR;
     }
-    if (getThreeBytesValue(buf) != 7063040) {  // 00c66b
+    if (getBytesValueByLen(buf,3) != 7063040) {  // 00c66b
         return VALUE_PARSING_ERROR;
     }
     uint8_t pre_pub_len;
@@ -421,7 +354,7 @@ parser_status_e add_init_pos_tx_deserialize(buffer_t *buf, add_init_pos_t *tx) {
     if (!buffer_seek_cur(buf, pre_pub_len)) {
         return FROM_PARSING_ERROR;
     }
-    if (getThreeBytesValue(buf) != 13139050) {  // 6a7cc8
+    if (getBytesValueByLen(buf,3) != 13139050) {  // 6a7cc8
         return VALUE_PARSING_ERROR;
     }
     uint8_t addr_len;
@@ -435,7 +368,7 @@ parser_status_e add_init_pos_tx_deserialize(buffer_t *buf, add_init_pos_t *tx) {
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return FROM_PARSING_ERROR;
     }
-    if (getThreeBytesValue(buf) != 13139050) {  // 6a7cc8
+    if (getBytesValueByLen(buf,3) != 13139050) {  // 6a7cc8
         return VALUE_PARSING_ERROR;
     }
     uint8_t pos_len;
@@ -447,45 +380,8 @@ parser_status_e add_init_pos_tx_deserialize(buffer_t *buf, add_init_pos_t *tx) {
         return VALUE_PARSING_ERROR;
     }
     tx->pos = value;
-    if (getThreeBytesValue(buf) != 13139050) {  // 6a7cc8
-        return VALUE_PARSING_ERROR;
-    }
-    uint8_t pre_code;
-    if (!buffer_read_u8(buf, &pre_code)) {
-        return OPCODE_PARSING_ERROR;
-    }
-    if (pre_code != 108) {  // 6c
-        return OPCODE_PARSING_ERROR;
-    }
-    uint8_t tag_len;
-    if (!buffer_read_u8(buf, &tag_len)) {
-        return OPCODE_PARSING_ERROR;
-    }
-    if (tag_len == 0) {
-        return OPCODE_PARSING_ERROR;
-    }
-    if (memcmp(buf->ptr + buf->offset, "addInitPos", tag_len) != 0) {
-        return PARSE_STRING_MATCH_ERROR;
-    }
-    if (!buffer_seek_cur(buf, tag_len)) {
-        return BUFFER_OFFSET_MOVE_ERROR;
-    }
-    uint8_t end_data[] = {0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x68, 0x16,
-                          0x4F, 0x6E, 0x74, 0x6F, 0x6C, 0x6F, 0x67, 0x79, 0x2E, 0x4E, 0x61, 0x74,
-                          0x69, 0x76, 0x65, 0x2E, 0x49, 0x6E, 0x76, 0x6F, 0x6B, 0x65, 0x00};
-    if (!buffer_can_read(buf, sizeof(end_data))) {
-        return DATA_END_PARSING_ERROR;
-    }
-    if (memcmp(buf->ptr + buf->offset, end_data, sizeof(end_data)) != 0) {
-        return DATA_END_PARSING_ERROR;
-    }
-    if (!buffer_seek_cur(buf, sizeof(end_data))) {
-        return DATA_END_PARSING_ERROR;
-    }
-    return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
+    return check_govern_end_data(buf,AddInitPos);
 }
-
 
 parser_status_e reduce_init_pos_tx_deserialize(buffer_t *buf, reduce_init_pos_t *tx) {
     LEDGER_ASSERT(buf != NULL, "NULL buf");
@@ -518,7 +414,7 @@ parser_status_e reduce_init_pos_tx_deserialize(buffer_t *buf, reduce_init_pos_t 
     if(!buffer_can_read(buf,op_code_size)) {
         return DATA_END_PARSING_ERROR;
     } 
-    if(getThreeBytesValue(buf) != 7063040) { //00c66b
+    if(getBytesValueByLen(buf,3) != 7063040) { //00c66b
         return VALUE_PARSING_ERROR;
     } 
      uint8_t pre_pub_len;
@@ -529,7 +425,7 @@ parser_status_e reduce_init_pos_tx_deserialize(buffer_t *buf, reduce_init_pos_t 
     if (!buffer_seek_cur(buf,pre_pub_len)) {
         return FROM_PARSING_ERROR;
     }
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }   
     uint8_t addr_len;
@@ -543,7 +439,7 @@ parser_status_e reduce_init_pos_tx_deserialize(buffer_t *buf, reduce_init_pos_t 
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return FROM_PARSING_ERROR;
     }
-   if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+   if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }
     uint8_t pos_len;
@@ -555,47 +451,8 @@ parser_status_e reduce_init_pos_tx_deserialize(buffer_t *buf, reduce_init_pos_t 
         return VALUE_PARSING_ERROR;
     }
     tx->pos = value;
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
-        return VALUE_PARSING_ERROR;
-    }
-    uint8_t  pre_code;
-    if(!buffer_read_u8(buf,&pre_code)) {
-        return OPCODE_PARSING_ERROR;
-    }
-    if (pre_code != 108) { //6c
-        return OPCODE_PARSING_ERROR;
-    }
-    uint8_t tag_len;
-    if(!buffer_read_u8(buf,&tag_len)) {
-        return OPCODE_PARSING_ERROR;
-    }
-    if (tag_len == 0) {
-        return OPCODE_PARSING_ERROR;   
-    } 
-    if(memcmp(buf->ptr+buf->offset, "reduceInitPos", tag_len) != 0) {
-        return PARSE_STRING_MATCH_ERROR;
-    }
-    if (!buffer_seek_cur(buf,tag_len)) {
-        return BUFFER_OFFSET_MOVE_ERROR;
-    }
-    uint8_t end_data[] = {
-        0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x68, 0x16,
-        0x4F, 0x6E, 0x74, 0x6F, 0x6C, 0x6F, 0x67, 0x79,
-        0x2E, 0x4E, 0x61, 0x74, 0x69, 0x76, 0x65, 0x2E,
-        0x49, 0x6E, 0x76, 0x6F, 0x6B, 0x65, 0x00
-    };
-    if(!buffer_can_read(buf,sizeof(end_data))) {
-        return DATA_END_PARSING_ERROR;
-    }
-    if(memcmp(buf->ptr+buf->offset, end_data, sizeof(end_data)) != 0) {
-        return DATA_END_PARSING_ERROR;
-    }
-    if (!buffer_seek_cur(buf,sizeof (end_data))) {
-        return DATA_END_PARSING_ERROR;
-    }
-    return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
+    
+    return check_govern_end_data(buf,ReduceInitPos);
 }
 
 
@@ -630,7 +487,7 @@ parser_status_e  change_max_authorization_tx_deserialize(buffer_t *buf, change_m
     if(!buffer_can_read(buf,op_code_size)) {
         return DATA_END_PARSING_ERROR;
     } 
-    if(getThreeBytesValue(buf) != 7063040) { //00c66b
+    if(getBytesValueByLen(buf,3) != 7063040) { //00c66b
         return VALUE_PARSING_ERROR;
     }
     uint8_t pre_pub_len;
@@ -641,7 +498,7 @@ parser_status_e  change_max_authorization_tx_deserialize(buffer_t *buf, change_m
     if (!buffer_seek_cur(buf,pre_pub_len)) {
         return FROM_PARSING_ERROR;
     }
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     } 
     uint8_t pre_pub;
@@ -655,7 +512,7 @@ parser_status_e  change_max_authorization_tx_deserialize(buffer_t *buf, change_m
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return FROM_PARSING_ERROR;
     }
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }
     uint8_t max_authorize_len;
@@ -667,47 +524,7 @@ parser_status_e  change_max_authorization_tx_deserialize(buffer_t *buf, change_m
         return VALUE_PARSING_ERROR;
     }
     tx->max_authorize = value;
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
-        return VALUE_PARSING_ERROR;
-    }
-    uint8_t  pre_code;
-    if(!buffer_read_u8(buf,&pre_code)) {
-        return OPCODE_PARSING_ERROR;
-    }
-    if (pre_code != 108) { //6c
-        return OPCODE_PARSING_ERROR;
-    }
-    uint8_t tag_len;
-    if(!buffer_read_u8(buf,&tag_len)) {
-        return OPCODE_PARSING_ERROR;
-    }
-    if (tag_len == 0) {
-        return OPCODE_PARSING_ERROR;   
-    } 
-    if(memcmp(buf->ptr+buf->offset, "changeMaxAuthorization", tag_len) != 0) {
-        return PARSE_STRING_MATCH_ERROR;
-    }
-    if (!buffer_seek_cur(buf,tag_len)) {
-        return BUFFER_OFFSET_MOVE_ERROR;
-    }
-    uint8_t end_data[] = {
-        0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x68, 0x16,
-        0x4F, 0x6E, 0x74, 0x6F, 0x6C, 0x6F, 0x67, 0x79,
-        0x2E, 0x4E, 0x61, 0x74, 0x69, 0x76, 0x65, 0x2E,
-        0x49, 0x6E, 0x76, 0x6F, 0x6B, 0x65, 0x00
-    };
-    if(!buffer_can_read(buf,sizeof(end_data))) {
-        return DATA_END_PARSING_ERROR;
-    }
-    if(memcmp(buf->ptr+buf->offset, end_data, sizeof(end_data)) != 0) {
-        return DATA_END_PARSING_ERROR;
-    }
-    if (!buffer_seek_cur(buf,sizeof (end_data))) {
-        return DATA_END_PARSING_ERROR;
-    }
-    return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
+    return check_govern_end_data(buf,ChangeMaxAuthorization);
 }
 
 
@@ -742,7 +559,7 @@ parser_status_e  set_fee_percentage_tx_deserialize(buffer_t *buf, set_fee_percen
     if(!buffer_can_read(buf,op_code_size)) {
         return DATA_END_PARSING_ERROR;
     }
-    if(getThreeBytesValue(buf) != 7063040) { //00c66b
+    if(getBytesValueByLen(buf,3) != 7063040) { //00c66b
         return VALUE_PARSING_ERROR;
     }
     uint8_t pre_pub_len;
@@ -753,7 +570,7 @@ parser_status_e  set_fee_percentage_tx_deserialize(buffer_t *buf, set_fee_percen
     if (!buffer_seek_cur(buf,pre_pub_len)) {
         return FROM_PARSING_ERROR;
     }
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }
     uint8_t pre_pub;
@@ -767,7 +584,7 @@ parser_status_e  set_fee_percentage_tx_deserialize(buffer_t *buf, set_fee_percen
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return FROM_PARSING_ERROR;
     }
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }
     uint8_t cost_len;
@@ -776,7 +593,7 @@ parser_status_e  set_fee_percentage_tx_deserialize(buffer_t *buf, set_fee_percen
     }
     tx->peer_cost = getBytesValueByLen(buf,cost_len);
 
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }
     uint8_t stake_cost_len;
@@ -784,40 +601,7 @@ parser_status_e  set_fee_percentage_tx_deserialize(buffer_t *buf, set_fee_percen
         return VALUE_PARSING_ERROR;
     }
     tx->stake_cost = getBytesValueByLen(buf,stake_cost_len);
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
-        return VALUE_PARSING_ERROR;
-    } 
-    uint16_t  pre_code;
-    if(!buffer_read_u16(buf,&pre_code,LE)) {
-        return OPCODE_PARSING_ERROR;
-    }
-    if (pre_code != 4204) { //6c10
-        return OPCODE_PARSING_ERROR;
-    }
-    if(memcmp(buf->ptr+buf->offset, "setFeePercentage", 16) != 0) {
-        return PARSE_STRING_MATCH_ERROR;
-    }
-    if (!buffer_seek_cur(buf,16)) {
-        return BUFFER_OFFSET_MOVE_ERROR;
-    }
-    uint8_t end_data[] = {
-        0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x68, 0x16,
-        0x4F, 0x6E, 0x74, 0x6F, 0x6C, 0x6F, 0x67, 0x79,
-        0x2E, 0x4E, 0x61, 0x74, 0x69, 0x76, 0x65, 0x2E,
-        0x49, 0x6E, 0x76, 0x6F, 0x6B, 0x65, 0x00
-    };
-    if(!buffer_can_read(buf,sizeof(end_data))) {
-        return DATA_END_PARSING_ERROR;
-    }
-    if(memcmp(buf->ptr+buf->offset, end_data, sizeof(end_data)) != 0) {
-        return DATA_END_PARSING_ERROR;
-    }
-    if (!buffer_seek_cur(buf,sizeof (end_data))) {
-        return DATA_END_PARSING_ERROR;
-    }
-    return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
+    return check_govern_end_data(buf,SetFeePercentage); 
 }
 
 
@@ -852,7 +636,7 @@ parser_status_e authorize_for_peer_tx_deserialize(buffer_t *buf, authorize_for_p
     if(!buffer_can_read(buf,op_code_size)) {
         return DATA_END_PARSING_ERROR;
     } 
-    if(getThreeBytesValue(buf) != 7063040) { //00c66b
+    if(getBytesValueByLen(buf,3) != 7063040) { //00c66b
         return VALUE_PARSING_ERROR;
     }
     uint8_t pre_pub;
@@ -867,7 +651,7 @@ parser_status_e authorize_for_peer_tx_deserialize(buffer_t *buf, authorize_for_p
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return FROM_PARSING_ERROR;
     }
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }  
     if(!buffer_read_varint(buf,&tx->peer_pubkey_length)) {
@@ -876,7 +660,7 @@ parser_status_e authorize_for_peer_tx_deserialize(buffer_t *buf, authorize_for_p
     if (tx->peer_pubkey_length >= 81) {
         tx->peer_pubkey_length = tx->peer_pubkey_length -80;
     }
-   if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+   if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     } 
     uint8_t pre_pub_len;
@@ -887,7 +671,7 @@ parser_status_e authorize_for_peer_tx_deserialize(buffer_t *buf, authorize_for_p
     if (!buffer_seek_cur(buf, pre_pub_len*tx->peer_pubkey_length)) {
         return FROM_PARSING_ERROR;
     } 
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     } 
     if(!buffer_read_u8(buf,&tx->pos_list_number)) {
@@ -896,7 +680,7 @@ parser_status_e authorize_for_peer_tx_deserialize(buffer_t *buf, authorize_for_p
     if (tx->pos_list_number >= 81) {
         tx->pos_list_number = tx->pos_list_number -80;
     } 
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }
     if(!buffer_read_u8(buf,&tx->pos_list_len)) {
@@ -908,41 +692,7 @@ parser_status_e authorize_for_peer_tx_deserialize(buffer_t *buf, authorize_for_p
             return FROM_PARSING_ERROR;
         }
     }
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
-        return VALUE_PARSING_ERROR;
-    } 
-    uint16_t  pre_code;
-    if(!buffer_read_u16(buf,&pre_code,LE)) {
-        return OPCODE_PARSING_ERROR;
-    }
-    if (pre_code != 4204) { //6c10
-        return OPCODE_PARSING_ERROR;
-    }
-    if(memcmp(buf->ptr+buf->offset, "authorizeForPeer", 16) != 0) {
-        return PARSE_STRING_MATCH_ERROR;
-    }
-    if (!buffer_seek_cur(buf,16)) {
-        return BUFFER_OFFSET_MOVE_ERROR;
-    }
-
-    uint8_t end_data[] = {
-        0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x68, 0x16,
-        0x4F, 0x6E, 0x74, 0x6F, 0x6C, 0x6F, 0x67, 0x79,
-        0x2E, 0x4E, 0x61, 0x74, 0x69, 0x76, 0x65, 0x2E,
-        0x49, 0x6E, 0x76, 0x6F, 0x6B, 0x65, 0x00
-    };
-    if(!buffer_can_read(buf,sizeof(end_data))) {
-        return DATA_END_PARSING_ERROR;
-    }
-    if(memcmp(buf->ptr+buf->offset, end_data, sizeof(end_data)) != 0) {
-        return DATA_END_PARSING_ERROR;
-    }
-    if (!buffer_seek_cur(buf,sizeof (end_data))) {
-        return DATA_END_PARSING_ERROR;
-    }
-    return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
+    return check_govern_end_data(buf,AuthorizeForPeer);  
 }
 
 
@@ -977,7 +727,7 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf, un_authorize
     if(!buffer_can_read(buf,op_code_size)) {
         return DATA_END_PARSING_ERROR;
     } 
-    if(getThreeBytesValue(buf) != 7063040) { //00c66b
+    if(getBytesValueByLen(buf,3) != 7063040) { //00c66b
         return VALUE_PARSING_ERROR;
     }
     uint8_t pre_pub;
@@ -991,7 +741,7 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf, un_authorize
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return FROM_PARSING_ERROR;
     }
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }  
     if(!buffer_read_varint(buf,&tx->peer_pubkey_length)) {
@@ -1000,7 +750,7 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf, un_authorize
     if (tx->peer_pubkey_length >= 81) {
         tx->peer_pubkey_length = tx->peer_pubkey_length -80;
     }
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }
     uint8_t pre_pub_len;
@@ -1011,7 +761,7 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf, un_authorize
     if (!buffer_seek_cur(buf, pre_pub_len*tx->peer_pubkey_length)) {
         return FROM_PARSING_ERROR;
     }
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     } 
     if(!buffer_read_u8(buf,&tx->pos_list_number)) {
@@ -1020,7 +770,7 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf, un_authorize
     if (tx->pos_list_number >= 81) {
         tx->pos_list_number = tx->pos_list_number -80;
     }
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }
     if(!buffer_read_u8(buf,&tx->pos_list_len)) {
@@ -1032,42 +782,7 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf, un_authorize
             return FROM_PARSING_ERROR;
         }
     }
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
-        return VALUE_PARSING_ERROR;
-    } 
-    uint16_t  pre_code;
-    if(!buffer_read_u16(buf,&pre_code,LE)) {
-        return OPCODE_PARSING_ERROR;
-    }
-    if (pre_code != 4716) { //6c12
-        return OPCODE_PARSING_ERROR;
-    }
-    //todo 
-    if(memcmp(buf->ptr+buf->offset, "unAuthorizeForPeer", 18) != 0) {
-        return PARSE_STRING_MATCH_ERROR;
-    }
-    if (!buffer_seek_cur(buf,18)) {
-        return BUFFER_OFFSET_MOVE_ERROR;
-    }
-
-    uint8_t end_data[] = {
-        0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x68, 0x16,
-        0x4F, 0x6E, 0x74, 0x6F, 0x6C, 0x6F, 0x67, 0x79,
-        0x2E, 0x4E, 0x61, 0x74, 0x69, 0x76, 0x65, 0x2E,
-        0x49, 0x6E, 0x76, 0x6F, 0x6B, 0x65, 0x00
-    };
-    if(!buffer_can_read(buf,sizeof(end_data))) {
-        return DATA_END_PARSING_ERROR;
-    }
-    if(memcmp(buf->ptr+buf->offset, end_data, sizeof(end_data)) != 0) {
-        return DATA_END_PARSING_ERROR;
-    }
-    if (!buffer_seek_cur(buf,sizeof (end_data))) {
-        return DATA_END_PARSING_ERROR;
-    }
-    return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
+    return check_govern_end_data(buf,UnAuthorizeForPeer);  
 }
 
 
@@ -1102,7 +817,7 @@ parser_status_e withdraw_ong_tx_deserialize(buffer_t *buf, withdraw_ong_t *tx) {
     if(!buffer_can_read(buf,op_code_size)) {
         return DATA_END_PARSING_ERROR;
     } 
-    if(getThreeBytesValue(buf) != 7063040) { //00c66b
+    if(getBytesValueByLen(buf,3) != 7063040) { //00c66b
         return VALUE_PARSING_ERROR;
     }
     uint8_t pre_pub;
@@ -1116,40 +831,7 @@ parser_status_e withdraw_ong_tx_deserialize(buffer_t *buf, withdraw_ong_t *tx) {
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return FROM_PARSING_ERROR;
     }
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
-        return VALUE_PARSING_ERROR;
-    }
-    uint16_t  pre_code;
-    if(!buffer_read_u16(buf,&pre_code,LE)) {
-        return OPCODE_PARSING_ERROR;
-    }
-    if (pre_code != 2924) { //6c0b
-        return OPCODE_PARSING_ERROR;
-    }
-    if(memcmp(buf->ptr+buf->offset, "withdrawOng", 11) != 0) {
-        return PARSE_STRING_MATCH_ERROR;
-    }
-    if (!buffer_seek_cur(buf,11)) {
-        return BUFFER_OFFSET_MOVE_ERROR;
-    }
-    uint8_t end_data[] = {
-        0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x68, 0x16,
-        0x4F, 0x6E, 0x74, 0x6F, 0x6C, 0x6F, 0x67, 0x79,
-        0x2E, 0x4E, 0x61, 0x74, 0x69, 0x76, 0x65, 0x2E,
-        0x49, 0x6E, 0x76, 0x6F, 0x6B, 0x65, 0x00
-    };
-    if(!buffer_can_read(buf,sizeof(end_data))) {
-        return DATA_END_PARSING_ERROR;
-    }
-    if(memcmp(buf->ptr+buf->offset, end_data, sizeof(end_data)) != 0) {
-        return DATA_END_PARSING_ERROR;
-    }
-    if (!buffer_seek_cur(buf,sizeof (end_data))) {
-        return DATA_END_PARSING_ERROR;
-    }
-    return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
+    return check_govern_end_data(buf,WithdrawOng);  
 }
 
 parser_status_e withdraw_fee_tx_deserialize(buffer_t *buf, withdraw_fee_t *tx) {
@@ -1183,7 +865,7 @@ parser_status_e withdraw_fee_tx_deserialize(buffer_t *buf, withdraw_fee_t *tx) {
     if(!buffer_can_read(buf,op_code_size)) {
         return DATA_END_PARSING_ERROR;
     }
-    if(getThreeBytesValue(buf) != 7063040) { //00c66b
+    if(getBytesValueByLen(buf,3) != 7063040) { //00c66b
         return VALUE_PARSING_ERROR;
     }
     uint8_t pre_pub;
@@ -1197,39 +879,5 @@ parser_status_e withdraw_fee_tx_deserialize(buffer_t *buf, withdraw_fee_t *tx) {
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return FROM_PARSING_ERROR;
     }
-    if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
-        return VALUE_PARSING_ERROR;
-    }
-    uint16_t  pre_code;
-    if(!buffer_read_u16(buf,&pre_code,LE)) {
-        return OPCODE_PARSING_ERROR;
-    }
-    if (pre_code != 2924) { //6c0b
-        return OPCODE_PARSING_ERROR;
-    }
-    if(memcmp(buf->ptr+buf->offset, "withdrawFee", 11) != 0) {
-        return PARSE_STRING_MATCH_ERROR;
-    }
-    if (!buffer_seek_cur(buf,11)) {
-        return BUFFER_OFFSET_MOVE_ERROR;
-    }
-
-    uint8_t end_data[] = {
-        0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x68, 0x16,
-        0x4F, 0x6E, 0x74, 0x6F, 0x6C, 0x6F, 0x67, 0x79,
-        0x2E, 0x4E, 0x61, 0x74, 0x69, 0x76, 0x65, 0x2E,
-        0x49, 0x6E, 0x76, 0x6F, 0x6B, 0x65, 0x00
-    };
-    if(!buffer_can_read(buf,sizeof(end_data))) {
-        return DATA_END_PARSING_ERROR;
-    }
-    if(memcmp(buf->ptr+buf->offset, end_data, sizeof(end_data)) != 0) {
-        return DATA_END_PARSING_ERROR;
-    }
-    if (!buffer_seek_cur(buf,sizeof (end_data))) {
-        return DATA_END_PARSING_ERROR;
-    }
-    return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
+    return check_govern_end_data(buf,WithdrawFee);  
 }

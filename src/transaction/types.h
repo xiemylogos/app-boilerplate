@@ -13,6 +13,22 @@
 #define ONG_ADDR ("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02")
 #define ONT_ADDR ("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01")
 
+#define  OntologyNativeInvoke  "Ontology.Native.Invoke"
+#define  TransferV2  "transferV2"
+#define  Transfer "transfer"
+#define  RegisterCandidate "registerCandidate"
+#define  Withdraw "withdraw"
+#define  QuitNode "quitNode"
+#define  AddInitPos "addInitPos"
+#define  ReduceInitPos "reduceInitPos"
+#define  ChangeMaxAuthorization "changeMaxAuthorization"
+#define  SetFeePercentage "setFeePercentage"
+#define  AuthorizeForPeer "authorizeForPeer"
+#define  UnAuthorizeForPeer "unAuthorizeForPeer"
+#define  WithdrawOng "withdrawOng"
+#define  WithdrawFee "withdrawFee"
+
+
 typedef struct {
     uint64_t nonce;     /// nonce (8 bytes)
     uint64_t value;     /// amount value (8 bytes)

@@ -214,9 +214,9 @@ int ui_display_blind_transaction_bs_choice() {
     nbgl_useCaseReviewBlindSigning(TYPE_TRANSACTION,
                               &pairsList,
                               &C_icon_ont_64px,
-                              "Review transaction\nto send ONT",
+                              "Review transaction",
                               NULL,
-                              "Sign transaction\nto send ONT",
+                              "Sign transaction",
                                NULL,
                               tx_review_choice);
 

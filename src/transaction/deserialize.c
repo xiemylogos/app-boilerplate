@@ -66,7 +66,7 @@ parser_status_e transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
         if(memcmp(buf->ptr+buf->size - 46 - 10 - 1, "transferV2", 10) != 0) {
             return PARSE_STRING_MATCH_ERROR;
         }
-        if(getThreeBytesValue(buf) != 7063040) { //00c66b
+        if(getBytesValueByLen(buf,3) != 7063040) { //00c66b
             return VALUE_PARSING_ERROR;
         }
         uint8_t  from_op_code;
@@ -80,7 +80,7 @@ parser_status_e transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
         if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
             return FROM_PARSING_ERROR;
         }
-        if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+        if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
             return VALUE_PARSING_ERROR;
         }
         uint8_t  to_op_code;
@@ -94,7 +94,7 @@ parser_status_e transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
         if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
             return TO_PARSING_ERROR;
         }
-        if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+        if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
             return VALUE_PARSING_ERROR;
         }
         if(!buffer_read_u8(buf,&tx->payload.value_len)) {
@@ -114,7 +114,7 @@ parser_status_e transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
                 tx->payload.value[1] = getBytesValueByLen(buf, tx->payload.value_len - 8);
             }
         }
-        if(getThreeBytesValue(buf) != 13139050) { //6a7cc8
+        if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
             return VALUE_PARSING_ERROR;
         }
         if(getBytesValueByLen(buf,3) != 12669292) { //6c51c1

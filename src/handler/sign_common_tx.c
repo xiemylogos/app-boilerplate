@@ -89,59 +89,59 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
             parser_status_e status = PARSING_OK;
             //parse transaction
             if (tx_type == 0xd1) { //InvokeNeo
-                if (memcmp(buf.ptr + buf.size - 22 - 1, "Ontology.Native.Invoke", 22) == 0) {
-                    if(memcmp(buf.ptr + buf.size - 46 - 10 - 1, "transferV2", 10) == 0) {
+                if (memcmp(buf.ptr + buf.size - 22 - 1, OntologyNativeInvoke, 22) == 0) {
+                    if(memcmp(buf.ptr + buf.size - 46 - 10 - 1, TransferV2, 10) == 0) {
                         status =  transaction_deserialize(&buf, &G_context.tx_info.tx_info);
                         G_context.tx_type = TRANSFER_TRANSACTION;
                         G_context.state = STATE_PARSED;
-                    } else if(memcmp(buf.ptr + buf.size-46-17-1,"registerCandidate",17) == 0) {
+                    } else if(memcmp(buf.ptr + buf.size-46-17-1,RegisterCandidate,17) == 0) {
                         status =  register_candidate_tx_deserialize(&buf, &G_context.tx_info.register_candidate_tx_info);
                         G_context.tx_type = REGISTER_CANDIDATE;
                         G_context.state = STATE_PARSED;
-                    }  else if (memcmp(buf.ptr + buf.size-46-8-1,"withdraw",8) == 0) {
+                    }  else if (memcmp(buf.ptr + buf.size-46-8-1,Withdraw,8) == 0) {
                         status =  withdraw_tx_deserialize(&buf, &G_context.tx_info.withdraw_tx_info);
                         G_context.tx_type = WITHDRAW;
                         G_context.state = STATE_PARSED;
-                    } else if (memcmp(buf.ptr + buf.size-46-8-1, "quitNode",8) == 0) {
+                    } else if (memcmp(buf.ptr + buf.size-46-8-1, QuitNode,8) == 0) {
                         status =  quit_node_tx_deserialize(&buf, &G_context.tx_info.quit_node_tx_info);
                         G_context.tx_type = QUIT_NODE;
                         G_context.state = STATE_PARSED;
-                    } else if(memcmp(buf.ptr + buf.size-46-10-1,"addInitPos",10) ==0) {
+                    } else if(memcmp(buf.ptr + buf.size-46-10-1,AddInitPos,10) ==0) {
                         status =  add_init_pos_tx_deserialize(&buf, &G_context.tx_info.add_init_pos_tx_info);
                         G_context.tx_type = ADD_INIT_POS;
                         G_context.state = STATE_PARSED;
-                    } else if (memcmp(buf.ptr + buf.size-46-13-1,"reduceInitPos",13) ==0) {
+                    } else if (memcmp(buf.ptr + buf.size-46-13-1,ReduceInitPos,13) ==0) {
                         status =  reduce_init_pos_tx_deserialize(&buf, &G_context.tx_info.reduce_init_pos_tx_info);
                         G_context.tx_type = REDUCE_INIT_POS;
                         G_context.state = STATE_PARSED;
-                    } else if(memcmp(buf.ptr + buf.size-46-22-1,"changeMaxAuthorization",22) ==0) {
+                    } else if(memcmp(buf.ptr + buf.size-46-22-1,ChangeMaxAuthorization,22) ==0) {
                         status =  change_max_authorization_tx_deserialize(&buf, &G_context.tx_info.change_max_authorization_tx_info);
                         G_context.tx_type = CHANGE_MAX_AUTHORIZATION;
                         G_context.state = STATE_PARSED;
-                    } else if (memcmp(buf.ptr + buf.size-46-16-1,"setFeePercentage",16) ==0) {
+                    } else if (memcmp(buf.ptr + buf.size-46-16-1,SetFeePercentage,16) ==0) {
                         status =  set_fee_percentage_tx_deserialize(&buf, &G_context.tx_info.set_fee_percentage_tx_info);
                         G_context.tx_type = SET_FEE_PERCENTAGE;
                         G_context.state = STATE_PARSED;
-                    } else if(memcmp(buf.ptr + buf.size-46-16-1,"authorizeForPeer",16) == 0) {
+                    } else if(memcmp(buf.ptr + buf.size-46-16-1,AuthorizeForPeer,16) == 0) {
                         status =  authorize_for_peer_tx_deserialize(&buf, &G_context.tx_info.authorize_for_peer_tx_info);
                         G_context.tx_type = AUTHORIZE_FOR_PEER;
                         G_context.state = STATE_PARSED;
-                    } else if (memcmp(buf.ptr + buf.size-46-18-1,"unAuthorizeForPeer",18) ==0) {
+                    } else if (memcmp(buf.ptr + buf.size-46-18-1,UnAuthorizeForPeer,18) ==0) {
                         status =  un_authorize_for_peer_tx_deserialize(&buf, &G_context.tx_info.un_authorize_for_peer_tx_info);
                         G_context.tx_type = UN_AUTHORIZE_FOR_PEER;
                         G_context.state = STATE_PARSED;
-                    } else if (memcmp(buf.ptr + buf.size-46-11-1,"withdrawOng",11) ==0) {
+                    } else if (memcmp(buf.ptr + buf.size-46-11-1,WithdrawOng,11) ==0) {
                         status =  withdraw_ong_tx_deserialize(&buf, &G_context.tx_info.withdraw_ong_tx_info);
                         G_context.tx_type = WITHDRAW_ONG;
                         G_context.state = STATE_PARSED;
-                    } else if(memcmp(buf.ptr + buf.size-46-11-1,"withdrawFee",11) == 0) {
+                    } else if(memcmp(buf.ptr + buf.size-46-11-1,WithdrawFee,11) == 0) {
                         status = withdraw_fee_tx_deserialize(&buf, &G_context.tx_info.withdraw_fee_tx_info);
                         G_context.tx_type = WITHDRAW_FEE;
                         G_context.state = STATE_PARSED;
                     } else {
                         status = TX_PARSING_ERROR;
                     }
-                } else if(memcmp(buf.ptr+buf.size - 21-8-1, "transfer", 8) == 0) { //neovm oep4
+                } else if(memcmp(buf.ptr+buf.size - 21-8-1, Transfer, 8) == 0) { //neovm oep4
                     status = oep4_neo_vm_transaction_deserialize(&buf, &G_context.tx_info.oep4_tx_info);
                     G_context.tx_type = OEP4_TRANSACTION;
                     G_context.state = STATE_PARSED;

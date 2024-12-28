@@ -38,7 +38,6 @@ bool transaction_utils_format_memo(const uint8_t *memo,
                                    char *dst,
                                    uint64_t dst_len);
 
-uint64_t getThreeBytesValue(buffer_t *buf);
 
 uint64_t getBytesValueByLen(buffer_t *buf,uint8_t len);
 
