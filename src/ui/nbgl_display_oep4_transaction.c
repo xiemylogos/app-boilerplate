@@ -42,16 +42,15 @@
 
 
 // Buffer where the oep4 transaction amount string is written
-static char g_amount[30];
+static char g_amount[40];
 static char g_fee[40];
 static char g_gasPrice[40];
 static char g_gasLimit[40];
 // Buffer where the oep4 transaction address string is written
 static char g_fromAddr[40];
 static char g_toAddr[40];
-static char g_decimals[20];
 
-#define OEP4_MAX_PAIRS        7
+#define OEP4_MAX_PAIRS        6
 
 static nbgl_layoutTagValue_t pairs[OEP4_MAX_PAIRS];
 static nbgl_layoutTagValueList_t pairsList;
@@ -78,14 +77,6 @@ static uint8_t setTagValuePairs(void) {
         decimals = 18;
     }
 
-     //decimals
-    memset(g_decimals, 0, sizeof(g_decimals));
-    if (!format_u64(g_decimals,sizeof(g_decimals),G_context.tx_info.oep4_tx_info.payload.value_len)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
-    pairs[nbPairs].item = "value_len";
-    pairs[nbPairs].value = g_decimals;
-    nbPairs++;
 
     memset(g_amount, 0, sizeof(g_amount));
     if (G_context.tx_info.oep4_tx_info.payload.value_len >= 81) {
@@ -94,7 +85,7 @@ static uint8_t setTagValuePairs(void) {
                                      G_context.tx_info.oep4_tx_info.payload.value[0],
                                      decimals);
         } else {
-            if (G_context.tx_info.oep4_tx_info.payload.value_len < 8) {
+            if (G_context.tx_info.oep4_tx_info.payload.value_len <= 8) {
                 format_fpu64_trimmed(g_amount,
                                      sizeof(g_amount),
                                      G_context.tx_info.oep4_tx_info.payload.value[0],

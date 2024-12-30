@@ -493,27 +493,33 @@ int ui_bagl_display_oep4_transaction_bs_choice() {
     memset(g_amount, 0, sizeof(g_amount));
     uint8_t decimals = 1;
    if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,WTK_ADDR,20) == 0) {
-       decimals = 18;
+       decimals = 9;
     } else if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,MYT_ADDR,20) == 0 ) {
         decimals = 18;
     }
     memset(g_amount, 0, sizeof(g_amount));
-    if (G_context.tx_info.tx_info.payload.value_len >= 81) {
-        format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.oep4_tx_info.payload.value[0],decimals);
-    } else {
-        if (G_context.tx_info.tx_info.payload.value_len <= 8) {
-            format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.oep4_tx_info.payload.value[0],decimals);
+    if (G_context.tx_info.oep4_tx_info.payload.value_len >= 81) {
+           format_fpu64_trimmed(g_amount,
+                                     sizeof(g_amount),
+                                     G_context.tx_info.oep4_tx_info.payload.value[0],
+                                     decimals);
         } else {
-            char amount[41];
-            uint128_t values;
-            values.elements[0] = G_context.tx_info.oep4_tx_info.payload.value[1];
-            values.elements[1] = G_context.tx_info.oep4_tx_info.payload.value[0];
-            tostring128(&values,10,amount,sizeof(amount));
-            process_precision(amount,decimals,g_amount,sizeof(g_amount));
-            explicit_bzero(&amount, sizeof(amount));
-            clear128(&values);
+            if (G_context.tx_info.oep4_tx_info.payload.value_len <= 8) {
+                format_fpu64_trimmed(g_amount,
+                                     sizeof(g_amount),
+                                     G_context.tx_info.oep4_tx_info.payload.value[0],
+                                     decimals);
+            } else {
+                char amount[41];
+                uint128_t values;
+                values.elements[0] = G_context.tx_info.oep4_tx_info.payload.value[1];
+                values.elements[1] = G_context.tx_info.oep4_tx_info.payload.value[0];
+                tostring128(&values, 10, amount, sizeof(amount));
+                process_precision(amount, decimals, g_amount, sizeof(g_amount));
+                explicit_bzero(&amount, sizeof(amount));
+                clear128(&values);
+            }
         }
-    }
     PRINTF("Amount: %s\n", g_amount);
 
     memset(g_fromAddr, 0, sizeof(g_fromAddr));
