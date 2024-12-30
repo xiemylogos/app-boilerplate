@@ -484,11 +484,6 @@ UX_FLOW(ux_display_oep4_transaction_flow,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
-UX_FLOW(ux_display_blind_signed_oep4_transaction_flow,
-        &ux_display_review_blind_signed_step,
-        &ux_display_approve_step,
-        &ux_display_reject_step);
-
 int ui_bagl_display_oep4_transaction_bs_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || G_context.tx_type != OEP4_TRANSACTION) {
@@ -496,18 +491,28 @@ int ui_bagl_display_oep4_transaction_bs_choice() {
         return io_send_sw(SW_BAD_STATE);
     }
     memset(g_amount, 0, sizeof(g_amount));
-
-    if (G_context.tx_info.tx_info.payload.value_len <= 8) {
-        if (!format_u64(g_amount,
-                            sizeof(g_amount),
-                            G_context.tx_info.oep4_tx_info.payload.value[0])) {
-                return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-            }
+    uint8_t decimals = 1;
+   if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,WTK_ADDR,20) == 0) {
+       decimals = 18;
+    } else if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,MYT_ADDR,20) == 0 ) {
+        decimals = 18;
+    }
+    memset(g_amount, 0, sizeof(g_amount));
+    if (G_context.tx_info.tx_info.payload.value_len >= 81) {
+        format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.oep4_tx_info.payload.value[0],decimals);
     } else {
-        uint128_t values;
-        values.elements[0] = G_context.tx_info.oep4_tx_info.payload.value[1];
-        values.elements[1] = G_context.tx_info.oep4_tx_info.payload.value[0];
-        tostring128(&values, 10, g_amount, sizeof(g_amount));
+        if (G_context.tx_info.tx_info.payload.value_len <= 8) {
+            format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.oep4_tx_info.payload.value[0],decimals);
+        } else {
+            char amount[41];
+            uint128_t values;
+            values.elements[0] = G_context.tx_info.oep4_tx_info.payload.value[1];
+            values.elements[1] = G_context.tx_info.oep4_tx_info.payload.value[0];
+            tostring128(&values,10,amount,sizeof(amount));
+            process_precision(amount,decimals,g_amount,sizeof(g_amount));
+            explicit_bzero(&amount, sizeof(amount));
+            clear128(&values);
+        }
     }
     PRINTF("Amount: %s\n", g_amount);
 

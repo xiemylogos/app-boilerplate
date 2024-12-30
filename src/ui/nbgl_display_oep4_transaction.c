@@ -38,6 +38,7 @@
 #include "../menu.h"
 #include "../utils.h"
 #include "../uint128.h"
+#include "token_info.h"
 
 
 // Buffer where the oep4 transaction amount string is written
@@ -68,22 +69,33 @@ static void oep4_tx_review_choice(bool confirm) {
 static uint8_t setTagValuePairs(void) {
     uint8_t nbPairs = 0;
     explicit_bzero(pairs, sizeof(pairs));
-     // Format amount and address to g_amount and g_address buffers
-
-    memset(g_amount, 0, sizeof(g_amount));
-    if (G_context.tx_info.tx_info.payload.value_len <= 8) {
-        if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.oep4_tx_info.payload.value[0])) {
-             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-         }
-    } else {
-        uint128_t values;
-        values.elements[0] = G_context.tx_info.oep4_tx_info.payload.value[1];
-        values.elements[1] = G_context.tx_info.oep4_tx_info.payload.value[0];
-        tostring128(&values,10,g_amount,sizeof(g_amount));
+    uint8_t decimals = 1;
+   if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,WTK_ADDR,20) == 0) {
+       decimals = 18;
+    } else if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,MYT_ADDR,20) == 0 ) {
+        decimals = 18;
     }
-    pairs[0].item = "Oep4 Amount";
+    memset(g_amount, 0, sizeof(g_amount));
+    if (G_context.tx_info.tx_info.payload.value_len >= 81) {
+        format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.oep4_tx_info.payload.value[0],decimals);
+    } else {
+        if (G_context.tx_info.tx_info.payload.value_len <= 8) {
+            format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.oep4_tx_info.payload.value[0],decimals);
+        } else {
+            char amount[41];
+            uint128_t values;
+            values.elements[0] = G_context.tx_info.oep4_tx_info.payload.value[1];
+            values.elements[1] = G_context.tx_info.oep4_tx_info.payload.value[0];
+            tostring128(&values,10,amount,sizeof(amount));
+            process_precision(amount,decimals,g_amount,sizeof(g_amount));
+            explicit_bzero(&amount, sizeof(amount));
+            clear128(&values);
+        }
+    }
+    pairs[0].item = "amount";
     pairs[nbPairs].value = g_amount;
     nbPairs++;
+
 
     //fromAddr
     memset(g_fromAddr, 0, sizeof(g_fromAddr));
@@ -145,9 +157,9 @@ int ui_display_oep4_transaction_bs_choice() {
     nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairsList,
                            &C_icon_ont_64px,
-                           "Review transaction\nto send oep4",
+                           "Review transaction\nto send token",
                            NULL,
-                           "Sign transaction\nto send oep4",
+                           "Sign transaction\nto send token",
                            oep4_tx_review_choice);
     return 0;
 }
