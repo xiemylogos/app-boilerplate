@@ -42,3 +42,5 @@ bool transaction_utils_format_memo(const uint8_t *memo,
 uint64_t getBytesValueByLen(buffer_t *buf,uint8_t len);
 
 uint64_t getValueByLen(uint8_t *value,uint8_t len);
+
+uint8_t getCountNonzeroBytes(buffer_t *buf,uint8_t len);

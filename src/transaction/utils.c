@@ -76,3 +76,18 @@ uint64_t getValueByLen(uint8_t *value,uint8_t len) {
     }
     return pre_value;
 }
+
+uint8_t getCountNonzeroBytes(buffer_t *buf,uint8_t len) {
+    uint8_t *value;
+    uint8_t count = 0;
+    size_t size = (size_t)(len);
+    for (size_t i=0; i<size; i++) {
+        value = (uint8_t*)(buf->ptr+buf->offset+i);
+        if (value != 0) {
+            count++;
+        } else {
+            break;
+        }
+    }
+    return count;
+}

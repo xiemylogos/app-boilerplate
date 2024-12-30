@@ -49,8 +49,9 @@ static char g_gasLimit[40];
 // Buffer where the oep4 transaction address string is written
 static char g_fromAddr[40];
 static char g_toAddr[40];
+static char g_decimals[20];
 
-#define OEP4_MAX_PAIRS        5
+#define OEP4_MAX_PAIRS        7
 
 static nbgl_layoutTagValue_t pairs[OEP4_MAX_PAIRS];
 static nbgl_layoutTagValueList_t pairsList;
@@ -69,30 +70,48 @@ static void oep4_tx_review_choice(bool confirm) {
 static uint8_t setTagValuePairs(void) {
     uint8_t nbPairs = 0;
     explicit_bzero(pairs, sizeof(pairs));
+
     uint8_t decimals = 1;
    if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,WTK_ADDR,20) == 0) {
-       decimals = 18;
+       decimals = 9;
     } else if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,MYT_ADDR,20) == 0 ) {
         decimals = 18;
     }
-    memset(g_amount, 0, sizeof(g_amount));
-    if (G_context.tx_info.tx_info.payload.value_len >= 81) {
-        format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.oep4_tx_info.payload.value[0],decimals);
-    } else {
-        if (G_context.tx_info.tx_info.payload.value_len <= 8) {
-            format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.oep4_tx_info.payload.value[0],decimals);
-        } else {
-            char amount[41];
-            uint128_t values;
-            values.elements[0] = G_context.tx_info.oep4_tx_info.payload.value[1];
-            values.elements[1] = G_context.tx_info.oep4_tx_info.payload.value[0];
-            tostring128(&values,10,amount,sizeof(amount));
-            process_precision(amount,decimals,g_amount,sizeof(g_amount));
-            explicit_bzero(&amount, sizeof(amount));
-            clear128(&values);
-        }
+
+     //decimals
+    memset(g_decimals, 0, sizeof(g_decimals));
+    if (!format_u64(g_decimals,sizeof(g_decimals),G_context.tx_info.oep4_tx_info.payload.value_len)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
-    pairs[0].item = "amount";
+    pairs[nbPairs].item = "value_len";
+    pairs[nbPairs].value = g_decimals;
+    nbPairs++;
+
+    memset(g_amount, 0, sizeof(g_amount));
+    if (G_context.tx_info.oep4_tx_info.payload.value_len >= 81) {
+           format_fpu64_trimmed(g_amount,
+                                     sizeof(g_amount),
+                                     G_context.tx_info.oep4_tx_info.payload.value[0],
+                                     decimals);
+        } else {
+            if (G_context.tx_info.oep4_tx_info.payload.value_len < 8) {
+                format_fpu64_trimmed(g_amount,
+                                     sizeof(g_amount),
+                                     G_context.tx_info.oep4_tx_info.payload.value[0],
+                                     decimals);
+            } else {
+                char amount[41];
+                uint128_t values;
+                values.elements[0] = G_context.tx_info.oep4_tx_info.payload.value[1];
+                values.elements[1] = G_context.tx_info.oep4_tx_info.payload.value[0];
+                tostring128(&values, 10, amount, sizeof(amount));
+                process_precision(amount, decimals, g_amount, sizeof(g_amount));
+                explicit_bzero(&amount, sizeof(amount));
+                clear128(&values);
+            }
+        }
+
+    pairs[nbPairs].item = "amount";
     pairs[nbPairs].value = g_amount;
     nbPairs++;
 

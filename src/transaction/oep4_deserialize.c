@@ -66,13 +66,19 @@ parser_status_e oep4_neo_vm_transaction_deserialize(buffer_t *buf, ont_transacti
     if(!buffer_read_u8(buf,&tx->payload.value_len)) {
         return OPCODE_PARSING_ERROR;
     }
-    if (tx->payload.value_len <= 8) {
-        tx->payload.value[0] = getBytesValueByLen(buf,tx->payload.value_len);
+    if (tx->payload.value_len >= 81) {
+        tx->payload.value[0] = tx->payload.value_len - 80;
+        tx->payload.value[1] = 0;
     } else {
-        if(!buffer_read_u64(buf,&tx->payload.value[0],LE)) {
-            return OPCODE_PARSING_ERROR;
+        if (tx->payload.value_len <= 8) {
+            tx->payload.value[0] = getBytesValueByLen(buf, tx->payload.value_len);
+            tx->payload.value[1] = 0;
+        } else {
+            if (!buffer_read_u64(buf, &tx->payload.value[0], LE)) {
+                return OPCODE_PARSING_ERROR;
+            }
+            tx->payload.value[1] = getBytesValueByLen(buf, tx->payload.value_len - 8);
         }
-        tx->payload.value[1] = getBytesValueByLen(buf,tx->payload.value_len-8);
     }
     uint8_t pre_to;
     if(!buffer_read_u8(buf,&pre_to)) {
@@ -184,6 +190,21 @@ parser_status_e oep4_wasm_vm_transaction_deserialize(buffer_t *buf, ont_transact
     if(!buffer_can_read(buf,17)) {
         return DATA_END_PARSING_ERROR;
     }
+
+    tx->payload.value_len = getCountNonzeroBytes(buf,16);
+    if (tx->payload.value_len <= 8) {
+        tx->payload.value[0] = getBytesValueByLen(buf, tx->payload.value_len);
+        tx->payload.value[1] = 0;
+    } else {
+        if (!buffer_read_u64(buf, &tx->payload.value[0], LE)) {
+            return OPCODE_PARSING_ERROR;
+        }
+        tx->payload.value[1] = getBytesValueByLen(buf, tx->payload.value_len - 8);
+    }
+    if(!buffer_can_read(buf,16-tx->payload.value_len)) {
+        return DATA_END_PARSING_ERROR;
+    }
+    /*
     if(!buffer_read_u64(buf,&tx->payload.value[0],LE)) {
         return OPCODE_PARSING_ERROR;
     }
@@ -191,6 +212,7 @@ parser_status_e oep4_wasm_vm_transaction_deserialize(buffer_t *buf, ont_transact
         return OPCODE_PARSING_ERROR;
     }
     tx->payload.value_len = 16;
+    */
     uint8_t end_data[] = {
         0x00
     };
