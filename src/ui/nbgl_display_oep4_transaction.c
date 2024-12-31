@@ -38,7 +38,6 @@
 #include "../menu.h"
 #include "../utils.h"
 #include "../uint128.h"
-#include "token_info.h"
 
 
 // Buffer where the oep4 transaction amount string is written
