@@ -423,7 +423,7 @@ UX_FLOW(ux_display_blind_signed_transaction_flow,
         &ux_display_reject_step);
 
 int ui_bagl_display_blind_transaction_bs_choice() {
-    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED) {
+    if (G_context.req_type != CONFIRM_TRANSACTION) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }

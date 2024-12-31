@@ -202,7 +202,7 @@ int ui_display_transaction() {
 }
 
 int ui_display_blind_transaction_bs_choice() {
-    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED) {
+    if (G_context.req_type != CONFIRM_TRANSACTION) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
