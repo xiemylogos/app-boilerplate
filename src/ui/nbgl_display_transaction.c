@@ -216,7 +216,7 @@ int ui_display_blind_transaction_bs_choice() {
                               &C_icon_ont_64px,
                               "Review transaction",
                               NULL,
-                              "Sign transaction",
+                              "Accept risk and send transaction?",
                                NULL,
                               tx_review_choice);
 

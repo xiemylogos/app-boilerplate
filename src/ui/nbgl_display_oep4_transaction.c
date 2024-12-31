@@ -75,6 +75,8 @@ static uint8_t setTagValuePairs(void) {
        decimals = 9;
     } else if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,MYT_ADDR,20) == 0 ) {
         decimals = 18;
+    } else if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,WING_ADDR,20) == 0 ) {
+        decimals = 9;
     }
 
 

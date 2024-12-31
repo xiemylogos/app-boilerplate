@@ -40,7 +40,8 @@
 #include "../transaction/utils.h"
 
 #define BLIND_SIGN_TX "Blind signing Transaction"
-#define BLIND_SIGN_MSG "Blind signing Msg"
+#define BLIND_SIGN_TX_MSG "Accept risk and send"
+
 static action_validate_cb g_validate_callback;
 static char g_amount[41];
 static char g_address[42];
@@ -416,6 +417,7 @@ int ui_display_transaction() {
 }
 
 UX_FLOW(ux_display_blind_signed_transaction_flow,
+        &ux_display_review_step
         &ux_display_review_blind_signed_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
@@ -428,7 +430,7 @@ int ui_bagl_display_blind_transaction_bs_choice() {
 
     g_validate_callback = &ui_action_validate_transaction;
         memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-        memcpy(g_peerPubkey, BLIND_SIGN_TX, sizeof(BLIND_SIGN_TX));
+        memcpy(g_peerPubkey, BLIND_SIGN_TX_MSG, sizeof(BLIND_SIGN_TX_MSG));
         ux_flow_init(0, ux_display_blind_signed_transaction_flow, NULL);
 
     return 0;
@@ -496,6 +498,8 @@ int ui_bagl_display_oep4_transaction_bs_choice() {
        decimals = 9;
     } else if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,MYT_ADDR,20) == 0 ) {
         decimals = 18;
+    } else if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,WING_ADDR,20) == 0 ) {
+        decimals = 9;
     }
     memset(g_amount, 0, sizeof(g_amount));
     if (G_context.tx_info.oep4_tx_info.payload.value_len >= 81) {
