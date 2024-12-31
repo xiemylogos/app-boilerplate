@@ -54,12 +54,12 @@ typedef union {
 
 cx_sha256_t global_sha256;
 strings_t strings;
-
+/*
 static const char SIGN_MAGIC[] =
     "\x19"
     "Ontology Signed Message:\n";
 
-
+*/
 
 int handler_sign_person_msg(buffer_t *cdata, uint8_t chunk, bool more) {
     if (chunk == 0) {  // first APDU, parse BIP32 path
@@ -147,7 +147,6 @@ int handler_sign_person_msg(buffer_t *cdata, uint8_t chunk, bool more) {
             PRINTF("Hash: %.*H\n", sizeof(G_context.person_msg_info.m_hash), G_context.person_msg_info.m_hash);
             return ui_display_person_msg();
         end:
-            //*sw = error;
             return io_send_sw(error);
         }
     }

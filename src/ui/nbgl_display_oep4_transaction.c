@@ -48,8 +48,9 @@ static char g_gasLimit[40];
 // Buffer where the oep4 transaction address string is written
 static char g_fromAddr[40];
 static char g_toAddr[40];
+static char g_decimals[20];
 
-#define OEP4_MAX_PAIRS        6
+#define OEP4_MAX_PAIRS        7
 
 static nbgl_layoutTagValue_t pairs[OEP4_MAX_PAIRS];
 static nbgl_layoutTagValueList_t pairsList;
@@ -70,13 +71,28 @@ static uint8_t setTagValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
 
     uint8_t decimals = 1;
+    pairs[nbPairs].item = "decimals";
+    memset(g_decimals, 0, sizeof(g_decimals));
+    bool know_decimals = false;
    if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,WTK_ADDR,20) == 0) {
        decimals = 9;
+       know_decimals = true;
     } else if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,MYT_ADDR,20) == 0 ) {
         decimals = 18;
+        know_decimals = true;
     } else if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,WING_ADDR,20) == 0 ) {
         decimals = 9;
+        know_decimals = true;
     }
+    if (know_decimals) {
+        if (!format_u64(g_decimals, sizeof(g_decimals), decimals)) {
+            return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+        }
+        pairs[nbPairs].value = g_decimals;
+    } else {
+        pairs[nbPairs].value = "token decimals unknown";
+    }
+    nbPairs++;
 
 
     memset(g_amount, 0, sizeof(g_amount));

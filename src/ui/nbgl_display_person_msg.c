@@ -35,10 +35,8 @@
 #include "utils.h"
 
 static char g_msg[1024];
-static char g_hash[40];
-static char g_len[40];
 
-static nbgl_layoutTagValue_t pairs[3];
+static nbgl_layoutTagValue_t pairs[1];
 static nbgl_layoutTagValueList_t pairList;
 
 static void person_msg_review_choice(bool confirm) {
@@ -55,77 +53,53 @@ static void person_msg_review_choice(bool confirm) {
 // Public function to start the person msg review
 // - Check if the app is in the right state for person msg review
 // - Display the first screen of the person msg review
-int ui_display_person_msg_bs_choice(bool is_blind_signed) {
+int ui_display_person_msg_bs_choice() {
     if (G_context.req_type != CONFIRM_MESSAGE || G_context.state != STATE_PARSED) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
 
     explicit_bzero(pairs, sizeof(pairs));
-    if (!is_blind_signed) {
-        memset(g_msg, 0, sizeof(g_msg));
-        if (G_context.person_msg_info.raw_msg_len >= 1024) {
-            memcpy(g_msg, G_context.person_msg_info.msg_info.person_msg, 1023);
+    memset(g_msg, 0, sizeof(g_msg));
+    size_t offset = 0;
+    memcpy(g_msg+offset,SIGN_MAGIC,sizeof(SIGN_MAGIC));
+    offset += sizeof(SIGN_MAGIC);
+    size_t len = utf8_strlen(G_context.person_msg_info.raw_msg);
+    memcpy(g_msg+offset, &len, sizeof(size_t));
+    offset += sizeof(size_t);
+
+    if (G_context.person_msg_info.raw_msg_len >= 1024) {
+            memcpy(g_msg+offset, G_context.person_msg_info.msg_info.person_msg, 1023);
             g_msg[1023] = '\0';
-        } else {
-            memcpy(g_msg,
-                   G_context.person_msg_info.msg_info.person_msg,
-                   G_context.person_msg_info.raw_msg_len);
-            g_msg[G_context.person_msg_info.raw_msg_len + 1] = '\0';
-        }
-        // Setup data to display
-        pairs[0].item = "msg content:";
-        pairs[0].value = g_msg;
-
-        memset(g_hash, 0, sizeof(g_hash));
-        memcpy(g_hash, G_context.person_msg_info.m_hash, 32);
-
-        pairs[1].item = "msg hash:";
-        pairs[1].value = g_hash;
-
-        memset(g_len, 0, sizeof(g_len));
-        if (!format_u64(g_len, sizeof(g_len), utf8_strlen(G_context.person_msg_info.raw_msg))) {
-            return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-        }
-        pairs[2].item = "msg len:";
-        pairs[2].value = g_len;
-        // Setup list
-        pairList.nbMaxLinesForValue = 0;
-        pairList.nbPairs = 3;
-        pairList.pairs = pairs;
     } else {
-        pairs[0].item = "msg";
-       pairs[0].value = "msg blind signing";
-       pairList.pairs = pairs;
-       pairList.nbPairs = 1;
+        memcpy(g_msg+offset,
+               G_context.person_msg_info.msg_info.person_msg,
+               G_context.person_msg_info.raw_msg_len);
+               g_msg[G_context.person_msg_info.raw_msg_len + 1] = '\0';
     }
+    // Setup data to display
+    pairs[0].item = "msg content:";
+    pairs[0].value = g_msg;
+    // Setup list
+    pairList.nbMaxLinesForValue = 0;
+    pairList.nbPairs = 1;
+    pairList.pairs = pairs;
 
     // Start review flow
-    if (is_blind_signed) {
-        nbgl_useCaseReviewBlindSigning(TYPE_MESSAGE,
-                           &pairList,
-                           &C_icon_ont_64px,
-                           "verify the message",
-                           NULL,
-                           "Sign the message",
-                           NULL,
-                           person_msg_review_choice);
-    } else {
-       nbgl_useCaseReview(TYPE_MESSAGE,
+    nbgl_useCaseReview(TYPE_MESSAGE,
                            &pairList,
                            &C_icon_ont_64px,
                            "verify the message",
                            NULL,
                            "Sign the message",
                            person_msg_review_choice);
-    }
     return 0;
 }
 
 
 // Flow used to display a clear-signed person msg
 int ui_display_person_msg() {
-    return ui_display_person_msg_bs_choice(false);
+    return ui_display_person_msg_bs_choice();
 }
 
 #endif
