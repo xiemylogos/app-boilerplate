@@ -417,7 +417,7 @@ int ui_display_transaction() {
 }
 
 UX_FLOW(ux_display_blind_signed_transaction_flow,
-        &ux_display_review_step
+        &ux_display_review_step,
         &ux_display_review_blind_signed_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
