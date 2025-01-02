@@ -71,8 +71,6 @@ static uint8_t setTagValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
 
     uint8_t decimals = 1;
-    pairs[nbPairs].item = "decimals";
-    memset(g_decimals, 0, sizeof(g_decimals));
     bool know_decimals = false;
    if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,WTK_ADDR,20) == 0) {
        decimals = 9;
@@ -84,13 +82,15 @@ static uint8_t setTagValuePairs(void) {
         decimals = 9;
         know_decimals = true;
     }
+    pairs[nbPairs].item = "decimals";
+    memset(g_decimals, 0, sizeof(g_decimals));
     if (know_decimals) {
         if (!format_u64(g_decimals, sizeof(g_decimals), decimals)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
         }
         pairs[nbPairs].value = g_decimals;
     } else {
-        pairs[nbPairs].value = "token decimals unknown";
+        pairs[nbPairs].value = "decimals unknown";
     }
     nbPairs++;
 

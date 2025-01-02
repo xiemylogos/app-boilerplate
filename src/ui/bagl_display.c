@@ -57,6 +57,7 @@ static char g_withdrawList[40];
 static char g_initPost[30];
 static char g_ontId[30];
 static char g_keyNo[20];
+static char g_decimals[30];
 // Validate/Invalidate public key and go back to home
 static void ui_action_validate_pubkey(bool choice) {
     validate_pubkey(choice);
@@ -253,6 +254,13 @@ UX_STEP_NOCB(ux_display_person_msg_step,
              {
                  .title = "person msg",
                  .text = g_address,
+             });
+
+UX_STEP_NOCB(ux_display_decimals_step,
+             bnnn_paging,
+             {
+                 .title = "decimals",
+                 .text = g_decimals,
              });
 
 // FLOW to display address:
@@ -482,6 +490,7 @@ UX_FLOW(ux_display_oep4_transaction_flow,
         &ux_display_review_step,
         &ux_display_from_address_step,
         &ux_display_address_step,
+        &ux_display_decimals_step,
         &ux_display_amount_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
@@ -494,12 +503,24 @@ int ui_bagl_display_oep4_transaction_bs_choice() {
     }
     memset(g_amount, 0, sizeof(g_amount));
     uint8_t decimals = 1;
+    bool know_decimals = false;
    if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,WTK_ADDR,20) == 0) {
        decimals = 9;
+       know_decimals = true;
     } else if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,MYT_ADDR,20) == 0 ) {
         decimals = 18;
+        know_decimals = true;
     } else if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,WING_ADDR,20) == 0 ) {
         decimals = 9;
+        know_decimals = true;
+    }
+    memset(g_decimals, 0, sizeof(g_decimals));
+    if (know_decimals) {
+       if (!format_u64(g_decimals, sizeof(g_decimals), decimals)) {
+            return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+        }
+    } else {
+        memcpy(g_decimals,"decimals unknown",sizeof("decimals unknown"));
     }
     memset(g_amount, 0, sizeof(g_amount));
     if (G_context.tx_info.oep4_tx_info.payload.value_len >= 81) {
