@@ -91,7 +91,7 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
             if (tx_type == 0xd1) { //InvokeNeo
                 if (memcmp(buf.ptr + buf.size - 22 - 1, OntologyNativeInvoke, 22) == 0) {
                     if(memcmp(buf.ptr + buf.size - 46 - 10 - 1, TransferV2, 10) == 0) {
-                        status =  transaction_native_transfer_deserialize(&buf, &G_context.tx_info.tx_info);
+                        status =  transaction_native_transfer_v2_deserialize(&buf, &G_context.tx_info.tx_info);
                         G_context.tx_type = TRANSFER_TRANSACTION;
                         G_context.state = STATE_PARSED;
                     } else if(memcmp(buf.ptr + buf.size-46-17-1,RegisterCandidate,17) == 0) {
@@ -141,6 +141,18 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                     } else if (memcmp(buf.ptr + buf.size-46-7-1,Approve,7) == 0) {
                         status = transaction_approve_deserialize(&buf, &G_context.tx_info.tx_info);
                         G_context.tx_type = APPROVE;
+                        G_context.state = STATE_PARSED;
+                    }else if (memcmp(buf.ptr + buf.size - 46 - 8 - 1, Transfer, 8) == 0){
+                        status =  transaction_native_transfer_deserialize(&buf, &G_context.tx_info.tx_info);
+                        G_context.tx_type = TRANSFER_TRANSACTION;
+                        G_context.state = STATE_PARSED;
+                    }else if (memcmp(buf.ptr + buf.size - 46 - 12 - 1, TransferFrom, 12) == 0) {
+                        status =  transaction_native_transfer_from_deserialize(&buf, &G_context.tx_info.from_tx_info);
+                        G_context.tx_type = TRANSFER_TRANSACTION;
+                        G_context.state = STATE_PARSED;
+                    }else if (memcmp(buf.ptr + buf.size - 46 - 14 - 1, TransferFromV2, 14) == 0){
+                        status =  transaction_native_transfer_from_v2_deserialize(&buf, &G_context.tx_info.from_tx_info);
+                        G_context.tx_type = TRANSFER_TRANSACTION;
                         G_context.state = STATE_PARSED;
                     }else {
                         status = TX_PARSING_ERROR;

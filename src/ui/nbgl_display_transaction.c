@@ -48,6 +48,7 @@ static char g_gasLimit[40];
 static char g_fromAddr[40];
 static char g_toAddr[40];
 static char g_signer[40];
+static char g_sender[40];
 
 #define MAX_PAIRS        7
 

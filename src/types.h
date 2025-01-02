@@ -98,6 +98,7 @@ typedef struct {
     size_t raw_tx_len;                    /// length of raw transaction
     union {
         ont_transaction_t tx_info;
+        ont_transaction_from_t  from_tx_info;
         ont_transaction_t oep4_tx_info;  ///oep4 transaction context
         register_candidate_t register_candidate_tx_info; ///registerCandidate transaction context
         withdraw_t  withdraw_tx_info;                    ///withdraw transaction context
