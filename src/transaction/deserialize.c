@@ -82,7 +82,7 @@ parser_status_e transaction_native_transfer_deserialize(buffer_t *buf, ont_trans
         return OPCODE_PARSING_ERROR;
     }
     if (buf->size-buf->offset > PAYLOAD_TRANSFER_V2_LEN) {
-        if(memcmp(buf->ptr+buf->size - 46 - 10 - 1, "transferV2", 10) != 0) {
+        if(memcmp(buf->ptr+buf->size - 46 - 10 - 1, TransferV2, 10) != 0) {
             return PARSE_STRING_MATCH_ERROR;
         }
         if(getBytesValueByLen(buf,3) != 7063040) { //00c66b
@@ -143,7 +143,7 @@ parser_status_e transaction_native_transfer_deserialize(buffer_t *buf, ont_trans
         if(!buffer_read_u8(buf,&tag_len)) {
             return OPCODE_PARSING_ERROR;
         }
-        if(memcmp(buf->ptr+buf->offset, "transferV2", tag_len) != 0) {
+        if(memcmp(buf->ptr+buf->offset, TransferV2, tag_len) != 0) {
             return PARSE_STRING_MATCH_ERROR;
         }
         if (!buffer_seek_cur(buf,tag_len)) {

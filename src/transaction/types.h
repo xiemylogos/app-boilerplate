@@ -31,7 +31,8 @@
 #define  WithdrawOng "withdrawOng"
 #define  WithdrawFee "withdrawFee"
 #define  Approve   "approve"
-
+#define  TransferFromV2  "transferFromV2"
+#define  TransferFrom    "transferFrom"
 
 typedef struct {
     uint64_t nonce;     /// nonce (8 bytes)

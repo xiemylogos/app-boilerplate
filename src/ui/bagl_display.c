@@ -447,59 +447,11 @@ int ui_bagl_display_approve_transaction_bs_choice() {
         return io_send_sw(SW_BAD_STATE);
     }
     memset(g_amount, 0, sizeof(g_amount));
-
-    if (memcmp(G_context.tx_info.tx_info.payload.contract_addr, ONT_ADDR, 20) == 0) {
-            if (G_context.tx_info.tx_info.payload.value_len >= 81) {
-                format_fpu64_trimmed(g_amount,
-                                     sizeof(g_amount),
-                                     G_context.tx_info.tx_info.payload.value[0],
-                                     9);
-            } else {
-                if (G_context.tx_info.tx_info.payload.value_len <= 8) {
-                    format_fpu64_trimmed(g_amount,
-                                         sizeof(g_amount),
-                                         G_context.tx_info.tx_info.payload.value[0],
-                                         9);
-                } else {
-                    char amount[41];
-                    uint128_t values;
-                    values.elements[0] = G_context.tx_info.tx_info.payload.value[1];
-                    values.elements[1] = G_context.tx_info.tx_info.payload.value[0];
-                    tostring128(&values, 10, amount, sizeof(amount));
-                    process_precision(amount, 9, g_amount, sizeof(g_amount));
-                    explicit_bzero(&amount, sizeof(amount));
-                    clear128(&values);
-                }
-            }
-    } else if (memcmp(G_context.tx_info.tx_info.payload.contract_addr, ONG_ADDR, 20) == 0) {
-            if (G_context.tx_info.tx_info.payload.value_len >= 81) {
-                format_fpu64_trimmed(g_amount,
-                                     sizeof(g_amount),
-                                     G_context.tx_info.tx_info.payload.value[0],
-                                     18);
-            } else {
-                if (G_context.tx_info.tx_info.payload.value_len <= 8) {
-                    format_fpu64_trimmed(g_amount,
-                                         sizeof(g_amount),
-                                         G_context.tx_info.tx_info.payload.value[0],
-                                         18);
-                } else {
-                    char amount[41];
-                    uint128_t values;
-                    values.elements[0] = G_context.tx_info.tx_info.payload.value[1];
-                    values.elements[1] = G_context.tx_info.tx_info.payload.value[0];
-                    tostring128(&values, 10, amount, sizeof(amount));
-                    process_precision(amount, 18, g_amount, sizeof(g_amount));
-                    explicit_bzero(&amount, sizeof(amount));
-                    clear128(&values);
-                }
-            }
+    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.tx_info.payload.value[0])) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
 
-    PRINTF("Amount: %s\n", g_amount);
-
     memset(g_address, 0, sizeof(g_address));
-
     if (script_hash_to_address(g_address,
                                    sizeof(g_address),
                                    G_context.tx_info.tx_info.payload.to) == -1) {

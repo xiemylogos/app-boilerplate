@@ -262,54 +262,10 @@ static uint8_t setTagApproveValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
      // Format amount and address to g_amount and g_address buffers
     memset(g_amount, 0, sizeof(g_amount));
-    // Setup data to display
-    if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONT_ADDR,20) == 0) {
-         pairs[nbPairs].item = "value";
-         if (G_context.tx_info.tx_info.payload.value_len >= 81) {
-             format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.tx_info.payload.value[0],9);
-         } else {
-            if (G_context.tx_info.tx_info.payload.value_len <= 8) {
-                format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.tx_info.payload.value[0],9);
-            } else {
-                char amount[41];
-                uint128_t values;
-                values.elements[0] = G_context.tx_info.tx_info.payload.value[1];
-                values.elements[1] = G_context.tx_info.tx_info.payload.value[0];
-                tostring128(&values,10,amount,sizeof(amount));
-                process_precision(amount,9,g_amount,sizeof(g_amount));
-                explicit_bzero(&amount, sizeof(amount));
-                clear128(&values);
-            }
-         }
-
-    } else if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONG_ADDR,20) == 0) {
-        pairs[nbPairs].item = "value";
-        if (G_context.tx_info.tx_info.payload.value_len >= 81) {
-           format_fpu64_trimmed(g_amount,
-                                     sizeof(g_amount),
-                                     G_context.tx_info.tx_info.payload.value[0],
-                                     18);
-        } else {
-            if (G_context.tx_info.tx_info.payload.value_len <= 8) {
-                format_fpu64_trimmed(g_amount,
-                                     sizeof(g_amount),
-                                     G_context.tx_info.tx_info.payload.value[0],
-                                     18);
-            } else {
-                char amount[41];
-                uint128_t values;
-                values.elements[0] = G_context.tx_info.tx_info.payload.value[1];
-                values.elements[1] = G_context.tx_info.tx_info.payload.value[0];
-                tostring128(&values, 10, amount, sizeof(amount));
-                process_precision(amount, 18, g_amount, sizeof(g_amount));
-                explicit_bzero(&amount, sizeof(amount));
-                clear128(&values);
-            }
-        }
+    pairs[nbPairs].item = "value";
+    if (!format_u64(g_amount,sizeof(g_amount),G_context.tx_info.tx_info.payload.value[0])) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
-
-
-
     pairs[nbPairs].value = g_amount;
     nbPairs++;
     //fromAddr
