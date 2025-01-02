@@ -64,3 +64,5 @@ int ui_display_withdraw_fee_tx(void);
 
 
 int ui_display_blind_signed_transaction(void);
+
+int ui_display_approve_tx(void);

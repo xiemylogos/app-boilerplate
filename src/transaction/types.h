@@ -30,6 +30,7 @@
 #define  UnAuthorizeForPeer "unAuthorizeForPeer"
 #define  WithdrawOng "withdrawOng"
 #define  WithdrawFee "withdrawFee"
+#define  Approve   "approve"
 
 
 typedef struct {

@@ -16,6 +16,10 @@
  * @return PARSING_OK if success, error status otherwise.
  *
  */
-parser_status_e transaction_deserialize(buffer_t *buf, ont_transaction_t *tx);
+
+parser_status_e check_native_end_data(buffer_t *buf);
+
+parser_status_e transaction_native_transfer_deserialize(buffer_t *buf, ont_transaction_t *tx);
 
 
+parser_status_e transaction_approve_deserialize(buffer_t *buf, ont_transaction_t *tx);

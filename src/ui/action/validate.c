@@ -312,3 +312,19 @@ void validate_withdraw_fee_transaction(bool choice) {
         io_send_sw(SW_DENY);
     }
 }
+
+void validate_approve_transaction(bool choice) {
+    if (choice) {
+        G_context.state = STATE_APPROVED;
+
+        if (crypto_sign_tx() != 0) {
+            G_context.state = STATE_NONE;
+            io_send_sw(SW_SIGNATURE_FAIL);
+        } else {
+            helper_tx_send_response_sig();
+        }
+    } else {
+        G_context.state = STATE_NONE;
+        io_send_sw(SW_DENY);
+    }
+}

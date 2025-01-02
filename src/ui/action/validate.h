@@ -70,3 +70,5 @@ void validate_un_authorize_for_peer_transaction(bool choice);
 void validate_withdraw_ong_transaction(bool choice);
 
 void validate_withdraw_fee_transaction(bool choice);
+
+void validate_approve_transaction(bool choice);

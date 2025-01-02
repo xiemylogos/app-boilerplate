@@ -91,7 +91,7 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
             if (tx_type == 0xd1) { //InvokeNeo
                 if (memcmp(buf.ptr + buf.size - 22 - 1, OntologyNativeInvoke, 22) == 0) {
                     if(memcmp(buf.ptr + buf.size - 46 - 10 - 1, TransferV2, 10) == 0) {
-                        status =  transaction_deserialize(&buf, &G_context.tx_info.tx_info);
+                        status =  transaction_native_transfer_deserialize(&buf, &G_context.tx_info.tx_info);
                         G_context.tx_type = TRANSFER_TRANSACTION;
                         G_context.state = STATE_PARSED;
                     } else if(memcmp(buf.ptr + buf.size-46-17-1,RegisterCandidate,17) == 0) {
@@ -138,7 +138,11 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                         status = withdraw_fee_tx_deserialize(&buf, &G_context.tx_info.withdraw_fee_tx_info);
                         G_context.tx_type = WITHDRAW_FEE;
                         G_context.state = STATE_PARSED;
-                    } else {
+                    } else if (memcmp(buf.ptr + buf.size-46-7-1,Approve,7) == 0) {
+                        status = transaction_approve_deserialize(&buf, &G_context.tx_info.tx_info);
+                        G_context.tx_type = APPROVE;
+                        G_context.state = STATE_PARSED;
+                    }else {
                         status = TX_PARSING_ERROR;
                     }
                 } else if(memcmp(buf.ptr+buf.size - 21-8-1, Transfer, 8) == 0) { //neovm oep4
@@ -186,7 +190,7 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                     return ui_display_blind_signed_transaction();
                 } 
             } else {
-                if ( G_context.tx_type == TRANSFER_TRANSACTION) {
+                if (G_context.tx_type == TRANSFER_TRANSACTION) {
                     return ui_display_transaction();
                 } else if(G_context.tx_type == OEP4_TRANSACTION) {
                     return ui_display_oep4_transaction();
@@ -212,6 +216,8 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                     return ui_display_withdraw_ong_tx();
                 } else if (G_context.tx_type == WITHDRAW_FEE) {
                     return ui_display_withdraw_fee_tx();
+                } else if (G_context.tx_type == APPROVE) {
+                    return ui_display_approve_tx();
                 }
             }
         }

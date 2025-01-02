@@ -78,7 +78,8 @@ typedef enum {
     AUTHORIZE_FOR_PEER,          ///confirm authorizeForPeer
     UN_AUTHORIZE_FOR_PEER,       ///confirm unAuthorizeForPeer
     WITHDRAW_ONG,                ///confirm withdrawOng
-    WITHDRAW_FEE                 ///confirm withdrawFee
+    WITHDRAW_FEE,                ///confirm withdrawFee
+    APPROVE                      ///approve
 } tx_type_e;
 
 /**
