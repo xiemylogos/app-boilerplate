@@ -4,6 +4,10 @@
 #include <stdint.h>
 
 #include <string.h>
+#include <stdbool.h>  // bool
+
+#define VERIFICATION_SCRIPT_LENGTH 40
+#define UINT160_LEN 20
 
 #define ARRAY_LEN(a) (sizeof(a) / sizeof((a)[0]))
 #define BAIL_IF(x)           \
@@ -21,3 +25,7 @@ int script_hash_to_address(char* out, size_t out_len, const unsigned char* scrip
 size_t utf8_strlen(const uint8_t* str);
 
 void process_precision(const char *input, int precision, char *output, size_t output_len);
+
+
+
+bool ont_address_from_pubkey(char* out, size_t out_len);

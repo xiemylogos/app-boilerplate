@@ -47,8 +47,9 @@ static char g_gasLimit[40];
 // Buffer where the transaction address string is written
 static char g_fromAddr[40];
 static char g_toAddr[40];
+static char g_signer[40];
 
-#define MAX_PAIRS        6
+#define MAX_PAIRS        7
 
 static nbgl_contentTagValue_t pairs[MAX_PAIRS];
 static nbgl_contentTagValueList_t pairsList;
@@ -159,6 +160,25 @@ static uint8_t setTagValuePairs(void) {
     pairs[nbPairs].item = "gasLimit";
     pairs[nbPairs].value = g_gasLimit;
     nbPairs++;
+
+    memset(g_signer, 0, sizeof(g_signer));
+   /*
+    size_t j = 0;
+    for (size_t i = 0; i < sizeof(G_context.pk_info.raw_public_key); i++) {
+        if (G_context.pk_info.raw_public_key[i] != 0) {
+            g_signer[j] = G_context.raw_public_key[i];
+                          j++;
+        }
+    }
+    */
+  // memcpy(g_signer, G_context.raw_public_key,sizeof(G_context.pk_info.raw_public_key));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    }
+    pairs[nbPairs].item = "signer";
+    pairs[nbPairs].value = g_signer;
+    nbPairs++;
+
     return nbPairs;
 }
 
