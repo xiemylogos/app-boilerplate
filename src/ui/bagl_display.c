@@ -355,7 +355,8 @@ UX_FLOW(ux_display_transaction_flow,
 
 int ui_bagl_display_transaction_bs_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED ||
-        G_context.tx_type != TRANSFER_V2_TRANSACTION) {
+        (G_context.tx_type != TRANSFER_V2_TRANSACTION &&
+         G_context.tx_type != TRANSFER_TRANSACTION)) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
