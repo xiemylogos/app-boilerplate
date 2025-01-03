@@ -329,7 +329,7 @@ UX_STEP_NOCB(ux_display_approve_review_step,
              {
                  &C_icon_eye,
                  "Review",
-                 "Approve Transaction",
+                 "Approve Tx",
              });
 
 // Step with title/text for amount
