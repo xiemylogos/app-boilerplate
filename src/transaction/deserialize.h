@@ -28,3 +28,6 @@ parser_status_e transaction_native_transfer_from_deserialize(buffer_t *buf, ont_
 parser_status_e transaction_native_transfer_from_v2_deserialize(buffer_t *buf, ont_transaction_from_t *tx);
 
 parser_status_e transaction_approve_deserialize(buffer_t *buf, ont_transaction_t *tx);
+
+parser_status_e transaction_approve_v2_deserialize(buffer_t *buf, ont_transaction_t *tx);
+

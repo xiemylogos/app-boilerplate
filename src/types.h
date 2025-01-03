@@ -82,7 +82,8 @@ typedef enum {
     APPROVE,                     ///confirm approve
     TRANSFER_TRANSACTION,        ///confirm transfer
     TRANSFER_FROM_TRANSACTION,   ///confirm transfer from
-    TRANSFER_FROM_V2_TRANSACTION ///confirm transfer from v2
+    TRANSFER_FROM_V2_TRANSACTION,///confirm transfer from v2
+    APPROVE_V2                  ///confirm approve v2
 } tx_type_e;
 
 /**

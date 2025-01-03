@@ -142,6 +142,10 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                         status = transaction_approve_deserialize(&buf, &G_context.tx_info.tx_info);
                         G_context.tx_type = APPROVE;
                         G_context.state = STATE_PARSED;
+                    }else if (memcmp(buf.ptr + buf.size-46-9-1,ApproveV2,9) == 0) {
+                        status = transaction_approve_v2_deserialize(&buf, &G_context.tx_info.tx_info);
+                        G_context.tx_type = APPROVE_V2;
+                        G_context.state = STATE_PARSED;
                     }else if (memcmp(buf.ptr + buf.size - 46 - 8 - 1, Transfer, 8) == 0){
                         status =  transaction_native_transfer_deserialize(&buf, &G_context.tx_info.tx_info);
                         G_context.tx_type = TRANSFER_TRANSACTION;
@@ -234,6 +238,8 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                 } else if (G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION ||
                            G_context.tx_type == TRANSFER_FROM_TRANSACTION) {
                    return ui_display_transaction_from();
+                } else if (G_context.tx_type == APPROVE_V2) {
+                    return ui_display_approve_v2_tx();
                 }
             }
         }

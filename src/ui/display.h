@@ -68,3 +68,5 @@ int ui_display_blind_signed_transaction(void);
 int ui_display_approve_tx(void);
 
 int ui_display_transaction_from(void);
+
+int ui_display_approve_v2_tx(void);

@@ -33,6 +33,7 @@
 #define  Approve   "approve"
 #define  TransferFromV2  "transferFromV2"
 #define  TransferFrom    "transferFrom"
+#define  ApproveV2       "approveV2"
 
 typedef struct {
     uint64_t nonce;     /// nonce (8 bytes)
