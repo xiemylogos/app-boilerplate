@@ -46,19 +46,11 @@ static action_validate_cb g_validate_callback;
 static char g_amount[41];
 static char g_address[40];
 static char g_fromAddr[40];
-static char g_sender[40];
+static char g_content[40];
+static char g_content2[30];
 
 static char g_peerPubkey[66];
-static char g_posList[60];
-static char g_peerCost[30];
-static char g_stakeCost[30];
-static char g_maxAuthorize[30];
-static char g_pos[20];
-static char g_withdrawList[40];
-static char g_initPost[30];
-static char g_ontId[30];
-static char g_keyNo[20];
-static char g_decimals[30];
+
 // Validate/Invalidate public key and go back to home
 static void ui_action_validate_pubkey(bool choice) {
     validate_pubkey(choice);
@@ -166,7 +158,7 @@ UX_STEP_NOCB(ux_display_sender_address_step,
              bnnn_paging,
              {
                  .title = "sender",
-                 .text = g_sender,
+                 .text = g_content,
              });
 
 UX_STEP_NOCB(ux_display_address_step,
@@ -209,63 +201,57 @@ UX_STEP_NOCB(ux_display_pos_list_step,
              bnnn_paging,
              {
                  .title = "posList",
-                 .text = g_posList,
+                 .text = g_content,
              });
 
 UX_STEP_NOCB(ux_display_peer_cost_step,
              bnnn_paging,
              {
                  .title = "peerCost",
-                 .text = g_peerCost,
+                 .text = g_content,
              });
 
 UX_STEP_NOCB(ux_display_stake_cost_step,
              bnnn_paging,
              {
                  .title = "stakeCost",
-                 .text = g_stakeCost,
+                 .text = g_content2,
              });
 
 UX_STEP_NOCB(ux_display_max_authorize_step,
              bnnn_paging,
              {
                  .title = "maxAuthorize",
-                 .text = g_maxAuthorize,
+                 .text = g_content,
              });
 
 UX_STEP_NOCB(ux_display_pos_step,
              bnnn_paging,
              {
                  .title = "pos",
-                 .text = g_pos,
+                 .text = g_content2,
              });
 
 UX_STEP_NOCB(ux_display_with_draw_step,
              bnnn_paging,
              {
                  .title = "withdrawList",
-                 .text = g_withdrawList,
+                 .text = g_content,
              });
 
 UX_STEP_NOCB(ux_display_init_pos_step,
              bnnn_paging,
              {
                  .title = "initPos",
-                 .text = g_initPost,
+                 .text = g_content,
              });
 
-UX_STEP_NOCB(ux_display_ont_id_step,
-             bnnn_paging,
-             {
-                 .title = "ontId",
-                 .text = g_ontId,
-             });
 
 UX_STEP_NOCB(ux_display_key_no_step,
              bnnn_paging,
              {
                  .title = "keyNo",
-                 .text = g_keyNo,
+                 .text = g_content2,
              });
 
 UX_STEP_NOCB(ux_display_person_msg_step,
@@ -279,7 +265,7 @@ UX_STEP_NOCB(ux_display_decimals_step,
              bnnn_paging,
              {
                  .title = "decimals",
-                 .text = g_decimals,
+                 .text = g_content,
              });
 
 // FLOW to display address:
@@ -629,8 +615,8 @@ int ui_display_transaction_from_bs_choice() {
         }
     }
 
-    memset(g_sender, 0, sizeof(g_sender));
-    if (script_hash_to_address(g_sender,sizeof(g_sender),G_context.tx_info.from_tx_info.payload.sender) ==
+    memset(g_content, 0, sizeof(g_content));
+    if (script_hash_to_address(g_content,sizeof(g_content),G_context.tx_info.from_tx_info.payload.sender) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
@@ -750,13 +736,13 @@ int ui_bagl_display_oep4_transaction_bs_choice() {
         decimals = 9;
         know_decimals = true;
     }
-    memset(g_decimals, 0, sizeof(g_decimals));
+    memset(g_content, 0, sizeof(g_content));
     if (know_decimals) {
-       if (!format_u64(g_decimals, sizeof(g_decimals), decimals)) {
+       if (!format_u64(g_content, sizeof(g_content), decimals)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
         }
     } else {
-        memcpy(g_decimals,"decimals unknown",sizeof("decimals unknown"));
+        memcpy(g_content,"decimals unknown",sizeof("decimals unknown"));
     }
     memset(g_amount, 0, sizeof(g_amount));
     if (G_context.tx_info.oep4_tx_info.payload.value_len >= 81) {
@@ -815,7 +801,6 @@ UX_FLOW(ux_display_register_candidate_transaction_flow,
         &ux_display_peer_pubkey_step,
         &ux_display_address_step,
         &ux_display_init_pos_step,
-        &ux_display_ont_id_step,
         &ux_display_key_no_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
@@ -838,21 +823,16 @@ int ui_bagl_display_register_candidate_tx_bs_choice() {
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
     memcpy(g_peerPubkey, G_context.tx_info.register_candidate_tx_info.peer_pubkey, 66);
 
-    memset(g_initPost, 0, sizeof(g_initPost));
-    if (!format_u64(g_initPost,
-                        sizeof(g_initPost),
+    memset(g_content, 0, sizeof(g_content));
+    if (!format_u64(g_content,
+                        sizeof(g_content),
                         G_context.tx_info.register_candidate_tx_info.init_pos)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
 
-    memset(g_ontId, 0, sizeof(g_ontId));
-    memcpy(g_ontId,
-           G_context.tx_info.register_candidate_tx_info.ont_id,
-           G_context.tx_info.register_candidate_tx_info.ont_id_len);
-
-    memset(g_keyNo, 0, sizeof(g_keyNo));
-    if (!format_u64(g_keyNo,
-                        sizeof(g_keyNo),
+    memset(g_content2, 0, sizeof(g_content2));
+    if (!format_u64(g_content2,
+                        sizeof(g_content2),
                         G_context.tx_info.register_candidate_tx_info.key_no)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
@@ -893,16 +873,16 @@ int ui_bagl_display_withdraw_tx_bs_choice() {
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
     memcpy(g_peerPubkey, G_context.tx_info.withdraw_tx_info.peer_pubkey, 66);
 
-    memset(g_withdrawList, 0, sizeof(g_withdrawList));
+    memset(g_content, 0, sizeof(g_content));
     if (G_context.tx_info.withdraw_tx_info.withdraw_list_len < 81) {
             uint64_t value = getValueByLen(G_context.tx_info.withdraw_tx_info.withdraw_list,
                                            G_context.tx_info.withdraw_tx_info.withdraw_list_len);
-            if (!format_u64(g_withdrawList, sizeof(g_withdrawList), value)) {
+            if (!format_u64(g_content, sizeof(g_content), value)) {
                 return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
             }
     } else {
-            if (!format_u64(g_withdrawList,
-                            sizeof(g_withdrawList),
+            if (!format_u64(g_content,
+                            sizeof(g_content),
                             G_context.tx_info.withdraw_tx_info.withdraw_list_len - 80)) {
                 return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
             }
@@ -978,8 +958,8 @@ int ui_bagl_display_add_init_pos_tx_bs_choice() {
             return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
 
-    memset(g_pos, 0, sizeof(g_pos));
-    if (!format_u64(g_pos, sizeof(g_pos), G_context.tx_info.add_init_pos_tx_info.pos)) {
+    memset(g_content2, 0, sizeof(g_content2));
+    if (!format_u64(g_content2, sizeof(g_content2), G_context.tx_info.add_init_pos_tx_info.pos)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
 
@@ -1019,8 +999,8 @@ int ui_bagl_display_reduce_init_pos_tx_bs_choice() {
             return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
 
-    memset(g_pos, 0, sizeof(g_pos));
-    if (!format_u64(g_pos, sizeof(g_pos), G_context.tx_info.reduce_init_pos_tx_info.pos)) {
+    memset(g_content2, 0, sizeof(g_content2));
+    if (!format_u64(g_content2, sizeof(g_content2), G_context.tx_info.reduce_init_pos_tx_info.pos)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     g_validate_callback = &ui_action_validate_reduce_init_pos_transaction;
@@ -1061,9 +1041,9 @@ int ui_display_bagl_change_max_authorization_tx_bs_choice() {
             return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
 
-    memset(g_maxAuthorize, 0, sizeof(g_maxAuthorize));
-    if (!format_u64(g_maxAuthorize,
-                        sizeof(g_maxAuthorize),
+    memset(g_content, 0, sizeof(g_content));
+    if (!format_u64(g_content,
+                        sizeof(g_content),
                         G_context.tx_info.change_max_authorization_tx_info.max_authorize)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
@@ -1106,16 +1086,16 @@ int ui_display_bagl_set_fee_percentage_tx_bs_choice() {
             return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
 
-    memset(g_peerCost, 0, sizeof(g_peerCost));
-    if (!format_u64(g_peerCost,
-                        sizeof(g_peerCost),
+    memset(g_content, 0, sizeof(g_content));
+    if (!format_u64(g_content,
+                        sizeof(g_content),
                         G_context.tx_info.set_fee_percentage_tx_info.peer_cost)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
 
-    memset(g_stakeCost, 0, sizeof(g_stakeCost));
-    if (!format_u64(g_stakeCost,
-                    sizeof(g_stakeCost),
+    memset(g_content2, 0, sizeof(g_content2));
+    if (!format_u64(g_content2,
+                    sizeof(g_content2),
                     G_context.tx_info.set_fee_percentage_tx_info.stake_cost)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
@@ -1154,10 +1134,10 @@ int ui_display_bagl_authorize_for_peer_tx_bs_choice() {
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
     memcpy(g_peerPubkey, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey, 66);
 
-    memset(g_posList, 0, sizeof(g_posList));
+    memset(g_content, 0, sizeof(g_content));
     uint64_t value = getValueByLen(G_context.tx_info.authorize_for_peer_tx_info.pos_list,
                                        G_context.tx_info.authorize_for_peer_tx_info.pos_list_len);
-    if (!format_u64(g_posList, sizeof(g_posList), value)) {
+    if (!format_u64(g_content, sizeof(g_content), value)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     g_validate_callback = &ui_action_validate_authorize_for_peer_transaction;
@@ -1195,17 +1175,17 @@ int ui_display_bagl_un_authorize_for_peer_tx_bs_choice() {
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
     memcpy(g_peerPubkey, G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey, 66);
 
-    memset(g_posList, 0, sizeof(g_posList));
+    memset(g_content, 0, sizeof(g_content));
     if (G_context.tx_info.un_authorize_for_peer_tx_info.pos_list_len < 81) {
             uint64_t value =
                 getValueByLen(G_context.tx_info.un_authorize_for_peer_tx_info.pos_list,
                               G_context.tx_info.un_authorize_for_peer_tx_info.pos_list_len);
-            if (!format_u64(g_posList, sizeof(g_posList), value)) {
+            if (!format_u64(g_content, sizeof(g_content), value)) {
                 return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
             }
     } else {
-            if (!format_u64(g_posList,
-                            sizeof(g_posList),
+            if (!format_u64(g_content,
+                            sizeof(g_content),
                             G_context.tx_info.un_authorize_for_peer_tx_info.pos_list_len - 80)) {
                 return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
             }
