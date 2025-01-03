@@ -66,7 +66,7 @@ typedef enum {
 } request_type_e;
 
 typedef enum {
-    TRANSFER_TRANSACTION,                 /// confirm transaction information
+    TRANSFER_V2_TRANSACTION,     /// confirm transferv2 transaction information
     OEP4_TRANSACTION,            /// confirm oep4 transaction information
     REGISTER_CANDIDATE,          ///confirm registerCandidate
     WITHDRAW,                    ///confirm withdraw
@@ -79,7 +79,10 @@ typedef enum {
     UN_AUTHORIZE_FOR_PEER,       ///confirm unAuthorizeForPeer
     WITHDRAW_ONG,                ///confirm withdrawOng
     WITHDRAW_FEE,                ///confirm withdrawFee
-    APPROVE                      ///approve
+    APPROVE,                     ///confirm approve
+    TRANSFER_TRANSACTION,        ///confirm transfer
+    TRANSFER_FROM_TRANSACTION,   ///confirm transfer from
+    TRANSFER_FROM_V2_TRANSACTION ///confirm transfer from v2
 } tx_type_e;
 
 /**

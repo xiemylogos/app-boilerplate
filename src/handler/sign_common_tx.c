@@ -92,7 +92,7 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                 if (memcmp(buf.ptr + buf.size - 22 - 1, OntologyNativeInvoke, 22) == 0) {
                     if(memcmp(buf.ptr + buf.size - 46 - 10 - 1, TransferV2, 10) == 0) {
                         status =  transaction_native_transfer_v2_deserialize(&buf, &G_context.tx_info.tx_info);
-                        G_context.tx_type = TRANSFER_TRANSACTION;
+                        G_context.tx_type = TRANSFER_V2_TRANSACTION;
                         G_context.state = STATE_PARSED;
                     } else if(memcmp(buf.ptr + buf.size-46-17-1,RegisterCandidate,17) == 0) {
                         status =  register_candidate_tx_deserialize(&buf, &G_context.tx_info.register_candidate_tx_info);
@@ -148,11 +148,11 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                         G_context.state = STATE_PARSED;
                     }else if (memcmp(buf.ptr + buf.size - 46 - 12 - 1, TransferFrom, 12) == 0) {
                         status =  transaction_native_transfer_from_deserialize(&buf, &G_context.tx_info.from_tx_info);
-                        G_context.tx_type = TRANSFER_TRANSACTION;
+                        G_context.tx_type = TRANSFER_FROM_TRANSACTION;
                         G_context.state = STATE_PARSED;
                     }else if (memcmp(buf.ptr + buf.size - 46 - 14 - 1, TransferFromV2, 14) == 0){
                         status =  transaction_native_transfer_from_v2_deserialize(&buf, &G_context.tx_info.from_tx_info);
-                        G_context.tx_type = TRANSFER_TRANSACTION;
+                        G_context.tx_type = TRANSFER_FROM_V2_TRANSACTION;
                         G_context.state = STATE_PARSED;
                     }else {
                         status = TX_PARSING_ERROR;
@@ -202,7 +202,8 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                     return ui_display_blind_signed_transaction();
                 } 
             } else {
-                if (G_context.tx_type == TRANSFER_TRANSACTION) {
+                if (G_context.tx_type == TRANSFER_V2_TRANSACTION ||
+                    G_context.tx_type == TRANSFER_TRANSACTION) {
                     return ui_display_transaction();
                 } else if(G_context.tx_type == OEP4_TRANSACTION) {
                     return ui_display_oep4_transaction();
@@ -230,6 +231,9 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                     return ui_display_withdraw_fee_tx();
                 } else if (G_context.tx_type == APPROVE) {
                     return ui_display_approve_tx();
+                } else if (G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION ||
+                           G_context.tx_type == TRANSFER_FROM_TRANSACTION) {
+                   return ui_display_transaction_from();
                 }
             }
         }

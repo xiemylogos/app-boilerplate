@@ -44,8 +44,9 @@
 
 static action_validate_cb g_validate_callback;
 static char g_amount[41];
-static char g_address[42];
-static char g_fromAddr[42];
+static char g_address[40];
+static char g_fromAddr[40];
+static char g_sender[40];
 
 static char g_peerPubkey[66];
 static char g_posList[60];
@@ -154,6 +155,12 @@ UX_STEP_NOCB(ux_display_from_address_step,
                  .text = g_fromAddr,
              });
 
+UX_STEP_NOCB(ux_display_sender_address_step,
+             bnnn_paging,
+             {
+                 .title = "sender",
+                 .text = g_sender,
+             });
 
 UX_STEP_NOCB(ux_display_address_step,
              bnnn_paging,
@@ -348,58 +355,66 @@ UX_FLOW(ux_display_transaction_flow,
 
 int ui_bagl_display_transaction_bs_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED ||
-        G_context.tx_type != TRANSFER_TRANSACTION) {
+        G_context.tx_type != TRANSFER_V2_TRANSACTION) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
     memset(g_amount, 0, sizeof(g_amount));
 
     if (memcmp(G_context.tx_info.tx_info.payload.contract_addr, ONT_ADDR, 20) == 0) {
-            if (G_context.tx_info.tx_info.payload.value_len >= 81) {
+        uint decimals = 0;
+        if(G_context.tx_type == TRANSFER_V2_TRANSACTION) {
+              decimals = 9;
+        }
+        if (G_context.tx_info.tx_info.payload.value_len >= 81) {
                 format_fpu64_trimmed(g_amount,
                                      sizeof(g_amount),
                                      G_context.tx_info.tx_info.payload.value[0],
-                                     9);
-            } else {
-                if (G_context.tx_info.tx_info.payload.value_len <= 8) {
+                                     decimals);
+        } else {
+            if (G_context.tx_info.tx_info.payload.value_len <= 8) {
                     format_fpu64_trimmed(g_amount,
                                          sizeof(g_amount),
                                          G_context.tx_info.tx_info.payload.value[0],
-                                         9);
-                } else {
-                    char amount[41];
-                    uint128_t values;
-                    values.elements[0] = G_context.tx_info.tx_info.payload.value[1];
-                    values.elements[1] = G_context.tx_info.tx_info.payload.value[0];
-                    tostring128(&values, 10, amount, sizeof(amount));
-                    process_precision(amount, 9, g_amount, sizeof(g_amount));
-                    explicit_bzero(&amount, sizeof(amount));
-                    clear128(&values);
-                }
+                                         decimals);
+            } else {
+                char amount[41];
+                uint128_t values;
+                values.elements[0] = G_context.tx_info.tx_info.payload.value[1];
+                values.elements[1] = G_context.tx_info.tx_info.payload.value[0];
+                tostring128(&values, 10, amount, sizeof(amount));
+                process_precision(amount, decimals, g_amount, sizeof(g_amount));
+                explicit_bzero(&amount, sizeof(amount));
+                clear128(&values);
             }
+        }
     } else if (memcmp(G_context.tx_info.tx_info.payload.contract_addr, ONG_ADDR, 20) == 0) {
-            if (G_context.tx_info.tx_info.payload.value_len >= 81) {
+        uint decimals = 9;
+        if(G_context.tx_type == TRANSFER_V2_TRANSACTION) {
+              decimals = 18;
+        }
+        if (G_context.tx_info.tx_info.payload.value_len >= 81) {
                 format_fpu64_trimmed(g_amount,
                                      sizeof(g_amount),
                                      G_context.tx_info.tx_info.payload.value[0],
-                                     18);
-            } else {
-                if (G_context.tx_info.tx_info.payload.value_len <= 8) {
+                                     decimals);
+        } else {
+            if (G_context.tx_info.tx_info.payload.value_len <= 8) {
                     format_fpu64_trimmed(g_amount,
                                          sizeof(g_amount),
                                          G_context.tx_info.tx_info.payload.value[0],
-                                         18);
-                } else {
-                    char amount[41];
-                    uint128_t values;
-                    values.elements[0] = G_context.tx_info.tx_info.payload.value[1];
-                    values.elements[1] = G_context.tx_info.tx_info.payload.value[0];
-                    tostring128(&values, 10, amount, sizeof(amount));
-                    process_precision(amount, 18, g_amount, sizeof(g_amount));
-                    explicit_bzero(&amount, sizeof(amount));
-                    clear128(&values);
-                }
+                                         decimals);
+            } else {
+                char amount[41];
+                uint128_t values;
+                values.elements[0] = G_context.tx_info.tx_info.payload.value[1];
+                values.elements[1] = G_context.tx_info.tx_info.payload.value[0];
+                tostring128(&values, 10, amount, sizeof(amount));
+                process_precision(amount, decimals, g_amount, sizeof(g_amount));
+                explicit_bzero(&amount, sizeof(amount));
+                clear128(&values);
             }
+        }
     }
 
     PRINTF("Amount: %s\n", g_amount);
@@ -474,6 +489,113 @@ int ui_bagl_display_approve_transaction_bs_choice() {
 int ui_display_approve_tx() {
     return ui_bagl_display_approve_transaction_bs_choice();
 }
+
+
+UX_FLOW(ux_display_transaction_from_flow,
+        &ux_display_review_step,
+        &ux_display_sender_address_step,
+        &ux_display_from_address_step,
+        &ux_display_address_step,
+        &ux_display_amount_step,
+        &ux_display_approve_step,
+        &ux_display_reject_step);
+
+
+int ui_display_transaction_from_bs_choice() {
+    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
+        ||(G_context.tx_type != TRANSFER_FROM_V2_TRANSACTION &&
+            G_context.tx_type != TRANSFER_FROM_TRANSACTION)) {
+        G_context.state = STATE_NONE;
+        return io_send_sw(SW_BAD_STATE);
+    }
+    memset(g_amount, 0, sizeof(g_amount));
+
+    if (memcmp(G_context.tx_info.from_tx_info.payload.contract_addr, ONT_ADDR, 20) == 0) {
+        uint decimals = 0;
+        if(G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION) {
+              decimals = 9;
+        }
+        if (G_context.tx_info.from_tx_info.payload.value_len >= 81) {
+                format_fpu64_trimmed(g_amount,
+                                     sizeof(g_amount),
+                                     G_context.tx_info.from_tx_info.payload.value[0],
+                                     decimals);
+        } else {
+            if (G_context.tx_info.from_tx_info.payload.value_len <= 8) {
+                    format_fpu64_trimmed(g_amount,
+                                         sizeof(g_amount),
+                                         G_context.tx_info.from_tx_info.payload.value[0],
+                                         decimals);
+            } else {
+                char amount[41];
+                uint128_t values;
+                values.elements[0] = G_context.tx_info.from_tx_info.payload.value[1];
+                values.elements[1] = G_context.tx_info.from_tx_info.payload.value[0];
+                tostring128(&values, 10, amount, sizeof(amount));
+                process_precision(amount, decimals, g_amount, sizeof(g_amount));
+                explicit_bzero(&amount, sizeof(amount));
+                clear128(&values);
+            }
+        }
+    } else if (memcmp(G_context.tx_info.from_tx_info.payload.contract_addr, ONG_ADDR, 20) == 0) {
+         uint decimals = 9;
+        if(G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION) {
+              decimals = 18;
+        }
+        if (G_context.tx_info.from_tx_info.payload.value_len >= 81) {
+                format_fpu64_trimmed(g_amount,
+                                     sizeof(g_amount),
+                                     G_context.tx_info.from_tx_info.payload.value[0],
+                                     18);
+        } else {
+            if (G_context.tx_info.from_tx_info.payload.value_len <= 8) {
+                    format_fpu64_trimmed(g_amount,
+                                         sizeof(g_amount),
+                                         G_context.tx_info.from_tx_info.payload.value[0],
+                                         18);
+            } else {
+                char amount[41];
+                uint128_t values;
+                values.elements[0] = G_context.tx_info.from_tx_info.payload.value[1];
+                values.elements[1] = G_context.tx_info.from_tx_info.payload.value[0];
+                tostring128(&values, 10, amount, sizeof(amount));
+                process_precision(amount, 18, g_amount, sizeof(g_amount));
+                explicit_bzero(&amount, sizeof(amount));
+                clear128(&values);
+            }
+        }
+    }
+
+    memset(g_sender, 0, sizeof(g_sender));
+    if (script_hash_to_address(g_sender,sizeof(g_sender),G_context.tx_info.from_tx_info.payload.sender) ==
+        -1) {
+           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+        }
+
+    memset(g_address, 0, sizeof(g_address));
+    if (script_hash_to_address(g_address,
+                                   sizeof(g_address),
+                                   G_context.tx_info.from_tx_info.payload.to) == -1) {
+            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    }
+
+    memset(g_fromAddr, 0, sizeof(g_fromAddr));
+
+    if (script_hash_to_address(g_fromAddr,
+                                   sizeof(g_fromAddr),
+                                   G_context.tx_info.from_tx_info.payload.from) == -1) {
+            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    }
+
+    g_validate_callback = &ui_action_validate_transaction;
+    ux_flow_init(0, ux_display_transaction_from_flow, NULL);
+    return 0;
+}
+
+int ui_display_transaction_from() {
+    return ui_display_transaction_from_bs_choice();
+}
+
 
 UX_FLOW(ux_display_blind_signed_transaction_flow,
         &ux_display_review_step,
