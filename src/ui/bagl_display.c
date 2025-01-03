@@ -155,6 +155,13 @@ UX_STEP_NOCB(ux_display_from_address_step,
                  .text = g_fromAddr,
              });
 
+UX_STEP_NOCB(ux_display_to_address_step,
+             bnnn_paging,
+             {
+                 .title = "toAddr",
+                 .text = g_address,
+             });
+
 UX_STEP_NOCB(ux_display_sender_address_step,
              bnnn_paging,
              {
@@ -316,6 +323,15 @@ UX_STEP_NOCB(ux_display_review_step,
                  "Review",
                  "Transaction",
              });
+
+UX_STEP_NOCB(ux_display_approve_review_step,
+             pnn,
+             {
+                 &C_icon_eye,
+                 "Review",
+                 "Approve Transaction",
+             });
+
 // Step with title/text for amount
 UX_STEP_NOCB(ux_display_amount_step,
              bnnn_paging,
@@ -347,7 +363,7 @@ UX_STEP_NOCB(ux_display_review_blind_msg_signed_step,
 UX_FLOW(ux_display_transaction_flow,
         &ux_display_review_step,
         &ux_display_from_address_step,
-        &ux_display_address_step,
+        &ux_display_to_address_step,
         &ux_display_amount_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
@@ -448,9 +464,9 @@ int ui_display_transaction() {
 
 
 UX_FLOW(ux_display_approve_transaction_flow,
-        &ux_display_review_step,
+        &ux_display_approve_review_step,
         &ux_display_from_address_step,
-        &ux_display_address_step,
+        &ux_display_to_address_step,
         &ux_display_amount_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
@@ -542,7 +558,7 @@ UX_FLOW(ux_display_transaction_from_flow,
         &ux_display_review_step,
         &ux_display_sender_address_step,
         &ux_display_from_address_step,
-        &ux_display_address_step,
+        &ux_display_to_address_step,
         &ux_display_amount_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
@@ -709,7 +725,7 @@ int ui_display_person_msg() {
 UX_FLOW(ux_display_oep4_transaction_flow,
         &ux_display_review_step,
         &ux_display_from_address_step,
-        &ux_display_address_step,
+        &ux_display_to_address_step,
         &ux_display_decimals_step,
         &ux_display_amount_step,
         &ux_display_approve_step,
