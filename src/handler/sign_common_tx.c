@@ -233,13 +233,12 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                     return ui_display_withdraw_ong_tx();
                 } else if (G_context.tx_type == WITHDRAW_FEE) {
                     return ui_display_withdraw_fee_tx();
-                } else if (G_context.tx_type == APPROVE) {
+                } else if (G_context.tx_type == APPROVE ||
+                           G_context.tx_type == APPROVE_V2) {
                     return ui_display_approve_tx();
                 } else if (G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION ||
                            G_context.tx_type == TRANSFER_FROM_TRANSACTION) {
                    return ui_display_transaction_from();
-                } else if (G_context.tx_type == APPROVE_V2) {
-                    return ui_display_approve_v2_tx();
                 }
             }
         }
