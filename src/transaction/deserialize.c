@@ -114,6 +114,9 @@ parser_status_e transaction_native_transfer_deserialize(buffer_t *buf, ont_trans
         if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
             return VALUE_PARSING_ERROR;
         }
+        if (!buffer_read_u8(buf, &tx->payload.value_len)) {
+            return OPCODE_PARSING_ERROR;
+        }
         if (tx->payload.value_len >= 81) {
             tx->payload.value[0] = tx->payload.value_len - 80;
             tx->payload.value[1] = 0;
@@ -325,7 +328,7 @@ parser_status_e transaction_native_transfer_from_deserialize(buffer_t *buf, ont_
         return VALUE_PARSING_ERROR;
     }
     if((buf->size-buf->offset > PAYLOAD_TRANSFER_FROM_LEN) &&
-       memcmp(buf->ptr + buf->size-buf->offset - 46 - 12, TransferFrom, 12) == 0) {
+       memcmp(buf->ptr + buf->size - 46 - 12 - 1, TransferFrom, 12) == 0) {
         uint8_t sender_op_code;
         if (!buffer_read_u8(buf, &sender_op_code)) {
             return OPCODE_PARSING_ERROR;
@@ -370,6 +373,9 @@ parser_status_e transaction_native_transfer_from_deserialize(buffer_t *buf, ont_
         }
         if (getBytesValueByLen(buf, 3) != 13139050) {  // 6a7cc8
             return VALUE_PARSING_ERROR;
+        }
+        if (!buffer_read_u8(buf, &tx->payload.value_len)) {
+            return OPCODE_PARSING_ERROR;
         }
         if (tx->payload.value_len >= 81) {
             tx->payload.value[0] = tx->payload.value_len - 80;
@@ -467,7 +473,7 @@ parser_status_e transaction_native_transfer_from_v2_deserialize(buffer_t *buf, o
         return VALUE_PARSING_ERROR;
     }
     if ((buf->size-buf->offset > PAYLOAD_TRANSFER_FROM_LEN) &&
-        memcmp(buf->ptr + buf->size-buf->offset - 46 - 14, TransferFromV2, 14) == 0) {
+        memcmp(buf->ptr + buf->size - 46 - 14 -1, TransferFromV2, 14) == 0) {
         uint8_t sender_op_code;
         if (!buffer_read_u8(buf, &sender_op_code)) {
             return OPCODE_PARSING_ERROR;
@@ -512,6 +518,9 @@ parser_status_e transaction_native_transfer_from_v2_deserialize(buffer_t *buf, o
         }
         if (getBytesValueByLen(buf, 3) != 13139050) {  // 6a7cc8
             return VALUE_PARSING_ERROR;
+        }
+        if (!buffer_read_u8(buf, &tx->payload.value_len)) {
+            return OPCODE_PARSING_ERROR;
         }
         if (tx->payload.value_len >= 81) {
             tx->payload.value[0] = tx->payload.value_len - 80;
