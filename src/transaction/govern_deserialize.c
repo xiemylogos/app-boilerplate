@@ -210,43 +210,79 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
     if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }
-    if(!buffer_read_varint(buf,&tx->peer_pubkey_length)) {
-        return GASPRICE_PARSING_ERROR;
-    }
-    if (tx->peer_pubkey_length >= 81) {
-        tx->peer_pubkey_length = tx->peer_pubkey_length -80;
-    }
-    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
+
+    uint8_t peer_pubkey_opcode;
+    if (!buffer_read_u8(buf, &peer_pubkey_opcode)) {
         return VALUE_PARSING_ERROR;
     }
-    uint8_t pre_pub_len;
-    if(!buffer_read_u8(buf,&pre_pub_len)) {
-        return VALUE_PARSING_ERROR;
-    }
-    tx->peer_pubkey = (uint8_t*)(buf->ptr+buf->offset);
-    if (!buffer_seek_cur(buf, pre_pub_len*tx->peer_pubkey_length)) {
-        return FROM_PARSING_ERROR;
-    }
-    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
-        return VALUE_PARSING_ERROR;
-    }
-    if(!buffer_read_varint(buf,&tx->withdraw_list_number)) {
-        return GASPRICE_PARSING_ERROR;
-    }
-    if (tx->withdraw_list_number >= 81) {
-        tx->withdraw_list_number = tx->withdraw_list_number - 80;
-    }
-    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
-        return VALUE_PARSING_ERROR;
-    }
-    if(!buffer_read_u8(buf,&tx->withdraw_list_len)) {
-        return VALUE_PARSING_ERROR;
-    }
-    if (tx->withdraw_list_len <81) {
-        tx->withdraw_list = (uint8_t *) (buf->ptr + buf->offset);
-        if (!buffer_seek_cur(buf, tx->withdraw_list_len * tx->withdraw_list_number)) {
+    if (peer_pubkey_opcode == 66){ //42
+        tx->peer_pubkey_number = 1;
+        tx->peer_pubkey_length = peer_pubkey_opcode;
+        tx->peer_pubkey = (uint8_t*)(buf->ptr+buf->offset);
+        if (!buffer_seek_cur(buf,tx->peer_pubkey_length)) {
             return FROM_PARSING_ERROR;
         }
+    } else if (peer_pubkey_opcode ==  76) {//4c The next byte
+        uint8_t peer_pubkey_len;
+        if (!buffer_read_u8(buf, &peer_pubkey_len)) {
+            return VALUE_PARSING_ERROR;
+        }
+        tx->peer_pubkey_length = peer_pubkey_len;
+        tx->peer_pubkey_number = peer_pubkey_len/66;
+        tx->peer_pubkey = (uint8_t*)(buf->ptr+buf->offset);
+        if (!buffer_seek_cur(buf, tx->peer_pubkey_length)) {
+            return FROM_PARSING_ERROR;
+        }
+    } else if(peer_pubkey_opcode ==  77) { //4d The next two bytes
+        uint16_t peer_pubkey_len;
+        if (!buffer_read_u16(buf, &peer_pubkey_len,LE)) {
+            return VALUE_PARSING_ERROR;
+        }
+        tx->peer_pubkey_length = peer_pubkey_len;
+        tx->peer_pubkey_number = peer_pubkey_len/66;
+        tx->peer_pubkey = (uint8_t*)(buf->ptr+buf->offset);
+        if (!buffer_seek_cur(buf, tx->peer_pubkey_length)) {
+            return FROM_PARSING_ERROR;
+        }
+    } else if (peer_pubkey_opcode ==  78){ //4e he next four bytes
+        uint32_t peer_pubkey_len;
+        if (!buffer_read_u32(buf, &peer_pubkey_len,LE)) {
+            return VALUE_PARSING_ERROR;
+        }
+        tx->peer_pubkey_length = peer_pubkey_len;
+        tx->peer_pubkey_number = peer_pubkey_len/66;
+        tx->peer_pubkey = (uint8_t*)(buf->ptr+buf->offset);
+        if (!buffer_seek_cur(buf, tx->peer_pubkey_length)) {
+            return FROM_PARSING_ERROR;
+        }
+    }
+    if(getBytesValueByLen(buf,2) != 49489) { //51c1
+        return VALUE_PARSING_ERROR;
+    }
+    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
+        return VALUE_PARSING_ERROR;
+    }
+
+    for(int j=0;j<tx->peer_pubkey_number;j++) {
+        uint8_t withdraw_len_opcode;
+        if (!buffer_read_u8(buf, &withdraw_len_opcode)) {
+            return VALUE_PARSING_ERROR;
+        }
+        if (withdraw_len_opcode >= 81) {
+            tx->withdraw_value = withdraw_len_opcode - 80;
+        } else {
+            tx->withdraw_list = (uint8_t *) (buf->ptr + buf->offset);
+            if (!buffer_seek_cur(buf,withdraw_len_opcode)) {
+                return FROM_PARSING_ERROR;
+            }
+        }
+    }
+    //0x51 // The number 1 is pushed onto the stack
+    if(getBytesValueByLen(buf,1) != 80 + tx->peer_pubkey_number) {
+        return VALUE_PARSING_ERROR;
+    }
+    if(getBytesValueByLen(buf,1) != 193) { //c1
+        return VALUE_PARSING_ERROR;
     }
     return check_govern_end_data(buf,Withdraw);
 }

@@ -104,10 +104,11 @@ typedef struct {
     uint64_t gas_limit;
     uint8_t *payer;
     uint8_t *account;
-    uint64_t peer_pubkey_length;
+    uint8_t peer_pubkey_number;
+    uint32_t peer_pubkey_length;
     uint8_t *peer_pubkey;
-    uint64_t withdraw_list_number;
-    uint8_t  withdraw_list_len;
+    uint32_t withdraw_list_len;
+    uint8_t  withdraw_value;
     uint8_t *withdraw_list;
 }withdraw_t;
 
