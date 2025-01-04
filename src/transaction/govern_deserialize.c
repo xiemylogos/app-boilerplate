@@ -375,11 +375,11 @@ parser_status_e add_init_pos_tx_deserialize(buffer_t *buf, add_init_pos_t *tx) {
     if (!buffer_read_u8(buf, &pos_len)) {
         return VALUE_PARSING_ERROR;
     }
-    uint64_t value = getBytesValueByLen(buf, pos_len);
-    if (value == 0) {
-        return VALUE_PARSING_ERROR;
+    if (pos_len >= 81) {
+        tx->pos = pos_len - 80;
+    } else {
+        tx->pos = getBytesValueByLen(buf, pos_len);
     }
-    tx->pos = value;
     return check_govern_end_data(buf,AddInitPos);
 }
 
@@ -446,12 +446,11 @@ parser_status_e reduce_init_pos_tx_deserialize(buffer_t *buf, reduce_init_pos_t 
     if(!buffer_read_u8(buf,&pos_len)) {
         return VALUE_PARSING_ERROR;
     }
-    uint64_t  value = getBytesValueByLen(buf,pos_len);
-    if (value == 0) {
-        return VALUE_PARSING_ERROR;
+    if (pos_len >= 81) {
+        tx->pos = pos_len - 80;
+    } else {
+        tx->pos = getBytesValueByLen(buf, pos_len);
     }
-    tx->pos = value;
-    
     return check_govern_end_data(buf,ReduceInitPos);
 }
 
