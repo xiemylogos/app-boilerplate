@@ -169,18 +169,8 @@ static uint8_t setTagValuePairs(void) {
     nbPairs++;
 
     memset(g_signer, 0, sizeof(g_signer));
-   /*
-    size_t j = 0;
-    for (size_t i = 0; i < sizeof(G_context.pk_info.raw_public_key); i++) {
-        if (G_context.pk_info.raw_public_key[i] != 0) {
-            g_signer[j] = G_context.raw_public_key[i];
-                          j++;
-        }
-    }
-    */
-  // memcpy(g_signer, G_context.raw_public_key,sizeof(G_context.pk_info.raw_public_key));
     if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
     }
     pairs[nbPairs].item = "signer";
     pairs[nbPairs].value = g_signer;
@@ -237,8 +227,16 @@ int ui_display_blind_transaction_bs_choice() {
     explicit_bzero(&pairsList, sizeof(pairsList));
     pairs[0].item = "transaction";
     pairs[0].value = "transaction blind signing";
+
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
+    pairs[1].item = "signer";
+    pairs[1].value = g_signer;
+
     pairsList.pairs = pairs;
-    pairsList.nbPairs = 1;
+    pairsList.nbPairs = 2;
     nbgl_useCaseReviewBlindSigning(TYPE_TRANSACTION,
                               &pairsList,
                               &C_icon_ont_64px,
@@ -368,10 +366,10 @@ static uint8_t setTagApproveValuePairs(void) {
 
     memset(g_signer, 0, sizeof(g_signer));
     if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
     }
     pairs[nbPairs].item = "signer";
-    pairs[nbPairs].value = "g_signer";
+    pairs[nbPairs].value = g_signer;
     nbPairs++;
 
     return nbPairs;
@@ -533,18 +531,8 @@ static uint8_t setTagFromValuePairs(void) {
     nbPairs++;
 
     memset(g_signer, 0, sizeof(g_signer));
-   /*
-    size_t j = 0;
-    for (size_t i = 0; i < sizeof(G_context.pk_info.raw_public_key); i++) {
-        if (G_context.pk_info.raw_public_key[i] != 0) {
-            g_signer[j] = G_context.raw_public_key[i];
-                          j++;
-        }
-    }
-    */
-  // memcpy(g_signer, G_context.raw_public_key,sizeof(G_context.pk_info.raw_public_key));
     if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
     }
     pairs[nbPairs].item = "signer";
     pairs[nbPairs].value = g_signer;

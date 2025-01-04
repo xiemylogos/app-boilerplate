@@ -51,8 +51,9 @@ static char g_withdrawList[200];
 static char g_initPost[30];
 static char g_ontId[100];
 static char g_keyNo[30];
+static char g_signer[40];
 
-#define MAX_PAIRS        20
+#define MAX_PAIRS        10
 
 static nbgl_contentTagValue_t pairs[MAX_PAIRS];
 static nbgl_contentTagValueList_t pairsList;
@@ -109,6 +110,15 @@ static uint8_t registerCandidateTagValuePairs(void) {
     pairs[nbPairs].item = "key_no";
     pairs[nbPairs].value = g_keyNo;
     nbPairs++;
+
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
+    pairs[nbPairs].item = "signer";
+    pairs[nbPairs].value = g_signer;
+    nbPairs++;
+
     return nbPairs;
 }
 
@@ -188,6 +198,14 @@ static uint8_t withdrawTagValuePairs(void) {
     pairs[nbPairs].value = g_withdrawList;
     nbPairs++;
 
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
+    pairs[nbPairs].item = "signer";
+    pairs[nbPairs].value = g_signer;
+    nbPairs++;
+
     return nbPairs;
 }
 
@@ -252,6 +270,14 @@ static uint8_t quitNodeTagValuePairs(void) {
         }
     pairs[nbPairs].item = "account";
     pairs[nbPairs].value = g_addr;
+    nbPairs++;
+
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
+    pairs[nbPairs].item = "signer";
+    pairs[nbPairs].value = g_signer;
     nbPairs++;
 
     return nbPairs;
@@ -326,6 +352,14 @@ static uint8_t addInitPosTagValuePairs(void) {
     pairs[nbPairs].value = g_pos;
     nbPairs++;
 
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
+    pairs[nbPairs].item = "signer";
+    pairs[nbPairs].value = g_signer;
+    nbPairs++;
+
     return nbPairs;
 }
 
@@ -397,6 +431,14 @@ static uint8_t reduceInitPosTagValuePairs(void) {
     pairs[nbPairs].value = g_pos;
     nbPairs++;
 
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
+    pairs[nbPairs].item = "signer";
+    pairs[nbPairs].value = g_signer;
+    nbPairs++;
+
     return nbPairs;
 }
 
@@ -465,6 +507,14 @@ static uint8_t changeMaxAuthorizationTagValuePairs(void) {
     }
     pairs[nbPairs].item = "maxAuthorize";
     pairs[nbPairs].value = g_maxAuthorize;
+    nbPairs++;
+
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
+    pairs[nbPairs].item = "signer";
+    pairs[nbPairs].value = g_signer;
     nbPairs++;
 
     return nbPairs;
@@ -547,6 +597,14 @@ static uint8_t setFeePercentageTagValuePairs(void) {
     pairs[nbPairs].value = g_stakeCost;
     nbPairs++;
 
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
+    pairs[nbPairs].item = "signer";
+    pairs[nbPairs].value = g_signer;
+    nbPairs++;
+
     return nbPairs;
 }
 
@@ -615,17 +673,25 @@ static uint8_t setAuthorizeForPeerTagValuePairs(void) {
 
     memset(g_posList,0,sizeof(g_posList));
     if (G_context.tx_info.authorize_for_peer_tx_info.pos_list_len < 81) {
-    uint64_t value = getValueByLen(G_context.tx_info.authorize_for_peer_tx_info.pos_list,G_context.tx_info.authorize_for_peer_tx_info.pos_list_len);
-    if (!format_u64(g_posList,sizeof(g_posList),value)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
+        uint64_t value = getValueByLen(G_context.tx_info.authorize_for_peer_tx_info.pos_list,G_context.tx_info.authorize_for_peer_tx_info.pos_list_len);
+        if (!format_u64(g_posList,sizeof(g_posList),value)) {
+            return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+        }
    } else {
       if (!format_u64(g_posList,sizeof(g_posList),G_context.tx_info.authorize_for_peer_tx_info.pos_list_len-80)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
+             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+        }
    }
     pairs[nbPairs].item = "posList";
     pairs[nbPairs].value = g_posList;
+    nbPairs++;
+
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
+    pairs[nbPairs].item = "signer";
+    pairs[nbPairs].value = g_signer;
     nbPairs++;
 
     return nbPairs;
@@ -708,6 +774,14 @@ static uint8_t setunAuthorizeForPeerTagValuePairs(void) {
     pairs[nbPairs].value = g_posList;
     nbPairs++;
 
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
+    pairs[nbPairs].item = "signer";
+    pairs[nbPairs].value = g_signer;
+    nbPairs++;
+
     return nbPairs;
 }
 
@@ -764,6 +838,15 @@ static uint8_t setwithdrawOngTagValuePairs(void) {
     pairs[nbPairs].item = "account";
     pairs[nbPairs].value = g_addr;
     nbPairs++;
+
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
+    pairs[nbPairs].item = "signer";
+    pairs[nbPairs].value = g_signer;
+    nbPairs++;
+
     return nbPairs;
 }
 // Public function to start the transaction review
@@ -820,6 +903,15 @@ static uint8_t setwithdrawFeeTagValuePairs(void) {
     pairs[nbPairs].item = "account";
     pairs[nbPairs].value = g_addr;
     nbPairs++;
+
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
+    pairs[nbPairs].item = "signer";
+    pairs[nbPairs].value = g_signer;
+    nbPairs++;
+
     return nbPairs;
 }
 // Public function to start the transaction review

@@ -25,6 +25,9 @@
 /** length of a Address before encoding, which is the length of <address_version>+<script_hash>+<checksum> */
 #define ADDRESS_LEN_PRE (1 + SCRIPT_HASH_LEN + SCRIPT_HASH_CHECKSUM_LEN)
 
+#define VERIFICATION_SCRIPT_LENGTH 35
+
+#define UINT160_LEN 20
 
 int script_hash_to_address(char* out, size_t out_len, const unsigned char* script_hash) {
 
@@ -106,66 +109,50 @@ void process_precision(const char *input, int precision, char *output, size_t ou
     }
 }
 
-bool create_signature_redeem_script(const uint8_t* public_key, uint8_t* out, size_t out_len) {
+bool create_signature_redeem_script(const uint8_t *uncompressed_key, uint8_t* out, size_t out_len) {
     if (out_len != VERIFICATION_SCRIPT_LENGTH) {
         return false;
     }
-    // we first have to compress the public key
+    const uint8_t *x = &uncompressed_key[1];
+    const uint8_t *y = &uncompressed_key[33];
     uint8_t compressed_key[33];
-    compressed_key[0] = ((public_key[63] & 1) ? 0x03 : 0x02);
-    memcpy(&compressed_key[1], public_key, 32);
-
-    out[0] = 0xc;   // OpCode.PUSHDATA1;
-    out[1] = 0x21;  // data size, 33 bytes for compressed public key
-    memcpy(&out[2], compressed_key, sizeof(compressed_key));
-
-    out[35] = 0x41;                  // OpCode.SYSCALL
-    uint32_t checksig = 0x27B3E756;  // Syscall "System.Crypto.CheckSig"
-    memcpy(&out[36], &checksig, 4);
-
+    compressed_key[0] = (y[31] & 1) ? 0x03 : 0x02;
+    memcpy(&compressed_key[1], x, 32);
+    out[0] = 0x21;
+    memcpy(&out[1], compressed_key, sizeof(compressed_key));
+    out[34] = 0xac;
     return true;
 }
 
-void public_key_hash160(const unsigned char* in, unsigned short inlen, unsigned char* out) {
-    union {
-        cx_sha256_t shasha;
-        cx_ripemd160_t riprip;
+void generate_address_from_public_key(const uint8_t *compressed_key, size_t key_len, uint8_t *output_hash) {
+    struct {
+        cx_ripemd160_t ripe;
     } u;
-    unsigned char buffer[32];
-
-    cx_sha256_init(&u.shasha);
-    CX_ASSERT(cx_hash_no_throw(&u.shasha.header, CX_LAST, in, inlen, buffer, 32));
-    cx_ripemd160_init(&u.riprip);
-    CX_ASSERT(cx_hash_no_throw(&u.riprip.header, CX_LAST, buffer, 32, out, 20));
+    uint8_t sha256_hash[SHA256_HASH_LEN];
+    cx_hash_sha256(compressed_key, key_len, sha256_hash, sizeof(sha256_hash));
+    cx_ripemd160_init(&u.ripe);
+    CX_ASSERT(cx_hash_no_throw(&u.ripe.header, CX_LAST, sha256_hash, 32, output_hash, 20));
 }
 
 bool ont_address_from_pubkey(char* out, size_t out_len) {
-    uint8_t public_key[65];  /// format (1), x-coordinate (32), y-coodinate (32)
+    uint8_t uncompressed_key[65];  /// format (1), x-coordinate (32), y-coodinate (32)
     uint8_t chain_code[32];
     cx_err_t error = bip32_derive_get_pubkey_256(CX_CURVE_256R1,
                                                  G_context.bip32_path,
                                                  G_context.bip32_path_len,
-                                                 public_key,
+                                                 uncompressed_key,
                                                  chain_code,
                                                  CX_SHA256);
 
     if (error != CX_OK) {
         return false;
     }
-    // we need to go through 3 steps
-    // 1. create a verification script with the public key
-    // 2. create a script hash of the verification script (using sha256 + ripemd160)
-    // 3. base58check encode the NEO account version + script hash to get the address
-    unsigned char verification_script[VERIFICATION_SCRIPT_LENGTH];
-    unsigned char script_hash[UINT160_LEN];
-
-    // step 1
-    if (!create_signature_redeem_script(public_key + 1, verification_script, sizeof(verification_script))) {
+    uint8_t verification_script[VERIFICATION_SCRIPT_LENGTH] = {0};
+    if(!create_signature_redeem_script(uncompressed_key, verification_script,sizeof verification_script)) {
         return false;
     }
-    // step 2
-    public_key_hash160(verification_script, sizeof(verification_script), script_hash);
-    // step 3
-    script_hash_to_address(out, out_len, script_hash);
+    uint8_t ripemd160_hash[UINT160_LEN] = {0};
+    generate_address_from_public_key(verification_script, sizeof verification_script, ripemd160_hash);
+    script_hash_to_address(out, out_len,ripemd160_hash);
     return true;
 }

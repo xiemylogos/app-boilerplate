@@ -6,9 +6,6 @@
 #include <string.h>
 #include <stdbool.h>  // bool
 
-#define VERIFICATION_SCRIPT_LENGTH 40
-#define UINT160_LEN 20
-
 #define ARRAY_LEN(a) (sizeof(a) / sizeof((a)[0]))
 #define BAIL_IF(x)           \
     do {                     \
@@ -27,5 +24,7 @@ size_t utf8_strlen(const uint8_t* str);
 void process_precision(const char *input, int precision, char *output, size_t output_len);
 
 
+bool create_signature_redeem_script(const uint8_t *uncompressed_key, uint8_t* out, size_t out_len);
+void generate_address_from_public_key(const uint8_t *compressed_key, size_t key_len, uint8_t *output_hash);
 
 bool ont_address_from_pubkey(char* out, size_t out_len);

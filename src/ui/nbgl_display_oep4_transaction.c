@@ -49,8 +49,9 @@ static char g_gasLimit[40];
 static char g_fromAddr[40];
 static char g_toAddr[40];
 static char g_decimals[20];
+static char g_signer[40];
 
-#define OEP4_MAX_PAIRS        7
+#define OEP4_MAX_PAIRS        8
 
 static nbgl_layoutTagValue_t pairs[OEP4_MAX_PAIRS];
 static nbgl_layoutTagValueList_t pairsList;
@@ -164,6 +165,15 @@ static uint8_t setTagValuePairs(void) {
     pairs[nbPairs].item = "gasLimit";
     pairs[nbPairs].value = g_gasLimit;
     nbPairs++;
+
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
+    pairs[nbPairs].item = "signer";
+    pairs[nbPairs].value = g_signer;
+    nbPairs++;
+
     return nbPairs;
 }
 

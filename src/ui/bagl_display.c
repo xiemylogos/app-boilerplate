@@ -48,6 +48,7 @@ static char g_address[40];
 static char g_fromAddr[40];
 static char g_content[40];
 static char g_content2[30];
+static char g_signer[40];
 
 static char g_peerPubkey[66];
 
@@ -159,6 +160,13 @@ UX_STEP_NOCB(ux_display_sender_address_step,
              {
                  .title = "sender",
                  .text = g_content,
+             });
+
+UX_STEP_NOCB(ux_display_signer_address_step,
+             bnnn_paging,
+             {
+                 .title = "signer",
+                 .text = g_signer,
              });
 
 UX_STEP_NOCB(ux_display_address_step,
@@ -351,6 +359,7 @@ UX_FLOW(ux_display_transaction_flow,
         &ux_display_from_address_step,
         &ux_display_to_address_step,
         &ux_display_amount_step,
+        &ux_display_signer_address_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -420,8 +429,6 @@ int ui_bagl_display_transaction_bs_choice() {
         }
     }
 
-    PRINTF("Amount: %s\n", g_amount);
-
     memset(g_address, 0, sizeof(g_address));
 
     if (script_hash_to_address(g_address,
@@ -436,6 +443,10 @@ int ui_bagl_display_transaction_bs_choice() {
                                    sizeof(g_fromAddr),
                                    G_context.tx_info.tx_info.payload.from) == -1) {
             return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    }
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
     }
 
     g_validate_callback = &ui_action_validate_transaction;
@@ -454,6 +465,7 @@ UX_FLOW(ux_display_approve_transaction_flow,
         &ux_display_from_address_step,
         &ux_display_to_address_step,
         &ux_display_amount_step,
+        &ux_display_signer_address_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -530,6 +542,10 @@ int ui_bagl_display_approve_transaction_bs_choice() {
                                    G_context.tx_info.tx_info.payload.from) == -1) {
             return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
 
     g_validate_callback = &ui_action_validate_approve_transaction;
     ux_flow_init(0, ux_display_approve_transaction_flow, NULL);
@@ -546,6 +562,7 @@ UX_FLOW(ux_display_transaction_from_flow,
         &ux_display_from_address_step,
         &ux_display_to_address_step,
         &ux_display_amount_step,
+        &ux_display_signer_address_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -636,6 +653,11 @@ int ui_display_transaction_from_bs_choice() {
             return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
 
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
+
     g_validate_callback = &ui_action_validate_transaction;
     ux_flow_init(0, ux_display_transaction_from_flow, NULL);
     return 0;
@@ -649,6 +671,7 @@ int ui_display_transaction_from() {
 UX_FLOW(ux_display_blind_signed_transaction_flow,
         &ux_display_review_step,
         &ux_display_review_blind_signed_step,
+        &ux_display_signer_address_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -658,10 +681,15 @@ int ui_bagl_display_blind_transaction_bs_choice() {
         return io_send_sw(SW_BAD_STATE);
     }
 
+    memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+    memcpy(g_peerPubkey, BLIND_SIGN_TX_MSG, sizeof(BLIND_SIGN_TX_MSG));
+
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
     g_validate_callback = &ui_action_validate_transaction;
-        memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-        memcpy(g_peerPubkey, BLIND_SIGN_TX_MSG, sizeof(BLIND_SIGN_TX_MSG));
-        ux_flow_init(0, ux_display_blind_signed_transaction_flow, NULL);
+    ux_flow_init(0, ux_display_blind_signed_transaction_flow, NULL);
 
     return 0;
 }
@@ -679,6 +707,7 @@ int ui_display_blind_signed_transaction() {
 UX_FLOW(ux_display_person_msg_flow,
         &ux_display_review_step,
         &ux_display_person_msg_step,
+        &ux_display_signer_address_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -692,6 +721,12 @@ int ui_display_bagl_person_msg_bs_choice() {
            G_context.person_msg_info.msg_info.person_msg,
            sizeof(g_address)-1);
     g_address[G_context.person_msg_info.raw_msg_len + 1] = '\0';
+
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
+
     g_validate_callback = &ui_action_validate_person_msg;
     ux_flow_init(0, ux_display_person_msg_flow, NULL);
     return 0;
@@ -714,6 +749,7 @@ UX_FLOW(ux_display_oep4_transaction_flow,
         &ux_display_to_address_step,
         &ux_display_decimals_step,
         &ux_display_amount_step,
+        &ux_display_signer_address_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -767,7 +803,6 @@ int ui_bagl_display_oep4_transaction_bs_choice() {
                 clear128(&values);
             }
         }
-    PRINTF("Amount: %s\n", g_amount);
 
     memset(g_fromAddr, 0, sizeof(g_fromAddr));
 
@@ -783,6 +818,11 @@ int ui_bagl_display_oep4_transaction_bs_choice() {
                                sizeof(g_address),
                                G_context.tx_info.oep4_tx_info.payload.to) == -1){
         return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    }
+
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
     }
 
     g_validate_callback = &ui_action_validate_oep4_transaction;
@@ -802,6 +842,7 @@ UX_FLOW(ux_display_register_candidate_transaction_flow,
         &ux_display_address_step,
         &ux_display_init_pos_step,
         &ux_display_key_no_step,
+        &ux_display_signer_address_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -836,7 +877,10 @@ int ui_bagl_display_register_candidate_tx_bs_choice() {
                         G_context.tx_info.register_candidate_tx_info.key_no)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
-
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
     g_validate_callback = &ui_action_validate_register_candidate_transaction;
     ux_flow_init(0, ux_display_register_candidate_transaction_flow, NULL);
     return 0;
@@ -853,6 +897,7 @@ UX_FLOW(ux_display_withdraw_transaction_flow,
         &ux_display_address_step,
         &ux_display_peer_pubkey_step,
         &ux_display_with_draw_step,
+        &ux_display_signer_address_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -888,6 +933,11 @@ int ui_bagl_display_withdraw_tx_bs_choice() {
             }
     }
 
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
+
     g_validate_callback = &ui_action_validate_withdraw_transaction;
 
     ux_flow_init(0, ux_display_withdraw_transaction_flow, NULL);
@@ -904,6 +954,7 @@ UX_FLOW(ux_display_quit_node_transaction_flow,
         &ux_display_review_step,
         &ux_display_peer_pubkey_step,
         &ux_display_address_step,
+        &ux_display_signer_address_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -923,6 +974,10 @@ int ui_bagl_display_quit_node_tx_bs_choice() {
             return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
 
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
     g_validate_callback = &ui_action_validate_quit_node_transaction;
     ux_flow_init(0, ux_display_quit_node_transaction_flow, NULL);
     return 0;
@@ -939,6 +994,7 @@ UX_FLOW(ux_display_add_init_pos_transaction_flow,
         &ux_display_peer_pubkey_step,
         &ux_display_address_step,
         &ux_display_pos_step,
+        &ux_display_signer_address_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -963,6 +1019,10 @@ int ui_bagl_display_add_init_pos_tx_bs_choice() {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
 
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
 
     g_validate_callback = &ui_action_validate_add_init_pos_transaction;
     ux_flow_init(0, ux_display_add_init_pos_transaction_flow, NULL);
@@ -980,6 +1040,7 @@ UX_FLOW(ux_display_reduce_init_pos_transaction_flow,
         &ux_display_peer_pubkey_step,
         &ux_display_address_step,
         &ux_display_pos_step,
+        &ux_display_signer_address_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -1003,6 +1064,10 @@ int ui_bagl_display_reduce_init_pos_tx_bs_choice() {
     if (!format_u64(g_content2, sizeof(g_content2), G_context.tx_info.reduce_init_pos_tx_info.pos)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
     g_validate_callback = &ui_action_validate_reduce_init_pos_transaction;
     ux_flow_init(0, ux_display_reduce_init_pos_transaction_flow, NULL);
     return 0;
@@ -1019,6 +1084,7 @@ UX_FLOW(ux_display_change_max_authorization_transaction_flow,
         &ux_display_peer_pubkey_step,
         &ux_display_address_step,
         &ux_display_max_authorize_step,
+        &ux_display_signer_address_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -1047,8 +1113,12 @@ int ui_display_bagl_change_max_authorization_tx_bs_choice() {
                         G_context.tx_info.change_max_authorization_tx_info.max_authorize)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
-    g_validate_callback = &ui_action_validate_change_max_authorization_transaction;
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
 
+    g_validate_callback = &ui_action_validate_change_max_authorization_transaction;
     ux_flow_init(0, ux_display_change_max_authorization_transaction_flow, NULL);
 
     return 0;
@@ -1066,6 +1136,7 @@ UX_FLOW(ux_display_set_fee_percentage_transaction_flow,
         &ux_display_address_step,
         &ux_display_peer_cost_step,
         &ux_display_stake_cost_step,
+        &ux_display_signer_address_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -1099,6 +1170,10 @@ int ui_display_bagl_set_fee_percentage_tx_bs_choice() {
                     G_context.tx_info.set_fee_percentage_tx_info.stake_cost)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
     g_validate_callback = &ui_action_validate_set_fee_percentage_transaction;
     ux_flow_init(0, ux_display_set_fee_percentage_transaction_flow, NULL);
     return 0;
@@ -1115,6 +1190,7 @@ UX_FLOW(ux_display_authorize_for_peer_transaction_flow,
         &ux_display_address_step,
         &ux_display_peer_pubkey_step,
         &ux_display_pos_list_step,
+        &ux_display_signer_address_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -1140,6 +1216,10 @@ int ui_display_bagl_authorize_for_peer_tx_bs_choice() {
     if (!format_u64(g_content, sizeof(g_content), value)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
     g_validate_callback = &ui_action_validate_authorize_for_peer_transaction;
     ux_flow_init(0, ux_display_authorize_for_peer_transaction_flow, NULL);
     return 0;
@@ -1156,6 +1236,7 @@ UX_FLOW(ux_display_un_authorize_for_peer_transaction_flow,
         &ux_display_address_step,
         &ux_display_peer_pubkey_step,
         &ux_display_pos_list_step,
+        &ux_display_signer_address_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -1190,6 +1271,10 @@ int ui_display_bagl_un_authorize_for_peer_tx_bs_choice() {
                 return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
             }
     }
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
     g_validate_callback = &ui_action_validate_un_authorize_for_peer_transaction;
     ux_flow_init(0, ux_display_un_authorize_for_peer_transaction_flow, NULL);
     return 0;
@@ -1204,6 +1289,7 @@ int ui_display_un_authorize_for_peer_tx() {
 UX_FLOW(ux_display_withdraw_ong_transaction_flow,
         &ux_display_review_step,
         &ux_display_account_step,
+        &ux_display_signer_address_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -1221,6 +1307,10 @@ int ui_display_bagl_withdraw_ong_tx_bs_choice() {
                                G_context.tx_info.withdraw_fee_tx_info.account) == -1) {
             return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
     g_validate_callback = &ui_action_validate_withdraw_ong_transaction;
     ux_flow_init(0, ux_display_withdraw_ong_transaction_flow, NULL);
     return 0;
@@ -1235,6 +1325,7 @@ int ui_display_withdraw_ong_tx() {
 UX_FLOW(ux_display_withdraw_fee_transaction_flow,
         &ux_display_review_step,
         &ux_display_account_step,
+        &ux_display_signer_address_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
@@ -1250,8 +1341,12 @@ int ui_display_bagl_withdraw_fee_tx_bs_choice() {
                                    G_context.tx_info.withdraw_fee_tx_info.account) == -1) {
             return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
-    g_validate_callback = &ui_action_validate_withdraw_fee_transaction;
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
 
+    g_validate_callback = &ui_action_validate_withdraw_fee_transaction;
     ux_flow_init(0, ux_display_withdraw_fee_transaction_flow, NULL);
     return 0;
 }
