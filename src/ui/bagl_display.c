@@ -919,20 +919,18 @@ int ui_bagl_display_withdraw_tx_bs_choice() {
     memcpy(g_peerPubkey, G_context.tx_info.withdraw_tx_info.peer_pubkey, 66);
 
     memset(g_content, 0, sizeof(g_content));
-    if (G_context.tx_info.withdraw_tx_info.withdraw_list_len < 81) {
-            uint64_t value = getValueByLen(G_context.tx_info.withdraw_tx_info.withdraw_list,
-                                           G_context.tx_info.withdraw_tx_info.withdraw_list_len);
-            if (!format_u64(g_content, sizeof(g_content), value)) {
-                return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-            }
+    memset(g_content,0,sizeof(g_content));
+    if (G_context.tx_info.withdraw_tx_info.withdraw_value >= 81) {
+       if (!format_u64(g_content, sizeof(g_content), G_context.tx_info.withdraw_tx_info.withdraw_value-80)) {
+            return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+        }
     } else {
-            if (!format_u64(g_content,
-                            sizeof(g_content),
-                            G_context.tx_info.withdraw_tx_info.withdraw_list_len - 80)) {
-                return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-            }
+       int64_t value = getValueByLen(G_context.tx_info.withdraw_tx_info.withdraw_list,
+                                       G_context.tx_info.withdraw_tx_info.withdraw_value);
+        if (!format_u64(g_content, sizeof(g_content), value)) {
+            return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+        }
     }
-
     memset(g_signer, 0, sizeof(g_signer));
     if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
         return io_send_sw(SW_DISPLAY_SIGNER_FAIL);

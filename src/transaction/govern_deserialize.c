@@ -269,8 +269,9 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
             return VALUE_PARSING_ERROR;
         }
         if (withdraw_len_opcode >= 81) {
-            tx->withdraw_value = withdraw_len_opcode - 80;
+            tx->withdraw_value = withdraw_len_opcode;
         } else {
+            tx->withdraw_value =  withdraw_len_opcode;
             tx->withdraw_list = (uint8_t *) (buf->ptr + buf->offset);
             if (!buffer_seek_cur(buf,withdraw_len_opcode)) {
                 return FROM_PARSING_ERROR;

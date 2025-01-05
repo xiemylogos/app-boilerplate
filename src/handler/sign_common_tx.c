@@ -77,14 +77,26 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
             uint8_t version;
             uint8_t tx_type;
             if(!buffer_read_u8(&buf,&version)) {
-                return VERSION_PARSING_ERROR;
+                if (!N_storage.blind_signed_allowed) {
+                    return io_send_sw(SW_TX_PARSING_FAIL);
+                } else {
+                    return VERSION_PARSING_ERROR;
+                }
             }
             if(version != 0x00) {
-                return VERSION_PARSING_ERROR;
+                if (!N_storage.blind_signed_allowed) {
+                    return io_send_sw(SW_TX_PARSING_FAIL);
+                } else {
+                    return VERSION_PARSING_ERROR;
+                }
             }
             //txType
             if(!buffer_read_u8(&buf,&tx_type)) {
-                return TXTYPE_PARSING_ERROR;
+                if (!N_storage.blind_signed_allowed) {
+                    return io_send_sw(SW_TX_PARSING_FAIL);
+                } else {
+                    return TXTYPE_PARSING_ERROR;
+                }
             }
             parser_status_e status = PARSING_OK;
             //parse transaction

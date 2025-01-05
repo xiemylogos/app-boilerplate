@@ -177,20 +177,20 @@ static uint8_t withdrawTagValuePairs(void) {
     nbPairs++;
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.tx_info.withdraw_tx_info.peer_pubkey, G_context.tx_info.withdraw_tx_info.peer_pubkey_length*66);
+    memcpy(g_peerPubkey, G_context.tx_info.withdraw_tx_info.peer_pubkey,66);
     pairs[nbPairs].item = "peerPubkey";
     pairs[nbPairs].value = g_peerPubkey;
     nbPairs++;
 
     memset(g_withdrawList,0,sizeof(g_withdrawList));
-    if (G_context.tx_info.withdraw_tx_info.withdraw_list_len < 81) {
-        uint64_t value = getValueByLen(G_context.tx_info.withdraw_tx_info.withdraw_list,
-                                       G_context.tx_info.withdraw_tx_info.withdraw_list_len);
-        if (!format_u64(g_withdrawList, sizeof(g_withdrawList), value)) {
+    if (G_context.tx_info.withdraw_tx_info.withdraw_value >= 81) {
+       if (!format_u64(g_withdrawList, sizeof(g_withdrawList), G_context.tx_info.withdraw_tx_info.withdraw_value-80)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
         }
     } else {
-         if (!format_u64(g_withdrawList,sizeof(g_withdrawList),G_context.tx_info.withdraw_tx_info.withdraw_list_len-80)) {
+       int64_t value = getValueByLen(G_context.tx_info.withdraw_tx_info.withdraw_list,
+                                       G_context.tx_info.withdraw_tx_info.withdraw_value);
+        if (!format_u64(g_withdrawList, sizeof(g_withdrawList), value)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
         }
     }
