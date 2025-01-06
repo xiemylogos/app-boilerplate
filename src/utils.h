@@ -15,7 +15,6 @@
 
 #define assert_string_equal(actual, expected) assert(strcmp(actual, expected) == 0)
 
-#define assert_pubkey_equal(actual, expected) assert(memcmp(actual, expected, 32) == 0)
 
 int script_hash_to_address(char* out, size_t out_len, const unsigned char* script_hash);
 

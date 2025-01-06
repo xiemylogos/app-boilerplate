@@ -33,12 +33,6 @@ parser_status_e personal_msg_deserialize(buffer_t *buf, personal_msg_info *info)
     if (buf->size > MAX_PERSON_MSG_LEN) {
         return WRONG_LENGTH_ERROR;
     }
-    // length of person msg
-   /*
-    if (!buffer_read_varint(buf, &info->person_msg_len) && info->person_msg_len > MAX_PERSON_MSG_LEN) {
-        return WRONG_LENGTH_ERROR;
-    }
-*/
     // person msg
     info->person_msg = (uint8_t *) (buf->ptr + buf->offset);
 

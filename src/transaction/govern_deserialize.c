@@ -214,20 +214,22 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
     if (!buffer_read_u8(buf, &op_code_value)) {
         return VALUE_PARSING_ERROR;
     }
-    if (op_code_value == 81) {
+    if (op_code_value >= 81) {
         tx->peer_pubkey_number = op_code_value - 80;
         if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
             return VALUE_PARSING_ERROR;
         }
-        if (!buffer_read_u8(buf, &tx->peer_pubkey_length)) {
-            return VALUE_PARSING_ERROR;
-        }
-        tx->peer_pubkey = (uint8_t*)(buf->ptr+buf->offset);
-        if (!buffer_seek_cur(buf,tx->peer_pubkey_length)) {
-            return FROM_PARSING_ERROR;
-        }
-        if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
-            return VALUE_PARSING_ERROR;
+        for(int i=0;i<tx->peer_pubkey_number;i++) {
+            if (!buffer_read_u8(buf, &tx->peer_pubkey_length)) {
+                return VALUE_PARSING_ERROR;
+            }
+            tx->peer_pubkey = (uint8_t *) (buf->ptr + buf->offset);
+            if (!buffer_seek_cur(buf, tx->peer_pubkey_length)) {
+                return FROM_PARSING_ERROR;
+            }
+            if (getBytesValueByLen(buf, 3) != 13139050) {  // 6a7cc8
+                return VALUE_PARSING_ERROR;
+            }
         }
         if (!buffer_read_u8(buf, &tx->withdraw_number)) {
             return VALUE_PARSING_ERROR;
@@ -241,16 +243,23 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
         if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
             return VALUE_PARSING_ERROR;
         }
-        if (!buffer_read_u8(buf, &tx->withdraw_list_len)) {
-            return VALUE_PARSING_ERROR;
-        }
-        tx->withdraw_value = 0;
-        if (tx->withdraw_list_len >= 81) {
-            tx->withdraw_value = tx->withdraw_list_len-80;
-        } else {
-            tx->withdraw_list = (uint8_t*)(buf->ptr+buf->offset);
-            if (!buffer_seek_cur(buf, tx->withdraw_list_len)) {
-                return FROM_PARSING_ERROR;
+        for(int j=0;j<tx->withdraw_number;j++) {
+            if (!buffer_read_u8(buf, &tx->withdraw_list_len)) {
+                return VALUE_PARSING_ERROR;
+            }
+            tx->withdraw_value = 0;
+            if (tx->withdraw_list_len >= 81) {
+                tx->withdraw_value = tx->withdraw_list_len - 80;
+            } else {
+                tx->withdraw_list = (uint8_t *) (buf->ptr + buf->offset);
+                if (!buffer_seek_cur(buf, tx->withdraw_list_len)) {
+                    return FROM_PARSING_ERROR;
+                }
+            }
+            if (tx->withdraw_number >1) {
+                if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
+                    return VALUE_PARSING_ERROR;
+                }
             }
         }
     } else {
