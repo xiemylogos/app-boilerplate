@@ -846,7 +846,8 @@ UX_FLOW(ux_display_oep4_approve_flow,
 
 int ui_bagl_display_oep4_approve_bs_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
-        || G_context.tx_type != OEP4_TRANSACTION) {
+        || (G_context.tx_type != NEO_VM_OEP4_APPROVE &&
+            G_context.tx_type != WASM_VM_OEP4_APPROVE)) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }

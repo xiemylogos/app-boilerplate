@@ -77,25 +77,25 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
             uint8_t version;
             uint8_t tx_type;
             if(!buffer_read_u8(&buf,&version)) {
-                if (!N_storage.blind_signed_allowed) {
-                    return io_send_sw(SW_TX_PARSING_FAIL);
+                if (N_storage.blind_signed_allowed) {
+                    return handler_hash_tx_and_display_tx(VERSION_PARSING_ERROR);
                 } else {
-                    return VERSION_PARSING_ERROR;
+                    return io_send_sw(SW_TX_PARSING_FAIL);
                 }
             }
             if(version != 0x00) {
-                if (!N_storage.blind_signed_allowed) {
-                    return io_send_sw(SW_TX_PARSING_FAIL);
+                if (N_storage.blind_signed_allowed) {
+                    return handler_hash_tx_and_display_tx(VERSION_PARSING_ERROR);
                 } else {
-                    return VERSION_PARSING_ERROR;
+                    return io_send_sw(SW_TX_PARSING_FAIL);
                 }
             }
             //txType
             if(!buffer_read_u8(&buf,&tx_type)) {
-                if (!N_storage.blind_signed_allowed) {
-                    return io_send_sw(SW_TX_PARSING_FAIL);
+                if (N_storage.blind_signed_allowed) {
+                    return handler_hash_tx_and_display_tx(TXTYPE_PARSING_ERROR);
                 } else {
-                    return TXTYPE_PARSING_ERROR;
+                    return io_send_sw(SW_TX_PARSING_FAIL);
                 }
             }
             parser_status_e status = PARSING_OK;
@@ -193,81 +193,87 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                     status = oep4_wasm_vm_approve_transaction_deserialize(&buf, &G_context.tx_info.oep4_tx_info);
                     G_context.tx_type = WASM_VM_OEP4_APPROVE;
                     G_context.state = STATE_PARSED;
+                } else {
+                    status = TX_PARSING_ERROR;
                 }
             } else {
                 status = TX_PARSING_ERROR;
             }
+            return handler_hash_tx_and_display_tx(status);
+        }
+    }
+    return 0;
+}
 
-            if (status != PARSING_OK) {
-                if (!N_storage.blind_signed_allowed) {
-                    return io_send_sw(SW_TX_PARSING_FAIL);
-                }
-            }
-            if (cx_sha256_hash(G_context.tx_info.raw_tx,
-                               G_context.tx_info.raw_tx_len,
-                               G_context.tx_info.m_hash) != CX_OK) {
-                return io_send_sw(SW_TX_HASH_FAIL);
-            }
-
-            uint8_t second_hash[32];
-            if (cx_sha256_hash(G_context.tx_info.m_hash, 32, second_hash) != CX_OK) {
-                return io_send_sw(SW_TX_HASH_FAIL);
-            }
-
-            memcpy(G_context.tx_info.m_hash, second_hash, 32);
-
-            if (cx_sha256_hash(G_context.tx_info.m_hash, 32, second_hash) != CX_OK) {
-                return io_send_sw(SW_TX_HASH_FAIL);
-            }
-
-            memcpy(G_context.tx_info.m_hash, second_hash, 32);
-            explicit_bzero(&second_hash, sizeof(second_hash));
-            PRINTF("Hash: %.*H\n", sizeof(G_context.tx_info.m_hash), G_context.tx_info.m_hash);
-            if (status != PARSING_OK) {
-                if (N_storage.blind_signed_allowed) {
-                    return ui_display_blind_signed_transaction();
-                } 
-            } else {
-                if (G_context.tx_type == TRANSFER_V2_TRANSACTION ||
-                    G_context.tx_type == TRANSFER_TRANSACTION) {
-                    return ui_display_transaction();
-                } else if(G_context.tx_type == OEP4_TRANSACTION) {
-                    return ui_display_oep4_transaction();
-                } else if (G_context.tx_type == REGISTER_CANDIDATE) {
-                    return ui_display_register_candidate_tx();
-                } else if (G_context.tx_type == WITHDRAW) {
-                    return ui_display_withdraw_tx();
-                } else if (G_context.tx_type == QUIT_NODE) {
-                    return ui_display_quit_node_tx();
-                } else if (G_context.tx_type == ADD_INIT_POS) {
-                    return ui_display_add_init_pos_tx();
-                } else if (G_context.tx_type == REDUCE_INIT_POS) {
-                    return ui_display_reduce_init_pos_tx();
-                } else if (G_context.tx_type == CHANGE_MAX_AUTHORIZATION) {
-                    return ui_display_change_max_authorization_tx();
-                } else if (G_context.tx_type == SET_FEE_PERCENTAGE) {
-                    return ui_display_set_fee_percentage_tx();
-                } else if (G_context.tx_type == AUTHORIZE_FOR_PEER) {
-                    return ui_display_authorize_for_peer_tx();
-                } else if (G_context.tx_type == UN_AUTHORIZE_FOR_PEER) {
-                    return ui_display_un_authorize_for_peer_tx();
-                } else if (G_context.tx_type == WITHDRAW_ONG) {
-                    return ui_display_withdraw_ong_tx();
-                } else if (G_context.tx_type == WITHDRAW_FEE) {
-                    return ui_display_withdraw_fee_tx();
-                } else if (G_context.tx_type == APPROVE ||
-                           G_context.tx_type == APPROVE_V2) {
-                    return ui_display_approve_tx();
-                } else if (G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION ||
-                           G_context.tx_type == TRANSFER_FROM_TRANSACTION) {
-                   return ui_display_transaction_from();
-                } else if(G_context.tx_type == NEO_VM_OEP4_APPROVE ||
-                           G_context.tx_type == WASM_VM_OEP4_APPROVE) {
-                    return ui_display_oep4_approve_tx();
-                }
-            }
+int handler_hash_tx_and_display_tx(int status) {
+    if (status != PARSING_OK) {
+        if (!N_storage.blind_signed_allowed) {
+            return io_send_sw(SW_TX_PARSING_FAIL);
         }
     }
 
+    if (cx_sha256_hash(G_context.tx_info.raw_tx,
+                       G_context.tx_info.raw_tx_len,
+                       G_context.tx_info.m_hash) != CX_OK) {
+        return io_send_sw(SW_TX_HASH_FAIL);
+    }
+
+    uint8_t second_hash[32];
+    if (cx_sha256_hash(G_context.tx_info.m_hash, 32, second_hash) != CX_OK) {
+        return io_send_sw(SW_TX_HASH_FAIL);
+    }
+
+    memcpy(G_context.tx_info.m_hash, second_hash, 32);
+
+    if (cx_sha256_hash(G_context.tx_info.m_hash, 32, second_hash) != CX_OK) {
+        return io_send_sw(SW_TX_HASH_FAIL);
+    }
+
+    memcpy(G_context.tx_info.m_hash, second_hash, 32);
+    explicit_bzero(&second_hash, sizeof(second_hash));
+    PRINTF("Hash: %.*H\n", sizeof(G_context.tx_info.m_hash), G_context.tx_info.m_hash);
+    if (status != PARSING_OK) {
+        if (N_storage.blind_signed_allowed) {
+            return ui_display_blind_signed_transaction();
+        }
+    } else {
+        if (G_context.tx_type == TRANSFER_V2_TRANSACTION ||
+            G_context.tx_type == TRANSFER_TRANSACTION) {
+            return ui_display_transaction();
+        } else if (G_context.tx_type == OEP4_TRANSACTION) {
+            return ui_display_oep4_transaction();
+        } else if (G_context.tx_type == REGISTER_CANDIDATE) {
+            return ui_display_register_candidate_tx();
+        } else if (G_context.tx_type == WITHDRAW) {
+            return ui_display_withdraw_tx();
+        } else if (G_context.tx_type == QUIT_NODE) {
+            return ui_display_quit_node_tx();
+        } else if (G_context.tx_type == ADD_INIT_POS) {
+            return ui_display_add_init_pos_tx();
+        } else if (G_context.tx_type == REDUCE_INIT_POS) {
+            return ui_display_reduce_init_pos_tx();
+        } else if (G_context.tx_type == CHANGE_MAX_AUTHORIZATION) {
+            return ui_display_change_max_authorization_tx();
+        } else if (G_context.tx_type == SET_FEE_PERCENTAGE) {
+            return ui_display_set_fee_percentage_tx();
+        } else if (G_context.tx_type == AUTHORIZE_FOR_PEER) {
+            return ui_display_authorize_for_peer_tx();
+        } else if (G_context.tx_type == UN_AUTHORIZE_FOR_PEER) {
+            return ui_display_un_authorize_for_peer_tx();
+        } else if (G_context.tx_type == WITHDRAW_ONG) {
+            return ui_display_withdraw_ong_tx();
+        } else if (G_context.tx_type == WITHDRAW_FEE) {
+            return ui_display_withdraw_fee_tx();
+        } else if (G_context.tx_type == APPROVE ||
+                   G_context.tx_type == APPROVE_V2) {
+            return ui_display_approve_tx();
+        } else if (G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION ||
+                   G_context.tx_type == TRANSFER_FROM_TRANSACTION) {
+            return ui_display_transaction_from();
+        } else if (G_context.tx_type == NEO_VM_OEP4_APPROVE ||
+                   G_context.tx_type == WASM_VM_OEP4_APPROVE) {
+            return ui_display_oep4_approve_tx();
+        }
+    }
     return 0;
 }
