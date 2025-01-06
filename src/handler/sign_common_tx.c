@@ -177,13 +177,23 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                     status = oep4_neo_vm_transaction_deserialize(&buf, &G_context.tx_info.oep4_tx_info);
                     G_context.tx_type = OEP4_TRANSACTION;
                     G_context.state = STATE_PARSED;
-                } else {
+                } else if(memcmp(buf.ptr+buf.size - 21-7-1, Approve, 7) == 0){ //neovm oep4
+                    status = oep4_neo_vm_approve_transaction_deserialize(&buf, &G_context.tx_info.oep4_tx_info);
+                    G_context.tx_type = NEO_VM_OEP4_APPROVE;
+                    G_context.state = STATE_PARSED;
+                }else {
                     status = TX_PARSING_ERROR;
                 }
             } else if (tx_type == 0xd2) { //InvokeWasm
-                status = oep4_wasm_vm_transaction_deserialize(&buf, &G_context.tx_info.oep4_tx_info);
-                G_context.tx_type = OEP4_TRANSACTION;
-                G_context.state = STATE_PARSED;
+                if(memcmp(buf.ptr+buf.size-56-8-1,Transfer,8) == 0) {   //wasm oep4
+                    status = oep4_wasm_vm_transaction_deserialize(&buf, &G_context.tx_info.oep4_tx_info);
+                    G_context.tx_type = OEP4_TRANSACTION;
+                    G_context.state = STATE_PARSED;
+                } else if (memcmp(buf.ptr+buf.size-56-7-1,Approve,7) == 0) { //wasm oep4
+                    status = oep4_wasm_vm_approve_transaction_deserialize(&buf, &G_context.tx_info.oep4_tx_info);
+                    G_context.tx_type = WASM_VM_OEP4_APPROVE;
+                    G_context.state = STATE_PARSED;
+                }
             } else {
                 status = TX_PARSING_ERROR;
             }
@@ -251,6 +261,9 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                 } else if (G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION ||
                            G_context.tx_type == TRANSFER_FROM_TRANSACTION) {
                    return ui_display_transaction_from();
+                } else if(G_context.tx_type == NEO_VM_OEP4_APPROVE ||
+                           G_context.tx_type == WASM_VM_OEP4_APPROVE) {
+                    return ui_display_oep4_approve_tx();
                 }
             }
         }

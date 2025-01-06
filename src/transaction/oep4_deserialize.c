@@ -173,10 +173,192 @@ parser_status_e oep4_wasm_vm_transaction_deserialize(buffer_t *buf, ont_transact
     if (pre_code != 2113) { //4108
         return OPCODE_PARSING_ERROR;
     }
-    if(memcmp(buf->ptr+buf->offset, "transfer", 8) != 0) {
+    if(memcmp(buf->ptr+buf->offset, Transfer, 8) != 0) {
         return PARSE_STRING_MATCH_ERROR;
     }
     if (!buffer_seek_cur(buf,8)) {
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    tx->payload.from = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+        return FROM_PARSING_ERROR;
+    }
+    tx->payload.to = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+        return TO_PARSING_ERROR;
+    }
+    if(!buffer_can_read(buf,17)) {
+        return DATA_END_PARSING_ERROR;
+    }
+    if(!buffer_read_u64(buf,&tx->payload.value[0],LE)) {
+        return OPCODE_PARSING_ERROR;
+    }
+    if(!buffer_read_u64(buf,&tx->payload.value[1],LE)) {
+        return OPCODE_PARSING_ERROR;
+    }
+    if (tx->payload.value[1] != 0 ) {
+        tx->payload.value_len = 16;
+    } else {
+        tx->payload.value_len = 8;
+    }
+    uint8_t end_data[] = {
+        0x00
+    };
+    if(memcmp(buf->ptr+buf->offset,end_data, sizeof (end_data)) != 0) {
+        return DATA_END_PARSING_ERROR;
+    }
+    if (!buffer_seek_cur(buf,sizeof (end_data))) {
+        return DATA_END_PARSING_ERROR;
+    }
+    return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
+}
+
+parser_status_e oep4_neo_vm_approve_transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
+    LEDGER_ASSERT(buf != NULL, "NULL buf");
+    LEDGER_ASSERT(tx != NULL, "NULL oep4 tx");
+
+    if (buf->size > MAX_TRANSACTION_LEN) {
+        return WRONG_LENGTH_ERROR;
+    }
+    //nonce
+    if(!buffer_read_u32(buf,&tx->nonce,LE)) {
+        return NONCE_PARSING_ERROR;
+    }
+    //gasPrice
+    if(!buffer_read_u64(buf,&tx->gas_price,LE)) {
+        return GASPRICE_PARSING_ERROR;
+    }
+    //gasLimit
+    if(!buffer_read_u64(buf,&tx->gas_limit,LE)) {
+        return GASLIMIT_PARSING_ERROR;
+    }
+    //payer
+    tx->payer = (uint8_t *) (buf->ptr + buf->offset);
+    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+        return PAYER_PARSING_ERROR;
+    }
+    uint8_t  payload_size;
+    if(!buffer_read_u8(buf,&payload_size)) {
+        return OPCODE_PARSING_ERROR;
+    }
+    if(!buffer_can_read(buf,payload_size)) {
+        return OPCODE_PARSING_ERROR;
+    }
+    if (buf->size - buf->offset != payload_size +1) {
+        return OPCODE_PARSING_ERROR;
+    }
+    //payload
+    if(!buffer_read_u8(buf,&tx->payload.value_len)) {
+        return OPCODE_PARSING_ERROR;
+    }
+    if (tx->payload.value_len >= 81) {
+        tx->payload.value[0] = tx->payload.value_len - 80;
+        tx->payload.value[1] = 0;
+    } else {
+        if (tx->payload.value_len <= 8) {
+            tx->payload.value[0] = getBytesValueByLen(buf, tx->payload.value_len);
+            tx->payload.value[1] = 0;
+        } else {
+            if (!buffer_read_u64(buf, &tx->payload.value[0], LE)) {
+                return OPCODE_PARSING_ERROR;
+            }
+            tx->payload.value[1] = getBytesValueByLen(buf, tx->payload.value_len - 8);
+        }
+    }
+    uint8_t pre_to;
+    if(!buffer_read_u8(buf,&pre_to)) {
+        return VALUE_PARSING_ERROR;
+    }
+    if (pre_to != ADDRESS_LEN) { //14
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    tx->payload.to = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+        return TO_PARSING_ERROR;
+    }
+    uint8_t pre_from;
+    if(!buffer_read_u8(buf,&pre_from)) {
+        return VALUE_PARSING_ERROR;
+    }
+    if (pre_from != ADDRESS_LEN) { //14
+        return BUFFER_OFFSET_MOVE_ERROR;
+    }
+    tx->payload.from = (uint8_t*)(buf->ptr+buf->offset);
+    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+        return FROM_PARSING_ERROR;
+    }
+    //53 c1 07 61 70 70 72 6f 76 65 67
+    uint8_t opcode_data[] = {0x53, 0xC1, 0x07, 0x61, 0x70, 0x70, 0x72, 0x6F, 0x76, 0x65,0x67};
+    if(!buffer_can_read(buf,sizeof(opcode_data))) {
+        return DATA_END_PARSING_ERROR;
+    }
+    if(memcmp(buf->ptr+buf->offset, opcode_data, sizeof(opcode_data)) != 0) {
+        return DATA_END_PARSING_ERROR;
+    }
+    if (!buffer_seek_cur(buf,sizeof (opcode_data))) {
+        return CONTRACT_ADDR_PARSING_ERROR;
+    }
+    tx->payload.contract_addr = (uint8_t *) (buf->ptr + buf->offset);
+    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+        return CONTRACT_ADDR_PARSING_ERROR;
+    }
+    uint8_t end_data[] = {
+        0x00
+    };
+    if(memcmp(buf->ptr+buf->offset,end_data, sizeof (end_data)) != 0) {
+        return DATA_END_PARSING_ERROR;
+    }
+    if (!buffer_seek_cur(buf,sizeof (end_data))) {
+        return DATA_END_PARSING_ERROR;
+    }
+    return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
+}
+
+parser_status_e oep4_wasm_vm_approve_transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
+    LEDGER_ASSERT(buf != NULL, "NULL buf");
+    LEDGER_ASSERT(tx != NULL, "NULL oep4 tx");
+
+    if (buf->size > MAX_TRANSACTION_LEN) {
+        return WRONG_LENGTH_ERROR;
+    }
+    //nonce
+    if(!buffer_read_u32(buf,&tx->nonce,LE)) {
+        return NONCE_PARSING_ERROR;
+    }
+    //gasPrice
+    if(!buffer_read_u64(buf,&tx->gas_price,LE)) {
+        return GASPRICE_PARSING_ERROR;
+    }
+    //gasLimit
+    if(!buffer_read_u64(buf,&tx->gas_limit,LE)) {
+        return GASLIMIT_PARSING_ERROR;
+    }
+    //payer
+    tx->payer = (uint8_t *) (buf->ptr + buf->offset);
+    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+        return PAYER_PARSING_ERROR;
+    }
+    uint8_t  payload_size;
+    if(!buffer_read_u8(buf,&payload_size)) {
+        return OPCODE_PARSING_ERROR;
+    }
+    if(!buffer_can_read(buf,payload_size)) {
+        return OPCODE_PARSING_ERROR;
+    }
+    if (buf->size - buf->offset != payload_size +1) {
+        return OPCODE_PARSING_ERROR;
+    }
+    uint16_t  pre_code;
+    if(!buffer_read_u16(buf,&pre_code,LE)) {
+        return OPCODE_PARSING_ERROR;
+    }
+    if (pre_code != 1856) { //4007
+        return OPCODE_PARSING_ERROR;
+    }
+    if(memcmp(buf->ptr+buf->offset, Approve, 7) != 0) {
+        return PARSE_STRING_MATCH_ERROR;
+    }
+    if (!buffer_seek_cur(buf,7)) {
         return BUFFER_OFFSET_MOVE_ERROR;
     }
     tx->payload.from = (uint8_t*)(buf->ptr+buf->offset);
