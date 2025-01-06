@@ -52,7 +52,7 @@ add_library(apdu_parser SHARED $ENV{BOLOS_SDK}/lib_standard_app/parser.c)
 add_library(transaction_deserialize ../src/transaction/deserialize.c)
 add_library(transaction_serialize ../src/transaction/serialize.c)
 add_library(transaction_utils ../src/transaction/utils.c)
-add_library(person_msg_deserialize ../src/person-msg/deserialize.c)
+add_library(person_msg_deserialize ../src/personal-msg/deserialize.c)
 add_library(oep4_transaction_deserialize ../src/transaction/oep4_deserialize.c)
 
 target_link_libraries(test_tx_parser PUBLIC

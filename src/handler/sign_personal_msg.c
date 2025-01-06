@@ -26,9 +26,9 @@
 #include "../sw.h"
 #include "../globals.h"
 #include "../ui/display.h"
-#include "sign_person_msg.h"
-#include "../person-msg/deserialize.h"
-#include "../person-msg/types.h"
+#include "sign_personal_msg.h"
+#include "../personal-msg/deserialize.h"
+#include "../personal-msg/types.h"
 #include "utils.h"
 
 
@@ -79,15 +79,15 @@ int handler_sign_person_msg(buffer_t *cdata, uint8_t chunk, bool more) {
         if (G_context.req_type != CONFIRM_MESSAGE) {
             return io_send_sw(SW_BAD_STATE);
         }
-        if (G_context.person_msg_info.raw_msg_len + cdata->size > sizeof(G_context.person_msg_info.raw_msg)) {
+        if (G_context.personal_msg_info.raw_msg_len + cdata->size > sizeof(G_context.personal_msg_info.raw_msg)) {
             return io_send_sw(SW_WRONG_PERSON_MSG_LENGTH);
         }
         if (!buffer_move(cdata,
-                         G_context.person_msg_info.raw_msg + G_context.person_msg_info.raw_msg_len,
+                         G_context.personal_msg_info.raw_msg + G_context.personal_msg_info.raw_msg_len,
                          cdata->size)) {
             return io_send_sw(SW_PERSON_MSG_PARSING_FAIL);
         }
-        G_context.person_msg_info.raw_msg_len += cdata->size;
+        G_context.personal_msg_info.raw_msg_len += cdata->size;
         if (more) {
             // more APDUs with transaction part are expected.
             // Send a SW_OK to signal that we have received the chunk
@@ -96,11 +96,11 @@ int handler_sign_person_msg(buffer_t *cdata, uint8_t chunk, bool more) {
         } else {
             // last APDU for this transaction, let's parse, display and request a sign confirmation
 
-            buffer_t buf = {.ptr = G_context.person_msg_info.raw_msg,
-                .size = G_context.person_msg_info.raw_msg_len,
+            buffer_t buf = {.ptr = G_context.personal_msg_info.raw_msg,
+                .size = G_context.personal_msg_info.raw_msg_len,
                 .offset = 0};
 
-            parser_status_e status = person_msg_deserialize(&buf, &G_context.person_msg_info.msg_info);
+            parser_status_e status = personal_msg_deserialize(&buf, &G_context.personal_msg_info.msg_info);
             PRINTF("Parsing status: %d.\n", status);
             if (status != PARSING_OK) {
                 return io_send_sw(SW_PERSON_MSG_PARSING_FAIL);
@@ -122,7 +122,7 @@ int handler_sign_person_msg(buffer_t *cdata, uint8_t chunk, bool more) {
             snprintf(strings.tmp.tmp2,
                      sizeof(strings.tmp.tmp2),
                      "%u",
-                     utf8_strlen(G_context.person_msg_info.raw_msg));
+                     utf8_strlen(G_context.personal_msg_info.raw_msg));
 
             CX_CHECK(cx_hash_no_throw((cx_hash_t *) &global_sha256,
                                       0,
@@ -132,8 +132,8 @@ int handler_sign_person_msg(buffer_t *cdata, uint8_t chunk, bool more) {
                                       0));
             CX_CHECK(cx_hash_no_throw((cx_hash_t *) &global_sha256,
                                       0,
-                                      G_context.person_msg_info.raw_msg,
-                                      G_context.person_msg_info.raw_msg_len,
+                                      G_context.personal_msg_info.raw_msg,
+                                      G_context.personal_msg_info.raw_msg_len,
                                       NULL,
                                       0));
 
@@ -141,11 +141,11 @@ int handler_sign_person_msg(buffer_t *cdata, uint8_t chunk, bool more) {
                                       CX_LAST,
                                       NULL,
                                       0,
-                                      G_context.person_msg_info.m_hash,
+                                      G_context.personal_msg_info.m_hash,
                                       32));
 
-            PRINTF("Hash: %.*H\n", sizeof(G_context.person_msg_info.m_hash), G_context.person_msg_info.m_hash);
-            return ui_display_person_msg();
+            PRINTF("Hash: %.*H\n", sizeof(G_context.personal_msg_info.m_hash), G_context.personal_msg_info.m_hash);
+            return ui_display_personal_msg();
         end:
             return io_send_sw(error);
         }

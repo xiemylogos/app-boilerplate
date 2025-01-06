@@ -31,7 +31,7 @@
 #include "../handler/get_app_name.h"
 #include "../handler/get_public_key.h"
 #include "../handler/sign_common_tx.h"
-#include "../handler/sign_person_msg.h"
+#include "../handler/sign_personal_msg.h"
 
 int apdu_dispatcher(const command_t *cmd) {
     LEDGER_ASSERT(cmd != NULL, "NULL cmd");

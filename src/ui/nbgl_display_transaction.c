@@ -148,7 +148,7 @@ static uint8_t setTagValuePairs(void) {
     //fee
     memset(g_fee, 0, sizeof(g_fee));
     format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.tx_info.gas_price*G_context.tx_info.tx_info.gas_limit,9);
-    pairs[nbPairs].item = "Fee:Ong";
+    pairs[nbPairs].item = "Fee:ONG";
     pairs[nbPairs].value = g_fee;
     nbPairs++;
     //gasPrice
@@ -344,7 +344,7 @@ static uint8_t setTagApproveValuePairs(void) {
     //fee
     memset(g_fee, 0, sizeof(g_fee));
     format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.tx_info.gas_price*G_context.tx_info.tx_info.gas_limit,9);
-    pairs[nbPairs].item = "Fee:Ong";
+    pairs[nbPairs].item = "Fee:ONG";
     pairs[nbPairs].value = g_fee;
     nbPairs++;
     //gasPrice
@@ -510,7 +510,7 @@ static uint8_t setTagFromValuePairs(void) {
     //fee
     memset(g_fee, 0, sizeof(g_fee));
     format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.from_tx_info.gas_price*G_context.tx_info.from_tx_info.gas_limit,9);
-    pairs[nbPairs].item = "Fee:Ong";
+    pairs[nbPairs].item = "Fee:ONG";
     pairs[nbPairs].value = g_fee;
     nbPairs++;
     //gasPrice

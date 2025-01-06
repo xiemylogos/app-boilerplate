@@ -241,7 +241,7 @@ static void test_person_msg(void **state) {
     };
     buffer_t buf = {.ptr = raw__person_msg, .size = sizeof(raw__person_msg), .offset = 0};
     assert_int_equal(buf.size,14);
-    person_msg_info info;
+    personal_msg_info info;
     parser_status_e status = person_msg_deserialize(&buf, &info);
     assert_int_equal(status, PARSING_OK);
 }

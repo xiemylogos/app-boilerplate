@@ -53,7 +53,7 @@ static void person_msg_review_choice(bool confirm) {
 // Public function to start the person msg review
 // - Check if the app is in the right state for person msg review
 // - Display the first screen of the person msg review
-int ui_display_person_msg_bs_choice() {
+int ui_display_personal_msg_bs_choice() {
     if (G_context.req_type != CONFIRM_MESSAGE || G_context.state != STATE_PARSED) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
@@ -64,18 +64,18 @@ int ui_display_person_msg_bs_choice() {
     size_t offset = 0;
     memcpy(g_msg+offset,SIGN_MAGIC,sizeof(SIGN_MAGIC));
     offset += sizeof(SIGN_MAGIC);
-    size_t len = utf8_strlen(G_context.person_msg_info.raw_msg);
+    size_t len = utf8_strlen(G_context.personal_msg_info.raw_msg);
     memcpy(g_msg+offset, &len, sizeof(size_t));
     offset += sizeof(size_t);
 
-    if (G_context.person_msg_info.raw_msg_len >= 1024) {
-            memcpy(g_msg+offset, G_context.person_msg_info.msg_info.person_msg, 1023);
+    if (G_context.personal_msg_info.raw_msg_len >= 1024) {
+            memcpy(g_msg+offset, G_context.personal_msg_info.msg_info.person_msg, 1023);
             g_msg[1023] = '\0';
     } else {
         memcpy(g_msg+offset,
-               G_context.person_msg_info.msg_info.person_msg,
-               G_context.person_msg_info.raw_msg_len);
-               g_msg[G_context.person_msg_info.raw_msg_len + 1] = '\0';
+               G_context.personal_msg_info.msg_info.person_msg,
+               G_context.personal_msg_info.raw_msg_len);
+               g_msg[G_context.personal_msg_info.raw_msg_len + 1] = '\0';
     }
     // Setup data to display
     pairs[0].item = "msg content:";
@@ -98,8 +98,8 @@ int ui_display_person_msg_bs_choice() {
 
 
 // Flow used to display a clear-signed person msg
-int ui_display_person_msg() {
-    return ui_display_person_msg_bs_choice();
+int ui_display_personal_msg() {
+    return ui_display_personal_msg_bs_choice();
 }
 
 #endif

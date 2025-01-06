@@ -7,7 +7,7 @@
 
 #include "constants.h"
 #include "transaction/types.h"
-#include "person-msg/types.h"
+#include "personal-msg/types.h"
 
 typedef enum {
     PARSING_OK = 1,
@@ -34,7 +34,7 @@ typedef enum {
     OPCODE_PARSING_ERROR = -21,
     VALUE_LEN_PARSING_ERROR = -22,
     DATA_END_PARSING_ERROR = -23,
-    TX_PARSING_ERROR = 24
+    TX_PARSING_ERROR = -24
 } parser_status_e;
 
 /**
@@ -125,12 +125,12 @@ typedef struct {
 typedef struct {
     uint8_t raw_msg[MAX_PERSON_MSG_LEN];  /// raw transaction serialized
     size_t raw_msg_len;
-    person_msg_info  msg_info;
+    personal_msg_info  msg_info;
     uint8_t m_hash[32];                   /// message hash digest
     uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
     uint8_t signature_len;                /// length of transaction signature
     uint8_t v;
-} person_msg_ctx_t;
+} personal_msg_ctx_t;
 
 typedef struct {
     uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
@@ -260,7 +260,7 @@ typedef struct {
     union {
         pubkey_ctx_t pk_info;                 /// public key context
         transaction_ctx_t tx_info;            /// transaction context
-        person_msg_ctx_t person_msg_info;     /// person msg context
+        personal_msg_ctx_t personal_msg_info; /// personal msg context
     };
     tx_type_e tx_type;
     request_type_e req_type;                  /// user request

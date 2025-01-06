@@ -9,4 +9,4 @@ static const char SIGN_MAGIC[] =
 
 typedef struct {
     uint8_t  *person_msg;       /// person_msg (variable length)
-} person_msg_info;
+} personal_msg_info;

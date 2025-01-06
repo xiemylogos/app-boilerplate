@@ -29,7 +29,7 @@ int ui_display_transaction(void);
  * @return 0 if success, negative integer otherwise.
  *
  */
-int ui_display_person_msg(void);
+int ui_display_personal_msg(void);
 
 
 /**

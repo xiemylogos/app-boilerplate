@@ -718,9 +718,9 @@ int ui_display_bagl_person_msg_bs_choice() {
     }
     memset(g_address, 0, sizeof(g_address));
     memcpy(g_address,
-           G_context.person_msg_info.msg_info.person_msg,
+           G_context.personal_msg_info.msg_info.person_msg,
            sizeof(g_address)-1);
-    g_address[G_context.person_msg_info.raw_msg_len + 1] = '\0';
+    g_address[G_context.personal_msg_info.raw_msg_len + 1] = '\0';
 
     memset(g_signer, 0, sizeof(g_signer));
     if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
@@ -732,7 +732,7 @@ int ui_display_bagl_person_msg_bs_choice() {
     return 0;
 }
 
-int ui_display_person_msg() {
+int ui_display_personal_msg() {
     return ui_display_bagl_person_msg_bs_choice();
 }
 

@@ -17,7 +17,7 @@
  * @return PARSING_OK if success, error status otherwise.
  *
  */
-parser_status_e person_msg_deserialize(buffer_t *buf, person_msg_info *info);
+parser_status_e personal_msg_deserialize(buffer_t *buf, personal_msg_info *info);
 
 
 

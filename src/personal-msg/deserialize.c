@@ -27,9 +27,9 @@
 #include "ledger_assert.h"
 #endif
 
-parser_status_e person_msg_deserialize(buffer_t *buf, person_msg_info *info) {
+parser_status_e personal_msg_deserialize(buffer_t *buf, personal_msg_info *info) {
     LEDGER_ASSERT(buf != NULL, "NULL buf");
-    LEDGER_ASSERT(info != NULL, "NULL person msg");
+    LEDGER_ASSERT(info != NULL, "NULL personal msg");
     if (buf->size > MAX_PERSON_MSG_LEN) {
         return WRONG_LENGTH_ERROR;
     }
