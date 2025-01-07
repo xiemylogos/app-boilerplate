@@ -181,6 +181,10 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                     status = oep4_neo_vm_approve_transaction_deserialize(&buf, &G_context.tx_info.oep4_tx_info);
                     G_context.tx_type = NEO_VM_OEP4_APPROVE;
                     G_context.state = STATE_PARSED;
+                }else if (memcmp(buf.ptr+buf.size - 21-12-1, TransferFrom, 12) == 0){ //neovm oep4
+                    status = oep4_neo_vm_transfer_from_transaction_deserialize(&buf, &G_context.tx_info.oep4_tx_info);
+                    G_context.tx_type = NEO_VM_OEP4_TRANSFER_FROM;
+                    G_context.state = STATE_PARSED;
                 }else {
                     status = TX_PARSING_ERROR;
                 }
@@ -193,7 +197,11 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                     status = oep4_wasm_vm_approve_transaction_deserialize(&buf, &G_context.tx_info.oep4_tx_info);
                     G_context.tx_type = WASM_VM_OEP4_APPROVE;
                     G_context.state = STATE_PARSED;
-                } else {
+                } else if(memcmp(buf.ptr+buf.size-56-12-1,Transfer,12) == 0){
+                    status = oep4_wasm_vm_transfer_from_transaction_deserialize(&buf, &G_context.tx_info.oep4_tx_info);
+                    G_context.tx_type = WASM_VM_OEP4_TRANSFER_FROM;
+                    G_context.state = STATE_PARSED;
+                }else {
                     status = TX_PARSING_ERROR;
                 }
             } else {
@@ -273,6 +281,9 @@ int handler_hash_tx_and_display_tx(int status) {
         } else if (G_context.tx_type == NEO_VM_OEP4_APPROVE ||
                    G_context.tx_type == WASM_VM_OEP4_APPROVE) {
             return ui_display_oep4_approve_tx();
+        } else if(G_context.tx_type == NEO_VM_OEP4_TRANSFER_FROM ||
+                   G_context.tx_type == WASM_VM_OEP4_TRANSFER_FROM) {
+            return ui_display_oep4_transfer_from_tx();
         }
     }
     return 0;

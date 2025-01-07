@@ -50,8 +50,9 @@ static char g_fromAddr[40];
 static char g_toAddr[40];
 static char g_decimals[20];
 static char g_signer[40];
+static char g_sender[40];
 
-#define OEP4_MAX_PAIRS        8
+#define OEP4_MAX_PAIRS        9
 
 static nbgl_layoutTagValue_t pairs[OEP4_MAX_PAIRS];
 static nbgl_layoutTagValueList_t pairsList;
@@ -131,7 +132,7 @@ static uint8_t setTagValuePairs(void) {
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
-    pairs[nbPairs].item = "From";
+    pairs[nbPairs].item = "from";
     pairs[nbPairs].value = g_fromAddr;
     nbPairs++;
      //toAddr
@@ -341,5 +342,146 @@ int ui_display_oep4_approve_tx() {
     return ui_display_oep4_approve_transaction_bs_choice();
 }
 
+static uint8_t setTagTransferFromValuePairs(void) {
+    uint8_t nbPairs = 0;
+    explicit_bzero(pairs, sizeof(pairs));
 
+    uint8_t decimals = 1;
+    bool know_decimals = false;
+   if (memcmp(G_context.tx_info.oep4_from_tx_info.payload.contract_addr,WTK_ADDR,20) == 0) {
+       decimals = 9;
+       know_decimals = true;
+    } else if (memcmp(G_context.tx_info.oep4_from_tx_info.payload.contract_addr,MYT_ADDR,20) == 0 ) {
+        decimals = 18;
+        know_decimals = true;
+    } else if (memcmp(G_context.tx_info.oep4_from_tx_info.payload.contract_addr,WING_ADDR,20) == 0 ) {
+        decimals = 9;
+        know_decimals = true;
+    }
+    pairs[nbPairs].item = "decimals";
+    memset(g_decimals, 0, sizeof(g_decimals));
+    if (know_decimals) {
+        if (!format_u64(g_decimals, sizeof(g_decimals), decimals)) {
+            return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+        }
+        pairs[nbPairs].value = g_decimals;
+    } else {
+        pairs[nbPairs].value = "decimals unknown";
+    }
+    nbPairs++;
+
+
+    memset(g_amount, 0, sizeof(g_amount));
+    if (G_context.tx_info.oep4_from_tx_info.payload.value_len >= 81) {
+           format_fpu64_trimmed(g_amount,
+                                     sizeof(g_amount),
+                                     G_context.tx_info.oep4_from_tx_info.payload.value[0],
+                                     decimals);
+        } else {
+            if (G_context.tx_info.oep4_from_tx_info.payload.value_len <= 8) {
+                format_fpu64_trimmed(g_amount,
+                                     sizeof(g_amount),
+                                     G_context.tx_info.oep4_from_tx_info.payload.value[0],
+                                     decimals);
+            } else {
+                char amount[41];
+                uint128_t values;
+                values.elements[0] = G_context.tx_info.oep4_from_tx_info.payload.value[1];
+                values.elements[1] = G_context.tx_info.oep4_from_tx_info.payload.value[0];
+                tostring128(&values, 10, amount, sizeof(amount));
+                process_precision(amount, decimals, g_amount, sizeof(g_amount));
+                explicit_bzero(&amount, sizeof(amount));
+                clear128(&values);
+            }
+        }
+
+    pairs[nbPairs].item = "amount";
+    pairs[nbPairs].value = g_amount;
+    nbPairs++;
+
+    //sender
+     memset(g_sender, 0, sizeof(g_sender));
+    if (script_hash_to_address(g_sender,sizeof(g_sender),G_context.tx_info.oep4_from_tx_info.payload.from) ==
+        -1) {
+           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+        }
+    pairs[nbPairs].item = "sender";
+    pairs[nbPairs].value = g_fromAddr;
+    nbPairs++;
+    //fromAddr
+    memset(g_fromAddr, 0, sizeof(g_fromAddr));
+    if (script_hash_to_address(g_fromAddr,sizeof(g_fromAddr),G_context.tx_info.oep4_from_tx_info.payload.from) ==
+        -1) {
+           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+        }
+    pairs[nbPairs].item = "from";
+    pairs[nbPairs].value = g_fromAddr;
+    nbPairs++;
+     //toAddr
+    memset(g_toAddr, 0, sizeof(g_toAddr));
+    if (script_hash_to_address(g_toAddr,sizeof(g_toAddr),G_context.tx_info.oep4_from_tx_info.payload.to) ==
+        -1) {
+           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+        }
+    pairs[nbPairs].item = "to";
+    pairs[nbPairs].value = g_toAddr;
+    nbPairs++;
+    //fee
+    memset(g_fee, 0, sizeof(g_fee));
+    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.oep4_from_tx_info.gas_price*G_context.tx_info.oep4_from_tx_info.gas_limit,9);
+    pairs[nbPairs].item = "Fee:ONG";
+    pairs[nbPairs].value = g_fee;
+    nbPairs++;
+    //gasPrice
+    memset(g_gasPrice, 0, sizeof(g_gasPrice));
+    if (!format_u64(g_gasPrice,sizeof(g_gasPrice),G_context.tx_info.oep4_from_tx_info.gas_price)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    }
+    pairs[nbPairs].item = "gasPrice";
+    pairs[nbPairs].value = g_gasPrice;
+    nbPairs++;
+    //gasLimit
+    memset(g_gasLimit, 0, sizeof(g_gasLimit));
+    if (!format_u64(g_gasLimit,sizeof(g_gasLimit),G_context.tx_info.oep4_from_tx_info.gas_limit)) {
+        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+    }
+    pairs[nbPairs].item = "gasLimit";
+    pairs[nbPairs].value = g_gasLimit;
+    nbPairs++;
+
+    memset(g_signer, 0, sizeof(g_signer));
+    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
+        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
+    }
+    pairs[nbPairs].item = "signer";
+    pairs[nbPairs].value = g_signer;
+    nbPairs++;
+
+    return nbPairs;
+}
+
+int ui_display_oep4_transfer_from_transaction_bs_choice() {
+    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
+        || (G_context.tx_type != NEO_VM_OEP4_TRANSFER_FROM &&
+            G_context.tx_type != WASM_VM_OEP4_TRANSFER_FROM)) {
+        G_context.state = STATE_NONE;
+        return io_send_sw(SW_BAD_STATE);
+    }
+
+    explicit_bzero(&pairsList, sizeof(pairsList));
+    pairsList.nbPairs = setTagTransferFromValuePairs();
+    pairsList.pairs = pairs;
+    nbgl_useCaseReview(TYPE_TRANSACTION,
+                           &pairsList,
+                           &C_icon_ont_64px,
+                           "Review transaction from\nto send token",
+                           NULL,
+                           "Sign transaction from \nto send token",
+                           oep4_tx_review_choice);
+    return 0;
+}
+
+int ui_display_oep4_transfer_from_tx() {
+    return ui_display_oep4_transfer_from_transaction_bs_choice();
+}
 #endif

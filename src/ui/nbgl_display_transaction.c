@@ -556,17 +556,17 @@ int ui_display_transaction_from_bs_choice() {
           nbgl_useCaseReview(TYPE_TRANSACTION,
                               &pairsList,
                               &C_icon_ont_64px,
-                              "Review transaction\nto send ONT",
+                              "Review transaction from\nto send ONT",
                               NULL,
-                              "Sign transaction\nto send ONT",
+                              "Sign transaction from\nto send ONT",
                               tx_review_choice);
    } else if (memcmp(G_context.tx_info.from_tx_info.payload.contract_addr,ONG_ADDR,20) == 0) {
           nbgl_useCaseReview(TYPE_TRANSACTION,
                               &pairsList,
                               &C_icon_ont_64px,
-                              "Review transaction\nto send ONG",
+                              "Review transaction from\nto send ONG",
                               NULL,
-                              "Sign transaction\nto send ONG",
+                              "Sign transaction from\nto send ONG",
                               tx_review_choice);
    }
     return 0;

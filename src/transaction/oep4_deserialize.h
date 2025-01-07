@@ -16,10 +16,17 @@
  * @return PARSING_OK if success, error status otherwise.
  *
  */
-parser_status_e oep4_wasm_vm_transaction_deserialize(buffer_t *buf, ont_transaction_t *tx);
 
 parser_status_e oep4_neo_vm_transaction_deserialize(buffer_t *buf, ont_transaction_t *tx);
+
+parser_status_e oep4_wasm_vm_transaction_deserialize(buffer_t *buf, ont_transaction_t *tx);
+
 
 parser_status_e oep4_neo_vm_approve_transaction_deserialize(buffer_t *buf, ont_transaction_t *tx);
 
 parser_status_e oep4_wasm_vm_approve_transaction_deserialize(buffer_t *buf, ont_transaction_t *tx);
+
+
+parser_status_e oep4_neo_vm_transfer_from_transaction_deserialize(buffer_t *buf, ont_transaction_from_t *tx);
+
+parser_status_e oep4_wasm_vm_transfer_from_transaction_deserialize(buffer_t *buf, ont_transaction_from_t *tx);

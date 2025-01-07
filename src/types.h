@@ -85,7 +85,9 @@ typedef enum {
     TRANSFER_FROM_V2_TRANSACTION,///confirm transfer from v2
     APPROVE_V2,                  ///confirm approve v2
     NEO_VM_OEP4_APPROVE,        ///confirm oep4 neo vm approve
-    WASM_VM_OEP4_APPROVE        ///confirm oep4 wasm vm approve
+    WASM_VM_OEP4_APPROVE,        ///confirm oep4 wasm vm approve
+    NEO_VM_OEP4_TRANSFER_FROM,   ///confirm oep4 neo vm transfer from
+    WASM_VM_OEP4_TRANSFER_FROM   ///confirm oep4 wasm vm transfer from
 } tx_type_e;
 
 /**
@@ -106,6 +108,7 @@ typedef struct {
         ont_transaction_t tx_info;
         ont_transaction_from_t  from_tx_info;
         ont_transaction_t oep4_tx_info;  ///oep4 transaction context
+        ont_transaction_from_t  oep4_from_tx_info;
         register_candidate_t register_candidate_tx_info; ///registerCandidate transaction context
         withdraw_t  withdraw_tx_info;                    ///withdraw transaction context
         quit_node_t  quit_node_tx_info;                  ///quitNode transaction context

@@ -70,3 +70,5 @@ int ui_display_approve_tx(void);
 int ui_display_transaction_from(void);
 
 int ui_display_oep4_approve_tx(void);
+
+int ui_display_oep4_transfer_from_tx(void);
