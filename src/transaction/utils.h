@@ -4,6 +4,8 @@
 #include <stdbool.h>  // bool
 #include "buffer.h"
 #include "types.h"
+#include "../types.h"
+
 
 /**
  * Check if memo is encoded using ASCII characters.
@@ -42,3 +44,5 @@ bool transaction_utils_format_memo(const uint8_t *memo,
 uint64_t getBytesValueByLen(buffer_t *buf,uint8_t len);
 
 uint64_t getValueByLen(uint8_t *value,uint8_t len);
+
+parser_status_e transaction_deserialize_header(buffer_t *buf,transaction_header_t *tx);

@@ -36,12 +36,13 @@
 #define  ApproveV2       "approveV2"
 
 typedef struct {
-    uint64_t nonce;     /// nonce (8 bytes)
-    uint64_t value;     /// amount value (8 bytes)
-    uint8_t *to;        /// pointer to address (20 bytes)
-    uint8_t *memo;      /// memo (variable length)
-    uint64_t memo_len;  /// length of memo (8 bytes)
-} transaction_t;
+    uint8_t version;
+    uint8_t tx_type;
+    uint32_t nonce;
+    uint64_t gas_price;
+    uint64_t gas_limit;
+    uint8_t *payer;
+}transaction_header_t;
 
 typedef struct {
     uint8_t *sender;
@@ -53,12 +54,7 @@ typedef struct {
 }state_info_from;
 
 typedef struct{
-    uint8_t version;
-    uint8_t tx_type;
-    uint32_t nonce;
-    uint64_t gas_price;
-    uint64_t gas_limit;
-    uint8_t *payer;        /// pointer to address (20 bytes)
+    transaction_header_t header;
     state_info_from payload;
 }ont_transaction_from_t;
 
@@ -71,22 +67,12 @@ typedef struct {
 }state_info_v2;
 
 typedef struct{
-    uint8_t version;
-    uint8_t tx_type;
-    uint32_t nonce;
-    uint64_t gas_price;
-    uint64_t gas_limit;
-    uint8_t *payer;        /// pointer to address (20 bytes)
+    transaction_header_t header;
     state_info_v2 payload;
 }ont_transaction_t;
 
 typedef struct {
-    uint8_t version;
-    uint8_t tx_type;
-    uint32_t nonce;
-    uint64_t gas_price;
-    uint64_t gas_limit;
-    uint8_t *payer;        /// pointer to address (20 bytes)
+    transaction_header_t header;
     uint8_t *peer_pubkey;
     uint8_t *account;
     uint64_t init_pos;
@@ -97,12 +83,7 @@ typedef struct {
 }register_candidate_t;
 
 typedef struct {
-    uint8_t version;
-    uint8_t tx_type;
-    uint32_t nonce;
-    uint64_t gas_price;
-    uint64_t gas_limit;
-    uint8_t *payer;
+    transaction_header_t header;
     uint8_t *account;
     uint8_t peer_pubkey_number;
     uint8_t peer_pubkey_length;
@@ -114,59 +95,34 @@ typedef struct {
 }withdraw_t;
 
 typedef struct {
-    uint8_t version;
-    uint8_t tx_type;
-    uint32_t nonce;
-    uint64_t gas_price;
-    uint64_t gas_limit;
-    uint8_t *payer;
+    transaction_header_t header;
     uint8_t *peer_pubkey;
     uint8_t *account;
 }quit_node_t;
 
 typedef struct {
-    uint8_t version;
-    uint8_t tx_type;
-    uint32_t nonce;
-    uint64_t gas_price;
-    uint64_t gas_limit;
-    uint8_t *payer;
+    transaction_header_t header;
     uint8_t *peer_pubkey;
     uint8_t *account;
     uint64_t pos;
 }add_init_pos_t;
 
 typedef struct {
-    uint8_t version;
-    uint8_t tx_type;
-    uint32_t nonce;
-    uint64_t gas_price;
-    uint64_t gas_limit;
-    uint8_t *payer;
+    transaction_header_t header;
     uint8_t *peer_pubkey;
     uint8_t *account;
     uint64_t pos;
 }reduce_init_pos_t;
 
 typedef struct {
-    uint8_t version;
-    uint8_t tx_type;
-    uint32_t nonce;
-    uint64_t gas_price;
-    uint64_t gas_limit;
-    uint8_t *payer;
+    transaction_header_t header;
     uint8_t *peer_pubkey;
     uint8_t *account;
     uint64_t max_authorize;
 }change_max_authorization_t;
 
 typedef struct {
-    uint8_t version;
-    uint8_t tx_type;
-    uint32_t nonce;
-    uint64_t gas_price;
-    uint64_t gas_limit;
-    uint8_t *payer;
+    transaction_header_t header;
     uint8_t *peer_pubkey;
     uint8_t *account;
     uint64_t peer_cost;
@@ -174,12 +130,7 @@ typedef struct {
 }set_fee_percentage_t;
 
 typedef struct {
-    uint8_t version;
-    uint8_t tx_type;
-    uint32_t nonce;
-    uint64_t gas_price;
-    uint64_t gas_limit;
-    uint8_t *payer;
+    transaction_header_t header;
     uint8_t *account;
     uint64_t peer_pubkey_length;
     uint8_t *peer_pubkey;
@@ -189,12 +140,7 @@ typedef struct {
 }authorize_for_peer_t;
 
 typedef struct {
-    uint8_t version;
-    uint8_t tx_type;
-    uint32_t nonce;
-    uint64_t gas_price;
-    uint64_t gas_limit;
-    uint8_t *payer;
+    transaction_header_t header;
     uint8_t *account;
     uint64_t peer_pubkey_length;
     uint8_t *peer_pubkey;
@@ -204,21 +150,11 @@ typedef struct {
 }un_authorize_for_peer_t;
 
 typedef struct {
-    uint8_t version;
-    uint8_t tx_type;
-    uint32_t nonce;
-    uint64_t gas_price;
-    uint64_t gas_limit;
-    uint8_t *payer;
+    transaction_header_t header;
     uint8_t *account;
 }withdraw_ong_t;
 
 typedef struct {
-    uint8_t version;
-    uint8_t tx_type;
-    uint32_t nonce;
-    uint64_t gas_price;
-    uint64_t gas_limit;
-    uint8_t *payer;
+    transaction_header_t header;
     uint8_t *account;
 }withdraw_fee_t;

@@ -146,13 +146,13 @@ static uint8_t setTagValuePairs(void) {
     nbPairs++;
     //fee
     memset(g_fee, 0, sizeof(g_fee));
-    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.oep4_tx_info.gas_price*G_context.tx_info.oep4_tx_info.gas_limit,9);
+    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.oep4_tx_info.header.gas_price*G_context.tx_info.oep4_tx_info.header.gas_limit,9);
     pairs[nbPairs].item = "Fee:ONG";
     pairs[nbPairs].value = g_fee;
     nbPairs++;
     //gasPrice
     memset(g_gasPrice, 0, sizeof(g_gasPrice));
-    if (!format_u64(g_gasPrice,sizeof(g_gasPrice),G_context.tx_info.oep4_tx_info.gas_price)) {
+    if (!format_u64(g_gasPrice,sizeof(g_gasPrice),G_context.tx_info.oep4_tx_info.header.gas_price)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = "gasPrice";
@@ -160,7 +160,7 @@ static uint8_t setTagValuePairs(void) {
     nbPairs++;
     //gasLimit
     memset(g_gasLimit, 0, sizeof(g_gasLimit));
-    if (!format_u64(g_gasLimit,sizeof(g_gasLimit),G_context.tx_info.oep4_tx_info.gas_limit)) {
+    if (!format_u64(g_gasLimit,sizeof(g_gasLimit),G_context.tx_info.oep4_tx_info.header.gas_limit)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = "gasLimit";
@@ -285,13 +285,13 @@ static uint8_t setTagOep4ApproveValuePairs(void) {
     nbPairs++;
     //fee
     memset(g_fee, 0, sizeof(g_fee));
-    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.oep4_tx_info.gas_price*G_context.tx_info.oep4_tx_info.gas_limit,9);
+    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.oep4_tx_info.header.gas_price*G_context.tx_info.oep4_tx_info.header.gas_limit,9);
     pairs[nbPairs].item = "Fee:ONG";
     pairs[nbPairs].value = g_fee;
     nbPairs++;
     //gasPrice
     memset(g_gasPrice, 0, sizeof(g_gasPrice));
-    if (!format_u64(g_gasPrice,sizeof(g_gasPrice),G_context.tx_info.oep4_tx_info.gas_price)) {
+    if (!format_u64(g_gasPrice,sizeof(g_gasPrice),G_context.tx_info.oep4_tx_info.header.gas_price)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = "gasPrice";
@@ -299,7 +299,7 @@ static uint8_t setTagOep4ApproveValuePairs(void) {
     nbPairs++;
     //gasLimit
     memset(g_gasLimit, 0, sizeof(g_gasLimit));
-    if (!format_u64(g_gasLimit,sizeof(g_gasLimit),G_context.tx_info.oep4_tx_info.gas_limit)) {
+    if (!format_u64(g_gasLimit,sizeof(g_gasLimit),G_context.tx_info.oep4_tx_info.header.gas_limit)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = "gasLimit";
@@ -428,13 +428,13 @@ static uint8_t setTagTransferFromValuePairs(void) {
     nbPairs++;
     //fee
     memset(g_fee, 0, sizeof(g_fee));
-    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.oep4_from_tx_info.gas_price*G_context.tx_info.oep4_from_tx_info.gas_limit,9);
+    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.oep4_from_tx_info.header.gas_price*G_context.tx_info.oep4_from_tx_info.header.gas_limit,9);
     pairs[nbPairs].item = "Fee:ONG";
     pairs[nbPairs].value = g_fee;
     nbPairs++;
     //gasPrice
     memset(g_gasPrice, 0, sizeof(g_gasPrice));
-    if (!format_u64(g_gasPrice,sizeof(g_gasPrice),G_context.tx_info.oep4_from_tx_info.gas_price)) {
+    if (!format_u64(g_gasPrice,sizeof(g_gasPrice),G_context.tx_info.oep4_from_tx_info.header.gas_price)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = "gasPrice";
@@ -442,7 +442,7 @@ static uint8_t setTagTransferFromValuePairs(void) {
     nbPairs++;
     //gasLimit
     memset(g_gasLimit, 0, sizeof(g_gasLimit));
-    if (!format_u64(g_gasLimit,sizeof(g_gasLimit),G_context.tx_info.oep4_from_tx_info.gas_limit)) {
+    if (!format_u64(g_gasLimit,sizeof(g_gasLimit),G_context.tx_info.oep4_from_tx_info.header.gas_limit)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = "gasLimit";

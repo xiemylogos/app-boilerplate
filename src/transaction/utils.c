@@ -76,3 +76,27 @@ uint64_t getValueByLen(uint8_t *value,uint8_t len) {
     }
     return pre_value;
 }
+
+parser_status_e transaction_deserialize_header(buffer_t *buf,transaction_header_t *tx) {
+    if (buf->size > MAX_TRANSACTION_LEN) {
+        return WRONG_LENGTH_ERROR;
+    }
+    //nonce
+    if(!buffer_read_u32(buf,&tx->nonce,LE)) {
+        return NONCE_PARSING_ERROR;
+    }
+    //gasPrice
+    if(!buffer_read_u64(buf,&tx->gas_price,LE)) {
+        return GASPRICE_PARSING_ERROR;
+    }
+    //gasLimit
+    if(!buffer_read_u64(buf,&tx->gas_limit,LE)) {
+        return GASLIMIT_PARSING_ERROR;
+    }
+    //payer
+    tx->payer = (uint8_t *) (buf->ptr + buf->offset);
+    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+        return PAYER_PARSING_ERROR;
+    }
+    return PARSING_OK;
+}

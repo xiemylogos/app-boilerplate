@@ -74,25 +74,9 @@ parser_status_e register_candidate_tx_deserialize(buffer_t *buf, register_candid
     LEDGER_ASSERT(buf != NULL, "NULL buf");
     LEDGER_ASSERT(tx != NULL, "NULL tx");
 
-    if (buf->size > MAX_TRANSACTION_LEN) {
-        return WRONG_LENGTH_ERROR;
-    }
-    //nonce
-    if(!buffer_read_u32(buf,&tx->nonce,LE)) {
-        return NONCE_PARSING_ERROR;
-    }
-    //gasPrice
-    if(!buffer_read_u64(buf,&tx->gas_price,LE)) {
-        return GASPRICE_PARSING_ERROR;
-    }
-    //gasLimit
-    if(!buffer_read_u64(buf,&tx->gas_limit,LE)) {
-        return GASLIMIT_PARSING_ERROR;
-    }
-    //payer
-    tx->payer = (uint8_t *) (buf->ptr + buf->offset);
-    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
-        return PAYER_PARSING_ERROR;
+    parser_status_e status = transaction_deserialize_header(buf,&tx->header);
+    if (status != PARSING_OK) {
+        return status;
     }
     uint8_t op_code_size;
     if (!buffer_read_u8(buf, &op_code_size)) {
@@ -166,25 +150,9 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
     LEDGER_ASSERT(buf != NULL, "NULL buf");
     LEDGER_ASSERT(tx != NULL, "NULL tx");
 
-    if (buf->size > MAX_TRANSACTION_LEN) {
-        return WRONG_LENGTH_ERROR;
-    }
-    //nonce
-    if(!buffer_read_u32(buf,&tx->nonce,LE)) {
-        return NONCE_PARSING_ERROR;
-    }
-    //gasPrice
-    if(!buffer_read_u64(buf,&tx->gas_price,LE)) {
-        return GASPRICE_PARSING_ERROR;
-    }
-    //gasLimit
-    if(!buffer_read_u64(buf,&tx->gas_limit,LE)) {
-        return GASLIMIT_PARSING_ERROR;
-    }
-    //payer
-    tx->payer = (uint8_t *) (buf->ptr + buf->offset);
-    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
-        return PAYER_PARSING_ERROR;
+    parser_status_e  status = transaction_deserialize_header(buf,&tx->header);
+    if (status != PARSING_OK) {
+        return status;
     }
     uint8_t op_code_size;
     if (!buffer_read_u8(buf, &op_code_size)) {
@@ -308,25 +276,9 @@ parser_status_e quit_node_tx_deserialize(buffer_t *buf, quit_node_t *tx) {
     LEDGER_ASSERT(buf != NULL, "NULL buf");
     LEDGER_ASSERT(tx != NULL, "NULL tx");
 
-    if (buf->size > MAX_TRANSACTION_LEN) {
-        return WRONG_LENGTH_ERROR;
-    }
-    //nonce
-    if(!buffer_read_u32(buf,&tx->nonce,LE)) {
-        return NONCE_PARSING_ERROR;
-    }
-    //gasPrice
-    if(!buffer_read_u64(buf,&tx->gas_price,LE)) {
-        return GASPRICE_PARSING_ERROR;
-    }
-    //gasLimit
-    if(!buffer_read_u64(buf,&tx->gas_limit,LE)) {
-        return GASLIMIT_PARSING_ERROR;
-    }
-    //payer
-    tx->payer = (uint8_t *) (buf->ptr + buf->offset);
-    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
-        return PAYER_PARSING_ERROR;
+    parser_status_e status = transaction_deserialize_header(buf,&tx->header);
+    if (status != PARSING_OK) {
+        return status;
     }
     uint8_t op_code_size;
     if (!buffer_read_u8(buf, &op_code_size)) {
@@ -368,25 +320,9 @@ parser_status_e add_init_pos_tx_deserialize(buffer_t *buf, add_init_pos_t *tx) {
     LEDGER_ASSERT(buf != NULL, "NULL buf");
     LEDGER_ASSERT(tx != NULL, "NULL tx");
 
-    if (buf->size > MAX_TRANSACTION_LEN) {
-        return WRONG_LENGTH_ERROR;
-    }
-    // nonce
-    if (!buffer_read_u32(buf, &tx->nonce, LE)) {
-        return NONCE_PARSING_ERROR;
-    }
-    // gasPrice
-    if (!buffer_read_u64(buf, &tx->gas_price, LE)) {
-        return GASPRICE_PARSING_ERROR;
-    }
-    // gasLimit
-    if (!buffer_read_u64(buf, &tx->gas_limit, LE)) {
-        return GASLIMIT_PARSING_ERROR;
-    }
-    // payer
-    tx->payer = (uint8_t *) (buf->ptr + buf->offset);
-    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
-        return PAYER_PARSING_ERROR;
+    parser_status_e status = transaction_deserialize_header(buf,&tx->header);
+    if (status != PARSING_OK) {
+        return status;
     }
     uint8_t op_code_size;
     if (!buffer_read_u8(buf, &op_code_size)) {
@@ -439,25 +375,9 @@ parser_status_e reduce_init_pos_tx_deserialize(buffer_t *buf, reduce_init_pos_t 
     LEDGER_ASSERT(buf != NULL, "NULL buf");
     LEDGER_ASSERT(tx != NULL, "NULL tx");
 
-    if (buf->size > MAX_TRANSACTION_LEN) {
-        return WRONG_LENGTH_ERROR;
-    } 
-    //nonce
-    if(!buffer_read_u32(buf,&tx->nonce,LE)) {
-        return NONCE_PARSING_ERROR;
-    }
-    //gasPrice
-    if(!buffer_read_u64(buf,&tx->gas_price,LE)) {
-        return GASPRICE_PARSING_ERROR;
-    }
-    //gasLimit
-    if(!buffer_read_u64(buf,&tx->gas_limit,LE)) {
-        return GASLIMIT_PARSING_ERROR;
-    }
-    //payer
-    tx->payer = (uint8_t *) (buf->ptr + buf->offset);
-    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
-        return PAYER_PARSING_ERROR;
+    parser_status_e status = transaction_deserialize_header(buf,&tx->header);
+    if (status != PARSING_OK) {
+        return status;
     }
     uint8_t  op_code_size;
     if(!buffer_read_u8(buf,&op_code_size)) {
@@ -511,25 +431,9 @@ parser_status_e  change_max_authorization_tx_deserialize(buffer_t *buf, change_m
     LEDGER_ASSERT(buf != NULL, "NULL buf");
     LEDGER_ASSERT(tx != NULL, "NULL tx");
 
-    if (buf->size > MAX_TRANSACTION_LEN) {
-        return WRONG_LENGTH_ERROR;
-    } 
-    //nonce
-    if(!buffer_read_u32(buf,&tx->nonce,LE)) {
-        return NONCE_PARSING_ERROR;
-    }
-    //gasPrice
-    if(!buffer_read_u64(buf,&tx->gas_price,LE)) {
-        return GASPRICE_PARSING_ERROR;
-    }
-    //gasLimit
-    if(!buffer_read_u64(buf,&tx->gas_limit,LE)) {
-        return GASLIMIT_PARSING_ERROR;
-    }
-    //payer
-    tx->payer = (uint8_t *) (buf->ptr + buf->offset);
-    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
-        return PAYER_PARSING_ERROR;
+    parser_status_e status = transaction_deserialize_header(buf,&tx->header);
+    if (status != PARSING_OK) {
+        return status;
     }
     uint8_t  op_code_size;
     if(!buffer_read_u8(buf,&op_code_size)) {
@@ -583,25 +487,9 @@ parser_status_e  set_fee_percentage_tx_deserialize(buffer_t *buf, set_fee_percen
     LEDGER_ASSERT(buf != NULL, "NULL buf");
     LEDGER_ASSERT(tx != NULL, "NULL tx");
 
-    if (buf->size > MAX_TRANSACTION_LEN) {
-        return WRONG_LENGTH_ERROR;
-    } 
-    //nonce
-    if(!buffer_read_u32(buf,&tx->nonce,LE)) {
-        return NONCE_PARSING_ERROR;
-    }
-    //gasPrice
-    if(!buffer_read_u64(buf,&tx->gas_price,LE)) {
-        return GASPRICE_PARSING_ERROR;
-    }
-    //gasLimit
-    if(!buffer_read_u64(buf,&tx->gas_limit,LE)) {
-        return GASLIMIT_PARSING_ERROR;
-    }
-    //payer
-    tx->payer = (uint8_t *) (buf->ptr + buf->offset);
-    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
-        return PAYER_PARSING_ERROR;
+    parser_status_e status = transaction_deserialize_header(buf,&tx->header);
+    if (status != PARSING_OK) {
+        return status;
     }
     uint8_t  op_code_size;
     if(!buffer_read_u8(buf,&op_code_size)) {
@@ -660,25 +548,9 @@ parser_status_e authorize_for_peer_tx_deserialize(buffer_t *buf, authorize_for_p
     LEDGER_ASSERT(buf != NULL, "NULL buf");
     LEDGER_ASSERT(tx != NULL, "NULL tx");
 
-    if (buf->size > MAX_TRANSACTION_LEN) {
-        return WRONG_LENGTH_ERROR;
-    } 
-    //nonce
-    if(!buffer_read_u32(buf,&tx->nonce,LE)) {
-        return NONCE_PARSING_ERROR;
-    }
-    //gasPrice
-    if(!buffer_read_u64(buf,&tx->gas_price,LE)) {
-        return GASPRICE_PARSING_ERROR;
-    }
-    //gasLimit
-    if(!buffer_read_u64(buf,&tx->gas_limit,LE)) {
-        return GASLIMIT_PARSING_ERROR;
-    }
-    //payer
-    tx->payer = (uint8_t *) (buf->ptr + buf->offset);
-    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
-        return PAYER_PARSING_ERROR;
+    parser_status_e status = transaction_deserialize_header(buf,&tx->header);
+    if (status != PARSING_OK) {
+        return status;
     }
     uint8_t  op_code_size;
     if(!buffer_read_u8(buf,&op_code_size)) {
@@ -751,25 +623,9 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf, un_authorize
     LEDGER_ASSERT(buf != NULL, "NULL buf");
     LEDGER_ASSERT(tx != NULL, "NULL tx");
 
-    if (buf->size > MAX_TRANSACTION_LEN) {
-        return WRONG_LENGTH_ERROR;
-    } 
-    //nonce
-    if(!buffer_read_u32(buf,&tx->nonce,LE)) {
-        return NONCE_PARSING_ERROR;
-    }
-    //gasPrice
-    if(!buffer_read_u64(buf,&tx->gas_price,LE)) {
-        return GASPRICE_PARSING_ERROR;
-    }
-    //gasLimit
-    if(!buffer_read_u64(buf,&tx->gas_limit,LE)) {
-        return GASLIMIT_PARSING_ERROR;
-    }
-    //payer
-    tx->payer = (uint8_t *) (buf->ptr + buf->offset);
-    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
-        return PAYER_PARSING_ERROR;
+    parser_status_e status = transaction_deserialize_header(buf,&tx->header);
+    if (status != PARSING_OK) {
+        return status;
     }
     uint8_t  op_code_size;
     if(!buffer_read_u8(buf,&op_code_size)) {
@@ -841,25 +697,9 @@ parser_status_e withdraw_ong_tx_deserialize(buffer_t *buf, withdraw_ong_t *tx) {
     LEDGER_ASSERT(buf != NULL, "NULL buf");
     LEDGER_ASSERT(tx != NULL, "NULL tx");
 
-    if (buf->size > MAX_TRANSACTION_LEN) {
-        return WRONG_LENGTH_ERROR;
-    }
-    //nonce
-    if(!buffer_read_u32(buf,&tx->nonce,LE)) {
-        return NONCE_PARSING_ERROR;
-    }
-    //gasPrice
-    if(!buffer_read_u64(buf,&tx->gas_price,LE)) {
-        return GASPRICE_PARSING_ERROR;
-    }
-    //gasLimit
-    if(!buffer_read_u64(buf,&tx->gas_limit,LE)) {
-        return GASLIMIT_PARSING_ERROR;
-    }
-    //payer
-    tx->payer = (uint8_t *) (buf->ptr + buf->offset);
-    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
-        return PAYER_PARSING_ERROR;
+    parser_status_e status = transaction_deserialize_header(buf,&tx->header);
+    if (status != PARSING_OK) {
+        return status;
     }
     uint8_t  op_code_size;
     if(!buffer_read_u8(buf,&op_code_size)) {
@@ -889,25 +729,9 @@ parser_status_e withdraw_fee_tx_deserialize(buffer_t *buf, withdraw_fee_t *tx) {
     LEDGER_ASSERT(buf != NULL, "NULL buf");
     LEDGER_ASSERT(tx != NULL, "NULL tx");
 
-    if (buf->size > MAX_TRANSACTION_LEN) {
-        return WRONG_LENGTH_ERROR;
-    }
-    //nonce
-    if(!buffer_read_u32(buf,&tx->nonce,LE)) {
-        return NONCE_PARSING_ERROR;
-    }
-    //gasPrice
-    if(!buffer_read_u64(buf,&tx->gas_price,LE)) {
-        return GASPRICE_PARSING_ERROR;
-    }
-    //gasLimit
-    if(!buffer_read_u64(buf,&tx->gas_limit,LE)) {
-        return GASLIMIT_PARSING_ERROR;
-    }
-    //payer
-    tx->payer = (uint8_t *) (buf->ptr + buf->offset);
-    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
-        return PAYER_PARSING_ERROR;
+    parser_status_e status = transaction_deserialize_header(buf,&tx->header);
+    if (status != PARSING_OK) {
+        return status;
     }
     uint8_t  op_code_size;
     if(!buffer_read_u8(buf,&op_code_size)) {
