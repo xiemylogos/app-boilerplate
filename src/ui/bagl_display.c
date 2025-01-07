@@ -928,7 +928,7 @@ int ui_display_oep4_approve_tx() {
 
 UX_FLOW(ux_display_oep4_transfer_from_flow,
         &ux_display_review_step,
-        ux_display_sender_address_step,
+        &ux_display_sender_address_step,
         &ux_display_from_address_step,
         &ux_display_to_address_step,
         &ux_display_decimals_step,
@@ -937,7 +937,7 @@ UX_FLOW(ux_display_oep4_transfer_from_flow,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
-int ui_bagl_display_oep4_approve_bs_choice() {
+int ui_display_oep4_transfer_from_transaction_bs_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || (G_context.tx_type != NEO_VM_OEP4_TRANSFER_FROM &&
             G_context.tx_type != WASM_VM_OEP4_TRANSFER_FROM)) {
@@ -1023,7 +1023,7 @@ int ui_bagl_display_oep4_approve_bs_choice() {
 
 int ui_display_oep4_transfer_from_tx() {
     return ui_display_oep4_transfer_from_transaction_bs_choice();
-
+}
 
 //registerCandidate
 UX_FLOW(ux_display_register_candidate_transaction_flow,
