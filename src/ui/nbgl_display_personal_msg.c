@@ -34,7 +34,7 @@
 #include "../menu.h"
 #include "utils.h"
 
-static char g_msg[1045];
+static char g_msg[1060];
 
 static nbgl_layoutTagValue_t pairs[1];
 static nbgl_layoutTagValueList_t pairList;
