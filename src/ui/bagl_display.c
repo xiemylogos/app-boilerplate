@@ -771,7 +771,7 @@ int ui_bagl_display_oep4_transaction_bs_choice() {
         return io_send_sw(SW_BAD_STATE);
     }
     memset(g_amount, 0, sizeof(g_amount));
-    uint8_t decimals = 1;
+    uint8_t decimals = 0;
     bool know_decimals = false;
    if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,WTK_ADDR,20) == 0) {
        decimals = 9;
@@ -863,7 +863,7 @@ int ui_bagl_display_oep4_approve_bs_choice() {
         return io_send_sw(SW_BAD_STATE);
     }
     memset(g_amount, 0, sizeof(g_amount));
-    uint8_t decimals = 1;
+    uint8_t decimals = 0;
     bool know_decimals = false;
    if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,WTK_ADDR,20) == 0) {
        decimals = 9;
@@ -956,7 +956,7 @@ int ui_display_oep4_transfer_from_transaction_bs_choice() {
         return io_send_sw(SW_BAD_STATE);
     }
     memset(g_amount, 0, sizeof(g_amount));
-    uint8_t decimals = 1;
+    uint8_t decimals = 0;
     bool know_decimals = false;
    if (memcmp(G_context.tx_info.oep4_from_tx_info.payload.contract_addr,WTK_ADDR,20) == 0) {
        decimals = 9;

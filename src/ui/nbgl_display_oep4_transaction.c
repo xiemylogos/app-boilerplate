@@ -72,7 +72,7 @@ static uint8_t setTagValuePairs(void) {
     uint8_t nbPairs = 0;
     explicit_bzero(pairs, sizeof(pairs));
 
-    uint8_t decimals = 1;
+    uint8_t decimals = 0;
     bool know_decimals = false;
    if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,WTK_ADDR,20) == 0) {
        decimals = 9;
@@ -211,7 +211,7 @@ static uint8_t setTagOep4ApproveValuePairs(void) {
     uint8_t nbPairs = 0;
     explicit_bzero(pairs, sizeof(pairs));
 
-    uint8_t decimals = 1;
+    uint8_t decimals = 0;
     bool know_decimals = false;
    if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,WTK_ADDR,20) == 0) {
        decimals = 9;
@@ -346,7 +346,7 @@ static uint8_t setTagTransferFromValuePairs(void) {
     uint8_t nbPairs = 0;
     explicit_bzero(pairs, sizeof(pairs));
 
-    uint8_t decimals = 1;
+    uint8_t decimals = 0;
     bool know_decimals = false;
    if (memcmp(G_context.tx_info.oep4_from_tx_info.payload.contract_addr,WTK_ADDR,20) == 0) {
        decimals = 9;
