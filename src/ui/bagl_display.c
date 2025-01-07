@@ -243,7 +243,7 @@ UX_STEP_NOCB(ux_display_pos_step,
 UX_STEP_NOCB(ux_display_with_draw_step,
              bnnn_paging,
              {
-                 .title = "withdrawList",
+                 .title = "total withdraw",
                  .text = g_content,
              });
 
@@ -1120,17 +1120,9 @@ int ui_bagl_display_withdraw_tx_bs_choice() {
     memcpy(g_peerPubkey, G_context.tx_info.withdraw_tx_info.peer_pubkey, 66);
 
     memset(g_content, 0, sizeof(g_content));
-   if (G_context.tx_info.withdraw_tx_info.withdraw_value >= 81) {
-       if (!format_u64(g_content, sizeof(g_content), G_context.tx_info.withdraw_tx_info.withdraw_value-80)) {
+     if (!format_u64(g_content, sizeof(g_content), G_context.tx_info.withdraw_tx_info.withdraw_value)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
         }
-    } else {
-       int64_t value = getValueByLen(G_context.tx_info.withdraw_tx_info.withdraw_list,
-                                       G_context.tx_info.withdraw_tx_info.withdraw_value);
-        if (!format_u64(g_content, sizeof(g_content), value)) {
-            return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-        }
-    }
     memset(g_signer, 0, sizeof(g_signer));
     if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
         return io_send_sw(SW_DISPLAY_SIGNER_FAIL);

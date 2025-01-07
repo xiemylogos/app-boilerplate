@@ -271,7 +271,7 @@ static uint8_t setTagOep4ApproveValuePairs(void) {
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
-    pairs[nbPairs].item = "From";
+    pairs[nbPairs].item = "from";
     pairs[nbPairs].value = g_fromAddr;
     nbPairs++;
      //toAddr

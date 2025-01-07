@@ -133,7 +133,7 @@ static uint8_t setTagValuePairs(void) {
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
-    pairs[nbPairs].item = "From";
+    pairs[nbPairs].item = "from";
     pairs[nbPairs].value = g_fromAddr;
     nbPairs++;
      //toAddr
@@ -329,7 +329,7 @@ static uint8_t setTagApproveValuePairs(void) {
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
-    pairs[nbPairs].item = "From";
+    pairs[nbPairs].item = "from";
     pairs[nbPairs].value = g_fromAddr;
     nbPairs++;
      //toAddr
@@ -486,7 +486,7 @@ static uint8_t setTagFromValuePairs(void) {
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
-    pairs[nbPairs].item = "Sender";
+    pairs[nbPairs].item = "sender";
     pairs[nbPairs].value = g_fromAddr;
     nbPairs++;
     //fromAddr
@@ -495,7 +495,7 @@ static uint8_t setTagFromValuePairs(void) {
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
-    pairs[nbPairs].item = "From";
+    pairs[nbPairs].item = "from";
     pairs[nbPairs].value = g_fromAddr;
     nbPairs++;
      //toAddr

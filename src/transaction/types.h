@@ -90,8 +90,7 @@ typedef struct {
     uint8_t *peer_pubkey;
     uint8_t withdraw_number;
     uint8_t withdraw_list_len;
-    uint8_t  withdraw_value;
-    uint8_t *withdraw_list;
+    uint64_t  withdraw_value;
 }withdraw_t;
 
 typedef struct {

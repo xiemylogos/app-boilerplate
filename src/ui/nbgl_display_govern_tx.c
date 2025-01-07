@@ -183,18 +183,10 @@ static uint8_t withdrawTagValuePairs(void) {
     nbPairs++;
 
     memset(g_withdrawList,0,sizeof(g_withdrawList));
-    if (G_context.tx_info.withdraw_tx_info.withdraw_value >= 81) {
-       if (!format_u64(g_withdrawList, sizeof(g_withdrawList), G_context.tx_info.withdraw_tx_info.withdraw_value-80)) {
+     if (!format_u64(g_withdrawList, sizeof(g_withdrawList), G_context.tx_info.withdraw_tx_info.withdraw_value)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
         }
-    } else {
-       int64_t value = getValueByLen(G_context.tx_info.withdraw_tx_info.withdraw_list,
-                                       G_context.tx_info.withdraw_tx_info.withdraw_value);
-        if (!format_u64(g_withdrawList, sizeof(g_withdrawList), value)) {
-            return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-        }
-    }
-    pairs[nbPairs].item = "withdrawList";
+    pairs[nbPairs].item = "total withdraw";
     pairs[nbPairs].value = g_withdrawList;
     nbPairs++;
 

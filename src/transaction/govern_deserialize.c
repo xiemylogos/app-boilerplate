@@ -160,7 +160,16 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
     }
     if (!buffer_can_read(buf, op_code_size)) {
         return DATA_END_PARSING_ERROR;
-    } 
+    }
+    if (op_code_size >= 253) {//fd
+        uint16_t code_size;
+        if (!buffer_read_u16(buf, &code_size,LE)) {
+            return OPCODE_PARSING_ERROR;
+        }
+        if (!buffer_can_read(buf, code_size)) {
+            return DATA_END_PARSING_ERROR;
+        }
+    }
     if(getBytesValueByLen(buf,3) != 7063040) { //00c66b
         return VALUE_PARSING_ERROR;
     }
@@ -211,20 +220,17 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
         if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
             return VALUE_PARSING_ERROR;
         }
+        tx->withdraw_value = 0;
         for(int j=0;j<tx->withdraw_number;j++) {
             if (!buffer_read_u8(buf, &tx->withdraw_list_len)) {
                 return VALUE_PARSING_ERROR;
             }
-            tx->withdraw_value = 0;
             if (tx->withdraw_list_len >= 81) {
-                tx->withdraw_value = tx->withdraw_list_len - 80;
+                tx->withdraw_value += tx->withdraw_list_len - 80;
             } else {
-                tx->withdraw_list = (uint8_t *) (buf->ptr + buf->offset);
-                if (!buffer_seek_cur(buf, tx->withdraw_list_len)) {
-                    return FROM_PARSING_ERROR;
-                }
+                tx->withdraw_value += getBytesValueByLen(buf, tx->withdraw_list_len);
             }
-            if (tx->withdraw_number >1) {
+            if (j+1 < tx->withdraw_number) {
                 if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
                     return VALUE_PARSING_ERROR;
                 }
@@ -244,20 +250,16 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
         if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
             return VALUE_PARSING_ERROR;
         }
-
+        tx->withdraw_value = 0;
         for(int j=0;j<tx->peer_pubkey_number;j++) {
             uint8_t withdraw_len_opcode;
             if (!buffer_read_u8(buf, &withdraw_len_opcode)) {
                 return VALUE_PARSING_ERROR;
             }
-            if (withdraw_len_opcode >= 81) {
-                tx->withdraw_value = withdraw_len_opcode;
+            if (tx->withdraw_list_len >= 81) {
+                tx->withdraw_value += tx->withdraw_list_len - 80;
             } else {
-                tx->withdraw_value =  withdraw_len_opcode;
-                tx->withdraw_list = (uint8_t *) (buf->ptr + buf->offset);
-                if (!buffer_seek_cur(buf,withdraw_len_opcode)) {
-                    return FROM_PARSING_ERROR;
-                }
+                tx->withdraw_value += getBytesValueByLen(buf, tx->withdraw_list_len);
             }
         }
         //0x51 // The number 1 is pushed onto the stack
