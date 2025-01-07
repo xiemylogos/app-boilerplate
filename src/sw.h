@@ -84,7 +84,9 @@
  * Status word for fail of oep4 payload transaction parsing.
  */
 #define SW_OEP4_TX_PAYLOAD_PARSING_FAIL 0xB00E
-
+/**
+ * Status word for display signer failed.
+ */
 #define SW_DISPLAY_SIGNER_FAIL 0xB00F
 
 

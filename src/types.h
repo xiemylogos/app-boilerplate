@@ -45,7 +45,7 @@ typedef enum {
     GET_APP_NAME = 0x04,               /// name of the application
     GET_PUBLIC_KEY = 0x05,             /// public key of corresponding BIP32 path
     SIGN_TX = 0x02,                    /// sign transaction with BIP32 path
-    SIGN_PERSON_MESSAGE = 0x07,        /// sign person message
+    SIGN_PERSONAL_MESSAGE = 0x07,      /// sign personal message
 } command_e;
 /**
  * Enumeration with parsing state.

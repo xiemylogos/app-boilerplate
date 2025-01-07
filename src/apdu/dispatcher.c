@@ -85,7 +85,7 @@ int apdu_dispatcher(const command_t *cmd) {
             buf.offset = 0;
 
             return handler_sign_common_tx(&buf, cmd->p1, (bool) (cmd->p2 & P2_MORE));
-        case SIGN_PERSON_MESSAGE:
+        case SIGN_PERSONAL_MESSAGE:
             if ((cmd->p1 == P1_START && cmd->p2 != P2_MORE) ||  //
                 cmd->p1 > P1_MAX ||                             //
                 (cmd->p2 != P2_LAST && cmd->p2 != P2_MORE)) {
