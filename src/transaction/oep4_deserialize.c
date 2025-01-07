@@ -348,6 +348,10 @@ parser_status_e oep4_wasm_vm_approve_transaction_deserialize(buffer_t *buf, ont_
     if (buf->size - buf->offset != payload_size +1) {
         return OPCODE_PARSING_ERROR;
     }
+    tx->payload.contract_addr = (uint8_t *) (buf->ptr + buf->offset);
+    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
+        return CONTRACT_ADDR_PARSING_ERROR;
+    }
     uint16_t  pre_code;
     if(!buffer_read_u16(buf,&pre_code,LE)) {
         return OPCODE_PARSING_ERROR;
