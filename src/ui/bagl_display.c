@@ -265,7 +265,7 @@ UX_STEP_NOCB(ux_display_key_no_step,
 UX_STEP_NOCB(ux_display_personal_msg_step,
              bnnn_paging,
              {
-                 .title = "personal msg",
+                 .title = "msg",
                  .text = g_peerPubkey,
              });
 

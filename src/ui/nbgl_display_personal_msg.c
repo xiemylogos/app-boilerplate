@@ -75,7 +75,7 @@ int ui_display_personal_msg_bs_choice() {
     }
     g_msg[totalLength-1] = '\0';
 
-    pairs[0].item = "msg content:";
+    pairs[0].item = "msg";
     pairs[0].value = g_msg;
     // Setup list
     pairList.nbMaxLinesForValue = 0;
