@@ -26,8 +26,8 @@ typedef enum {
     PAYLOAD_LEN_PARSING_ERROR = -13,
     PAYLOAD_PARSING_ERROR = -14,
     PARSE_STRING_MATCH_ERROR = -15,
-    PERSON_MESSAGE_LENGTH_ERROR = -16,
-    PERSON_MESSAGE_PARSING_ERROR = -17,
+    PERSONAL_MESSAGE_LENGTH_ERROR = -16,
+    PERSONAL_MESSAGE_PARSING_ERROR = -17,
     FROM_PARSING_ERROR = -18,
     CONTRACT_ADDR_PARSING_ERROR = -19,
     BUFFER_OFFSET_MOVE_ERROR = -20,
@@ -105,10 +105,10 @@ typedef struct {
     uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
     size_t raw_tx_len;                    /// length of raw transaction
     union {
-        ont_transaction_t tx_info;
-        ont_transaction_from_t  from_tx_info;
+        ont_transaction_t tx_info;        ///native transaction context
+        ont_transaction_from_t  from_tx_info; ///native transfer from transaction context
         ont_transaction_t oep4_tx_info;  ///oep4 transaction context
-        ont_transaction_from_t  oep4_from_tx_info;
+        ont_transaction_from_t  oep4_from_tx_info;  ///oep4 transfer from context
         register_candidate_t register_candidate_tx_info; ///registerCandidate transaction context
         withdraw_t  withdraw_tx_info;                    ///withdraw transaction context
         quit_node_t  quit_node_tx_info;                  ///quitNode transaction context
