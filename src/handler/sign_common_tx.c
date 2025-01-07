@@ -182,7 +182,7 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                     G_context.tx_type = NEO_VM_OEP4_APPROVE;
                     G_context.state = STATE_PARSED;
                 }else if (memcmp(buf.ptr+buf.size - 21-12-1, TransferFrom, 12) == 0){ //neovm oep4
-                    status = oep4_neo_vm_transfer_from_transaction_deserialize(&buf, &G_context.tx_info.oep4_tx_info);
+                    status = oep4_neo_vm_transfer_from_transaction_deserialize(&buf, &G_context.tx_info.oep4_from_tx_info);
                     G_context.tx_type = NEO_VM_OEP4_TRANSFER_FROM;
                     G_context.state = STATE_PARSED;
                 }else {
@@ -197,8 +197,8 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                     status = oep4_wasm_vm_approve_transaction_deserialize(&buf, &G_context.tx_info.oep4_tx_info);
                     G_context.tx_type = WASM_VM_OEP4_APPROVE;
                     G_context.state = STATE_PARSED;
-                } else if(memcmp(buf.ptr+buf.size-56-12-1,Transfer,12) == 0){
-                    status = oep4_wasm_vm_transfer_from_transaction_deserialize(&buf, &G_context.tx_info.oep4_tx_info);
+                } else if(memcmp(buf.ptr+buf.size-76-12-1,TransferFrom,12) == 0){ //wasm oep4
+                    status = oep4_wasm_vm_transfer_from_transaction_deserialize(&buf, &G_context.tx_info.oep4_from_tx_info);
                     G_context.tx_type = WASM_VM_OEP4_TRANSFER_FROM;
                     G_context.state = STATE_PARSED;
                 }else {
