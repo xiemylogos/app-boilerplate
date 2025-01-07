@@ -42,8 +42,8 @@ static const char* const INFO_TYPES[SETTING_INFO_NB] = {"Version", "Developer"};
 static const char* const INFO_CONTENTS[SETTING_INFO_NB] = {APPVERSION, "Ledger"};
 
 // settings switches definitions
-enum { DUMMY_SWITCH_1_TOKEN = FIRST_USER_TOKEN, DUMMY_SWITCH_2_TOKEN };
-enum { DUMMY_SWITCH_1_ID = 0, DUMMY_SWITCH_2_ID, SETTINGS_SWITCHES_NB };
+enum { DUMMY_SWITCH_1_TOKEN = FIRST_USER_TOKEN/*, DUMMY_SWITCH_2_TOKEN*/ };
+enum { DUMMY_SWITCH_1_ID = 0, /*DUMMY_SWITCH_2_ID,*/ SETTINGS_SWITCHES_NB };
 
 static nbgl_contentSwitch_t switches[SETTINGS_SWITCHES_NB] = {0};
 
@@ -54,7 +54,7 @@ static const nbgl_contentInfoList_t infoList = {
 };
 
 static uint8_t initSettingPage;
-static void review_warning_choice(bool confirm);
+//static void review_warning_choice(bool confirm);
 static void controls_callback(int token, uint8_t index, int page);
 
 // settings menu definition
@@ -70,6 +70,7 @@ static const nbgl_genericContents_t settingContents = {.callbackCallNeeded = fal
                                                        .nbContents = SETTING_CONTENTS_NB};
 
 // callback for setting warning choice
+/*
 static void review_warning_choice(bool confirm) {
     uint8_t switch_value;
     if (confirm) {
@@ -90,7 +91,7 @@ static void review_warning_choice(bool confirm) {
                                 NULL,
                                 app_quit);
 }
-
+*/
 static void controls_callback(int token, uint8_t index, int page) {
     UNUSED(index);
 
@@ -104,7 +105,7 @@ static void controls_callback(int token, uint8_t index, int page) {
         switches[DUMMY_SWITCH_1_ID].initState = (nbgl_state_t) switch_value;
         // store the new setting value in NVM
         nvm_write((void*) &N_storage.blind_signed_allowed, &switch_value, 1);
-    } else if (token == DUMMY_SWITCH_2_TOKEN) {
+    } /*else if (token == DUMMY_SWITCH_2_TOKEN) {
         // Dummy 2 switch touched
 
         // in this example we display a warning when the user wants
@@ -125,6 +126,7 @@ static void controls_callback(int token, uint8_t index, int page) {
             nvm_write((void*) &N_storage.dummy2_allowed, &switch_value, 1);
         }
     }
+    */
 }
 
 // home page definition
@@ -135,13 +137,13 @@ void ui_menu_main(void) {
     switches[DUMMY_SWITCH_1_ID].subText = "Enables transaction or msg blind signing";
     switches[DUMMY_SWITCH_1_ID].token = DUMMY_SWITCH_1_TOKEN;
     switches[DUMMY_SWITCH_1_ID].tuneId = TUNE_TAP_CASUAL;
-
+    /*
     switches[DUMMY_SWITCH_2_ID].initState = (nbgl_state_t) N_storage.dummy2_allowed;
     switches[DUMMY_SWITCH_2_ID].text = "Dummy 2";
     switches[DUMMY_SWITCH_2_ID].subText = "Allow dummy 2\nin transactions";
     switches[DUMMY_SWITCH_2_ID].token = DUMMY_SWITCH_2_TOKEN;
     switches[DUMMY_SWITCH_2_ID].tuneId = TUNE_TAP_CASUAL;
-
+    */
     nbgl_useCaseHomeAndSettings(APPNAME,
                                 &C_icon_ont_64px,
                                 NULL,

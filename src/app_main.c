@@ -43,7 +43,7 @@ void app_main() {
 
 	io_init();
 
-	ui_menu_main();
+	//ui_menu_main();
 
 	// Reset context
 	explicit_bzero(&G_context, sizeof(G_context));
@@ -52,7 +52,7 @@ void app_main() {
 	if (N_storage.initialized != 0x01) {
 		internal_storage_t storage;
 		storage.blind_signed_allowed = 0x00;
-		storage.dummy2_allowed = 0x00;
+		//storage.dummy2_allowed = 0x00;
 		storage.initialized = 0x01;
 		nvm_write((void *) &N_storage, &storage, sizeof(internal_storage_t));
 	}
