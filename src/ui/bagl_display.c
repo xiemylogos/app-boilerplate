@@ -69,9 +69,9 @@ static void ui_action_validate_approve_transaction(bool choice) {
     ui_menu_main();
 }
 
-// Validate/Invalidate person msg and go back to home
-static void ui_action_validate_person_msg(bool choice) {
-    validate_person_msg(choice);
+// Validate/Invalidate personal msg and go back to home
+static void ui_action_validate_personal_msg(bool choice) {
+    validate_personal_msg(choice);
     ui_menu_main();
 }
 
@@ -262,11 +262,11 @@ UX_STEP_NOCB(ux_display_key_no_step,
                  .text = g_content2,
              });
 
-UX_STEP_NOCB(ux_display_person_msg_step,
+UX_STEP_NOCB(ux_display_personal_msg_step,
              bnnn_paging,
              {
-                 .title = "person msg",
-                 .text = g_address,
+                 .title = "personal msg",
+                 .text = g_peerPubkey,
              });
 
 UX_STEP_NOCB(ux_display_decimals_step,
@@ -698,42 +698,53 @@ int ui_display_blind_signed_transaction() {
     return ui_bagl_display_blind_transaction_bs_choice();
 }
 
-// FLOW to display person msg information:
+// FLOW to display personal msg information:
 // #1 screen : eye icon + "Review Transaction"
 // #2 screen : display amount
 // #3 screen : display destination address
 // #4 screen : approve button
 // #5 screen : reject button
-UX_FLOW(ux_display_person_msg_flow,
+UX_FLOW(ux_display_personal_msg_flow,
         &ux_display_review_step,
-        &ux_display_person_msg_step,
+        &ux_display_personal_msg_step,
         &ux_display_signer_address_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
 
-int ui_display_bagl_person_msg_bs_choice() {
+int ui_display_bagl_personal_msg_bs_choice() {
     if (G_context.req_type != CONFIRM_MESSAGE || G_context.state != STATE_PARSED) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
-    memset(g_address, 0, sizeof(g_address));
-    memcpy(g_address,
-           G_context.personal_msg_info.msg_info.person_msg,
-           sizeof(g_address)-1);
-    g_address[G_context.personal_msg_info.raw_msg_len + 1] = '\0';
+    memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
+    memcpy(g_peerPubkey, SIGN_MAGIC, sizeof(SIGN_MAGIC) - 2);
+    int msglen = utf8_strlen(G_context.personal_msg_info.raw_msg);
+
+    char lengthStr[10];
+    snprintf(lengthStr, sizeof(lengthStr), "%d", msglen);
+    int totalLength = sizeof(SIGN_MAGIC) - 2 + strlen(lengthStr) + G_context.personal_msg_info.raw_msg_len + 1;
+    memcpy(g_peerPubkey + sizeof(SIGN_MAGIC) - 2, lengthStr, strlen(lengthStr));
+
+    for (size_t i=0;i< G_context.personal_msg_info.raw_msg_len;i++) {
+        if((sizeof(SIGN_MAGIC) - 2+strlen(lengthStr) + i) > 64) {
+                break;
+            }
+       g_peerPubkey[sizeof(SIGN_MAGIC) - 2+strlen(lengthStr) + i] = (char)(G_context.personal_msg_info.msg_info.personal_msg[i]);
+    }
+    g_peerPubkey[totalLength-1] = '\0';
 
     memset(g_signer, 0, sizeof(g_signer));
     if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
         return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
     }
 
-    g_validate_callback = &ui_action_validate_person_msg;
-    ux_flow_init(0, ux_display_person_msg_flow, NULL);
+    g_validate_callback = &ui_action_validate_personal_msg;
+    ux_flow_init(0, ux_display_personal_msg_flow, NULL);
     return 0;
 }
 
 int ui_display_personal_msg() {
-    return ui_display_bagl_person_msg_bs_choice();
+    return ui_display_bagl_personal_msg_bs_choice();
 }
 
 

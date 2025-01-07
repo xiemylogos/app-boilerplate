@@ -40,7 +40,7 @@ int helper_tx_send_response_sig(void);
 
 /**
  * Helper to send APDU response with signature and v (parity of
- * y-coordinate of R). for person msg
+ * y-coordinate of R). for personal msg
  *
  * response = G_context.personal_msg_info.signature_len (1) ||
  *            G_context.personal_msg_info.signature (G_context.personal_msg_info.signature_len) ||

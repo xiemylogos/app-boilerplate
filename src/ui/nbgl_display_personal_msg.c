@@ -34,14 +34,14 @@
 #include "../menu.h"
 #include "utils.h"
 
-static char g_msg[1024];
+static char g_msg[1045];
 
 static nbgl_layoutTagValue_t pairs[1];
 static nbgl_layoutTagValueList_t pairList;
 
-static void person_msg_review_choice(bool confirm) {
+static void personal_msg_review_choice(bool confirm) {
     // Answer, display a status page and go back to main
-    validate_person_msg(confirm);
+    validate_personal_msg(confirm);
     if (confirm) {
         nbgl_useCaseReviewStatus(STATUS_TYPE_MESSAGE_SIGNED, ui_menu_main);
     } else {
@@ -50,9 +50,9 @@ static void person_msg_review_choice(bool confirm) {
 }
 
 
-// Public function to start the person msg review
-// - Check if the app is in the right state for person msg review
-// - Display the first screen of the person msg review
+// Public function to start the personal msg review
+// - Check if the app is in the right state for personal msg review
+// - Display the first screen of the personal msg review
 int ui_display_personal_msg_bs_choice() {
     if (G_context.req_type != CONFIRM_MESSAGE || G_context.state != STATE_PARSED) {
         G_context.state = STATE_NONE;
@@ -60,24 +60,21 @@ int ui_display_personal_msg_bs_choice() {
     }
 
     explicit_bzero(pairs, sizeof(pairs));
-    memset(g_msg, 0, sizeof(g_msg));
-    size_t offset = 0;
-    memcpy(g_msg+offset,SIGN_MAGIC,sizeof(SIGN_MAGIC));
-    offset += sizeof(SIGN_MAGIC);
-    size_t len = utf8_strlen(G_context.personal_msg_info.raw_msg);
-    memcpy(g_msg+offset, &len, sizeof(size_t));
-    offset += sizeof(size_t);
 
-    if (G_context.personal_msg_info.raw_msg_len >= 1024) {
-            memcpy(g_msg+offset, G_context.personal_msg_info.msg_info.person_msg, 1023);
-            g_msg[1023] = '\0';
-    } else {
-        memcpy(g_msg+offset,
-               G_context.personal_msg_info.msg_info.person_msg,
-               G_context.personal_msg_info.raw_msg_len);
-               g_msg[G_context.personal_msg_info.raw_msg_len + 1] = '\0';
+    memset(g_msg, 0, sizeof(g_msg));
+    memcpy(g_msg, SIGN_MAGIC, sizeof(SIGN_MAGIC) - 2);
+    int msglen = utf8_strlen(G_context.personal_msg_info.raw_msg);
+
+    char lengthStr[10];
+    snprintf(lengthStr, sizeof(lengthStr), "%d", msglen);
+    int totalLength = sizeof(SIGN_MAGIC) - 2 + strlen(lengthStr) + G_context.personal_msg_info.raw_msg_len + 1;
+    memcpy(g_msg + sizeof(SIGN_MAGIC) - 2, lengthStr, strlen(lengthStr));
+
+    for (size_t i=0;i< G_context.personal_msg_info.raw_msg_len;i++) {
+       g_msg[sizeof(SIGN_MAGIC) - 2+strlen(lengthStr) + i] = (char)(G_context.personal_msg_info.msg_info.personal_msg[i]);
     }
-    // Setup data to display
+    g_msg[totalLength-1] = '\0';
+
     pairs[0].item = "msg content:";
     pairs[0].value = g_msg;
     // Setup list
@@ -92,12 +89,12 @@ int ui_display_personal_msg_bs_choice() {
                            "verify the message",
                            NULL,
                            "Sign the message",
-                           person_msg_review_choice);
+                           personal_msg_review_choice);
     return 0;
 }
 
 
-// Flow used to display a clear-signed person msg
+// Flow used to display a clear-signed personal msg
 int ui_display_personal_msg() {
     return ui_display_personal_msg_bs_choice();
 }

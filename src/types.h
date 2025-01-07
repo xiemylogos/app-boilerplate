@@ -128,7 +128,7 @@ typedef struct {
 } transaction_ctx_t;
 
 typedef struct {
-    uint8_t raw_msg[MAX_PERSON_MSG_LEN];  /// raw transaction serialized
+    uint8_t raw_msg[MAX_PERSONAL_MSG_LEN];  /// raw transaction serialized
     size_t raw_msg_len;
     personal_msg_info  msg_info;
     uint8_t m_hash[32];                   /// message hash digest

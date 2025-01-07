@@ -30,11 +30,11 @@
 parser_status_e personal_msg_deserialize(buffer_t *buf, personal_msg_info *info) {
     LEDGER_ASSERT(buf != NULL, "NULL buf");
     LEDGER_ASSERT(info != NULL, "NULL personal msg");
-    if (buf->size > MAX_PERSON_MSG_LEN) {
+    if (buf->size > MAX_PERSONAL_MSG_LEN) {
         return WRONG_LENGTH_ERROR;
     }
-    // person msg
-    info->person_msg = (uint8_t *) (buf->ptr + buf->offset);
+    // personal msg
+    info->personal_msg = (uint8_t *) (buf->ptr + buf->offset);
 
     if (!buffer_seek_cur(buf, buf->size)) {
         return PERSON_MESSAGE_PARSING_ERROR;

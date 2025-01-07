@@ -74,7 +74,7 @@ def unpack_sign_tx_response(response: bytes) -> Tuple[int, bytes, int]:
 # response = der_sig_len (1)
 #            der_sig (var)
 #            v (1)
-def unpack_sign_person_msg_response(response: bytes) -> Tuple[int, bytes, int]:
+def unpack_sign_personal_msg_response(response: bytes) -> Tuple[int, bytes, int]:
     response, der_sig_len, der_sig = pop_size_prefixed_buf_from_buf(response)
     response, v = pop_sized_buf_from_buffer(response, 1)
 

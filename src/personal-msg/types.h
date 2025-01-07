@@ -8,5 +8,5 @@ static const char SIGN_MAGIC[] =
     "Ontology Signed Message:\n";
 
 typedef struct {
-    uint8_t  *person_msg;       /// person_msg (variable length)
+    uint8_t  *personal_msg;       /// personal_msg (variable length)
 } personal_msg_info;

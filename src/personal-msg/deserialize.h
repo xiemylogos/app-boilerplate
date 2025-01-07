@@ -7,12 +7,12 @@
 
 
 /**
- * Deserialize raw person msg in structure.
+ * Deserialize raw personal msg in structure.
  *
  * @param[in, out] buf
- *   Pointer to buffer with serialized person msg.
- * @param[out]     person msg info
- *   Pointer to person structure.
+ *   Pointer to buffer with serialized personal msg.
+ * @param[out]     personal msg info
+ *   Pointer to personal msg structure.
  *
  * @return PARSING_OK if success, error status otherwise.
  *

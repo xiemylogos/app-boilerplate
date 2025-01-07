@@ -29,7 +29,7 @@ class InsType(IntEnum):
     GET_VERSION = 0x03
     GET_APP_NAME = 0x04
     GET_PUBLIC_KEY = 0x05
-    SIGN_PERSON_MESSAGE = 0x07
+    SIGN_PERSONAL_MESSAGE = 0x07
 
 class Errors(IntEnum):
     SW_DENY                    = 0x6985
@@ -46,9 +46,9 @@ class Errors(IntEnum):
     SW_TX_HASH_FAIL            = 0xB006
     SW_BAD_STATE               = 0xB007
     SW_SIGNATURE_FAIL          = 0xB008
-    SW_PERSON_MSG_PARSING_FAIL = 0xB009
-    SW_PERSON_MSG_HASH_FAIL    = 0xB00A
-    SW_WRONG_PERSON_MSG_LENGTH = 0xB00B
+    SW_PERSONAL_MSG_PARSING_FAIL = 0xB009
+    SW_PERSONAl_MSG_HASH_FAIL    = 0xB00A
+    SW_WRONG_PERSONAL_MSG_LENGTH = 0xB00B
     SW_TX_PAYLOAD_PARSING_FAIL = 0xB00C
     SW_OEP4_TX_PARSING_FAIL    = 0xB00D
     SW_OEP4_TX_PAYLOAD_PARSING_FAIL = 0xB00E
@@ -131,25 +131,25 @@ class BoilerplateCommandSender:
             yield response
 
     @contextmanager
-    def sign_person_msg(self, path: str, personmsg: bytes) -> Generator[None, None, None]:
+    def sign_personal_msg(self, path: str, personalmsg: bytes) -> Generator[None, None, None]:
         self.backend.exchange(cla=CLA,
-                              ins=InsType.SIGN_PERSON_MESSAGE,
+                              ins=InsType.SIGN_PERSONAL_MESSAGE,
                               p1=P1.P1_START,
                               p2=P2.P2_MORE,
                               data=pack_derivation_path(path))
-        messages = split_message(personmsg, MAX_APDU_LEN)
+        messages = split_message(personalmsg, MAX_APDU_LEN)
         idx: int = P1.P1_START + 1
 
         for msg in messages[:-1]:
             self.backend.exchange(cla=CLA,
-                                  ins=InsType.SIGN_PERSON_MESSAGE,
+                                  ins=InsType.SIGN_PERSONAL_MESSAGE,
                                   p1=idx,
                                   p2=P2.P2_MORE,
                                   data=msg)
             idx += 1
 
         with self.backend.exchange_async(cla=CLA,
-                                         ins=InsType.SIGN_PERSON_MESSAGE,
+                                         ins=InsType.SIGN_PERSONAL_MESSAGE,
                                          p1=idx,
                                          p2=P2.P2_LAST,
                                          data=messages[-1]) as response:

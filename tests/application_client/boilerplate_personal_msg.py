@@ -4,27 +4,25 @@ from typing import Union
 from .boilerplate_utils import read, read_uint, read_varint, write_varint, UINT64_MAX
 
 
-class PersonMsgError(Exception):
+class PersonalMsgError(Exception):
     pass
 
 
-class PersonMsg:
+class PersonalMsg:
     def __init__(self,
-                 personmsg: str) -> None:
-        self.personmsg: bytes = personmsg.encode("ascii")
+                 personalmsg: str) -> None:
+        self.personalmsg: bytes = personalmsg.encode("ascii")
 
 
     def serialize(self) -> bytes:
         return b"".join([
-            self.personmsg
+            self.personalmsg
         ])
 
     @classmethod
     def from_bytes(cls, hexa: Union[bytes, BytesIO]):
         buf: BytesIO = BytesIO(hexa) if isinstance(hexa, bytes) else hexa
 
-        #personmsg_len: int = read_varint(buf)
-        #personmsg: str = read(buf, personmsg_len).decode("ascii")
 
-        personmsg: str = read(buf).decode("ascii")
-        return cls(personmsg=personmsg)
+        personalmsg: str = read(buf).decode("ascii")
+        return cls(personalmsg=personalmsg)

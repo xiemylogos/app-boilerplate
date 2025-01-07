@@ -61,7 +61,7 @@ static const char SIGN_MAGIC[] =
 
 */
 
-int handler_sign_person_msg(buffer_t *cdata, uint8_t chunk, bool more) {
+int handler_sign_personal_msg(buffer_t *cdata, uint8_t chunk, bool more) {
     if (chunk == 0) {  // first APDU, parse BIP32 path
         explicit_bzero(&G_context, sizeof(G_context));
         G_context.req_type = CONFIRM_MESSAGE;
@@ -80,12 +80,12 @@ int handler_sign_person_msg(buffer_t *cdata, uint8_t chunk, bool more) {
             return io_send_sw(SW_BAD_STATE);
         }
         if (G_context.personal_msg_info.raw_msg_len + cdata->size > sizeof(G_context.personal_msg_info.raw_msg)) {
-            return io_send_sw(SW_WRONG_PERSON_MSG_LENGTH);
+            return io_send_sw(SW_WRONG_PERSONAL_MSG_LENGTH);
         }
         if (!buffer_move(cdata,
                          G_context.personal_msg_info.raw_msg + G_context.personal_msg_info.raw_msg_len,
                          cdata->size)) {
-            return io_send_sw(SW_PERSON_MSG_PARSING_FAIL);
+            return io_send_sw(SW_PERSONAL_MSG_PARSING_FAIL);
         }
         G_context.personal_msg_info.raw_msg_len += cdata->size;
         if (more) {
@@ -103,7 +103,7 @@ int handler_sign_person_msg(buffer_t *cdata, uint8_t chunk, bool more) {
             parser_status_e status = personal_msg_deserialize(&buf, &G_context.personal_msg_info.msg_info);
             PRINTF("Parsing status: %d.\n", status);
             if (status != PARSING_OK) {
-                return io_send_sw(SW_PERSON_MSG_PARSING_FAIL);
+                return io_send_sw(SW_PERSONAL_MSG_PARSING_FAIL);
             }
 
             G_context.state = STATE_PARSED;

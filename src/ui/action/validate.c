@@ -76,7 +76,7 @@ void validate_transaction(bool choice) {
 }
 
 
-static int crypto_sign_person_message(void) {
+static int crypto_sign_personal_message(void) {
     uint32_t info = 0;
     size_t sig_len = sizeof(G_context.personal_msg_info.signature);
 
@@ -102,11 +102,11 @@ static int crypto_sign_person_message(void) {
     return 0;
 }
 
-void validate_person_msg(bool choice) {
+void validate_personal_msg(bool choice) {
     if (choice) {
         G_context.state = STATE_APPROVED;
 
-        if (crypto_sign_person_message() != 0) {
+        if (crypto_sign_personal_message() != 0) {
             G_context.state = STATE_NONE;
             io_send_sw(SW_SIGNATURE_FAIL);
         } else {

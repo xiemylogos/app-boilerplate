@@ -61,17 +61,17 @@
  */
 #define SW_SIGNATURE_FAIL 0xB008
 /**
- * Status word for fail of person msg parsing.
+ * Status word for fail of personal msg parsing.
  */
-#define SW_PERSON_MSG_PARSING_FAIL 0xB009
+#define SW_PERSONAL_MSG_PARSING_FAIL 0xB009
 /**
- * Status word for fail of person msg hash.
+ * Status word for fail of personal msg hash.
  */
-#define SW_PERSON_MSG_HASH_FAIL 0xB00A
+#define SW_PERSONAL_MSG_HASH_FAIL 0xB00A
 /**
- * Status word for wrong person msg length.
+ * Status word for wrong personal msg length.
  */
-#define SW_WRONG_PERSON_MSG_LENGTH 0xB00B
+#define SW_WRONG_PERSONAL_MSG_LENGTH 0xB00B
 /**
  * Status word for fail of payload transaction parsing.
  */

@@ -96,11 +96,11 @@ The input data is the RLP encoded transaction streamed to the device in 255 byte
 | v                                                    | 1        |
 
 
-### SIGN PERSON MESSAGE
+### SIGN PERSONAL MESSAGE
 
 #### Description
 
-This command signs a person message after having the user validate the message parameters.
+This command signs a personal message after having the user validate the message parameters.
 
 The input data is the RLP encoded transaction streamed to the device in 255 bytes maximum data chunks.
 
@@ -110,8 +110,8 @@ The input data is the RLP encoded transaction streamed to the device in 255 byte
 
 | CLA | INS  | P1                   | P2                               | Lc       | Le       |
 | --- | ---  | ---                  | ---                              | ---      | ---      |
-| 80  | 07   |  00-FF : chunk index | 00 : last person msg data block  | variable | variable |
-|     |      |                      | 80 : subsequent person msg data block |    |          |
+| 80  | 07   |  00-FF : chunk index | 00 : last personal msg data block  | variable | variable |
+|     |      |                      | 80 : subsequent personal msg data block |    |          |
 
 ##### `Input data (first person message data block)`
 
@@ -129,7 +129,7 @@ uint8_t msg_content[] = {'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd'};
 [0x00, 0x00, 0x00, 0x0B] [0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64]
 |      msg length       |                      message content                            |
 ```
-##### `Input data (other person msg data block)`
+##### `Input data (other personal msg data block)`
 
 | Description                                          | Length   |
 | ---                                                  | ---      |
@@ -259,10 +259,10 @@ The following standard Status Words are returned for all APDUs.
 |   B005   | SW_TX_PARSING_FAIL          | Failed to parse raw transaction                       |
 |   B006   | SW_TX_HASH_FAIL	         | Failed to compute hash digest of raw transaction      |
 |   B007   | SW_BAD_STATE                | Security issue with bad state                         |
-|   B008   | SW_SIGNATURE_FAIL           | Signature of data(tx or person msg) failed            |
-|   B009   | SW_PERSON_MSG_PARSING_FAIL  | Failed to parse person msg                            |
-|   B00A   | SW_PERSON_MSG_HASH_FAIL     | Failed to compute hash digest of person msg           |
-|   B00B   | SW_WRONG_PERSON_MSG_LENGTH  | Wrong person msg length                               |
+|   B008   | SW_SIGNATURE_FAIL           | Signature of data(tx or personal msg) failed            |
+|   B009   | SW_PERSONAL_MSG_PARSING_FAIL  | Failed to parse personal msg                            |
+|   B00A   | SW_PERSONAL_MSG_HASH_FAIL     | Failed to compute hash digest of personal msg           |
+|   B00B   | SW_WRONG_PERSONAL_MSG_LENGTH  | Wrong personal msg length                               |
 |   B00C   | SW_TX_PAYLOAD_PARSING_FAIL  | Failed to parse tx payload                            |
 |   B00D   | SW_OEP4_TX_PARSING_FAIL     | Failed to parse oep4 tx                               |
 |   B00E   | SW_OEP4_TX_PAYLOAD_PARSING_FAIL | Failed to parse tx payload                        |

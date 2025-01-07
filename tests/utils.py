@@ -20,7 +20,7 @@ def check_signature_validity(public_key: bytes, signature: bytes, message: bytes
                      sigdecode=sigdecode_der)
 
 
-def checkperson_signature_validity(public_key: bytes, signature: bytes, message: bytes) -> bool:
+def checkpersonal_signature_validity(public_key: bytes, signature: bytes, message: bytes) -> bool:
     pk: VerifyingKey = VerifyingKey.from_string(
         public_key,
         curve=NIST256p,

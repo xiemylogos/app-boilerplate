@@ -6,4 +6,4 @@
 
 #include "buffer.h"
 
-int handler_sign_person_msg(buffer_t *cdata, uint8_t chunk, bool more);
+int handler_sign_personal_msg(buffer_t *cdata, uint8_t chunk, bool more);
