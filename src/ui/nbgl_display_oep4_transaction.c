@@ -182,7 +182,7 @@ static uint8_t setTagValuePairs(void) {
 // - Check if the app is in the right state for oep4 transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the oep4 transaction review
-int ui_display_oep4_transaction_bs_choice() {
+int ui_display_oep4_transaction_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || G_context.tx_type != OEP4_TRANSACTION) {
         G_context.state = STATE_NONE;
@@ -204,7 +204,7 @@ int ui_display_oep4_transaction_bs_choice() {
 
 // Flow used to display a clear-signed transaction
 int ui_display_oep4_transaction() {
-    return ui_display_oep4_transaction_bs_choice();
+    return ui_display_oep4_transaction_choice();
 }
 
 static uint8_t setTagOep4ApproveValuePairs(void) {
@@ -317,7 +317,7 @@ static uint8_t setTagOep4ApproveValuePairs(void) {
     return nbPairs;
 }
 
-int ui_display_oep4_approve_transaction_bs_choice() {
+int ui_display_oep4_approve_transaction_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || (G_context.tx_type != NEO_VM_OEP4_APPROVE &&
             G_context.tx_type != WASM_VM_OEP4_APPROVE)) {
@@ -339,7 +339,7 @@ int ui_display_oep4_approve_transaction_bs_choice() {
 }
 
 int ui_display_oep4_approve_tx() {
-    return ui_display_oep4_approve_transaction_bs_choice();
+    return ui_display_oep4_approve_transaction_choice();
 }
 
 static uint8_t setTagTransferFromValuePairs(void) {
@@ -460,7 +460,7 @@ static uint8_t setTagTransferFromValuePairs(void) {
     return nbPairs;
 }
 
-int ui_display_oep4_transfer_from_transaction_bs_choice() {
+int ui_display_oep4_transfer_from_transaction_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || (G_context.tx_type != NEO_VM_OEP4_TRANSFER_FROM &&
             G_context.tx_type != WASM_VM_OEP4_TRANSFER_FROM)) {
@@ -482,6 +482,6 @@ int ui_display_oep4_transfer_from_transaction_bs_choice() {
 }
 
 int ui_display_oep4_transfer_from_tx() {
-    return ui_display_oep4_transfer_from_transaction_bs_choice();
+    return ui_display_oep4_transfer_from_transaction_choice();
 }
 #endif

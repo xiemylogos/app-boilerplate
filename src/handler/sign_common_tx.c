@@ -142,10 +142,6 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                         status =  un_authorize_for_peer_tx_deserialize(&buf, &G_context.tx_info.un_authorize_for_peer_tx_info);
                         G_context.tx_type = UN_AUTHORIZE_FOR_PEER;
                         G_context.state = STATE_PARSED;
-                    } else if (memcmp(buf.ptr + buf.size-46-11-1,WithdrawOng,11) ==0) {
-                        status =  withdraw_ong_tx_deserialize(&buf, &G_context.tx_info.withdraw_ong_tx_info);
-                        G_context.tx_type = WITHDRAW_ONG;
-                        G_context.state = STATE_PARSED;
                     } else if(memcmp(buf.ptr + buf.size-46-11-1,WithdrawFee,11) == 0) {
                         status = withdraw_fee_tx_deserialize(&buf, &G_context.tx_info.withdraw_fee_tx_info);
                         G_context.tx_type = WITHDRAW_FEE;
@@ -268,8 +264,6 @@ int handler_hash_tx_and_display_tx(int status) {
             return ui_display_authorize_for_peer_tx();
         } else if (G_context.tx_type == UN_AUTHORIZE_FOR_PEER) {
             return ui_display_un_authorize_for_peer_tx();
-        } else if (G_context.tx_type == WITHDRAW_ONG) {
-            return ui_display_withdraw_ong_tx();
         } else if (G_context.tx_type == WITHDRAW_FEE) {
             return ui_display_withdraw_fee_tx();
         } else if (G_context.tx_type == APPROVE ||

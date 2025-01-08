@@ -77,7 +77,6 @@ typedef enum {
     SET_FEE_PERCENTAGE,          ///confirm setFeePercentage
     AUTHORIZE_FOR_PEER,          ///confirm authorizeForPeer
     UN_AUTHORIZE_FOR_PEER,       ///confirm unAuthorizeForPeer
-    WITHDRAW_ONG,                ///confirm withdrawOng
     WITHDRAW_FEE,                ///confirm withdrawFee
     APPROVE,                     ///confirm approve
     TRANSFER_TRANSACTION,        ///confirm transfer
@@ -118,7 +117,6 @@ typedef struct {
         set_fee_percentage_t  set_fee_percentage_tx_info;  ///setFeePercentage transaction context
         authorize_for_peer_t authorize_for_peer_tx_info;   ///authorizeForPeer transaction context
         un_authorize_for_peer_t un_authorize_for_peer_tx_info; ///unAuthorizeForPeer transaction context
-        withdraw_ong_t  withdraw_ong_tx_info;             ///withdrawOng transaction context
         withdraw_fee_t  withdraw_fee_tx_info;             //////withdrawFee transaction context
     };
     uint8_t m_hash[32];                   /// message hash digest
@@ -237,16 +235,6 @@ typedef struct {
     uint8_t signature_len;                /// length of transaction signature
     uint8_t v;
 }un_authorize_for_peer_ctx_t;
-
-typedef struct {
-    uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
-    size_t raw_tx_len;                    /// length of raw transaction
-    withdraw_ong_t transaction;        /// structured transaction
-    uint8_t m_hash[32];                   /// message hash digest
-    uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
-    uint8_t signature_len;                /// length of transaction signature
-    uint8_t v;
-}withdraw_ong_ctx_t;
 
 typedef struct {
     uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized

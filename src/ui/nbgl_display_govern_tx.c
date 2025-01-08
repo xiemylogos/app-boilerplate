@@ -126,7 +126,7 @@ static uint8_t registerCandidateTagValuePairs(void) {
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
-int ui_display_register_candidate_tx_bs_choice() {
+int ui_display_register_candidate_tx_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || G_context.tx_type != REGISTER_CANDIDATE) {
         G_context.state = STATE_NONE;
@@ -148,7 +148,7 @@ int ui_display_register_candidate_tx_bs_choice() {
 
 // Flow used to display a clear-signed transaction
 int ui_display_register_candidate_tx() {
-    return ui_display_register_candidate_tx_bs_choice();
+    return ui_display_register_candidate_tx_choice();
 }
 
 //withdraw
@@ -206,7 +206,7 @@ static uint8_t withdrawTagValuePairs(void) {
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
-int ui_display_withdraw_tx_bs_choice() {
+int ui_display_withdraw_tx_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || G_context.tx_type != WITHDRAW) {
         G_context.state = STATE_NONE;
@@ -229,7 +229,7 @@ int ui_display_withdraw_tx_bs_choice() {
 
 // Flow used to display a clear-signed transaction
 int ui_display_withdraw_tx() {
-    return ui_display_withdraw_tx_bs_choice();
+    return ui_display_withdraw_tx_choice();
 }
 
 
@@ -279,7 +279,7 @@ static uint8_t quitNodeTagValuePairs(void) {
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
-int ui_display_quit_node_tx_bs_choice() {
+int ui_display_quit_node_tx_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || G_context.tx_type != QUIT_NODE) {
         G_context.state = STATE_NONE;
@@ -302,7 +302,7 @@ int ui_display_quit_node_tx_bs_choice() {
 
 // Flow used to display a clear-signed transaction
 int ui_display_quit_node_tx() {
-    return ui_display_quit_node_tx_bs_choice();
+    return ui_display_quit_node_tx_choice();
 }
 
 //addInitPos
@@ -359,7 +359,7 @@ static uint8_t addInitPosTagValuePairs(void) {
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
-int ui_display_add_init_pos_tx_bs_choice() {
+int ui_display_add_init_pos_tx_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || G_context.tx_type != ADD_INIT_POS) {
         G_context.state = STATE_NONE;
@@ -381,7 +381,7 @@ int ui_display_add_init_pos_tx_bs_choice() {
 
 // Flow used to display a clear-signed transaction
 int ui_display_add_init_pos_tx() {
-    return ui_display_add_init_pos_tx_bs_choice();
+    return ui_display_add_init_pos_tx_choice();
 }
 
 //reduceInitPos
@@ -438,7 +438,7 @@ static uint8_t reduceInitPosTagValuePairs(void) {
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
-int ui_display_reduce_init_pos_tx_bs_choice() {
+int ui_display_reduce_init_pos_tx_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || G_context.tx_type != REDUCE_INIT_POS) {
         G_context.state = STATE_NONE;
@@ -459,7 +459,7 @@ int ui_display_reduce_init_pos_tx_bs_choice() {
 
 // Flow used to display a clear-signed transaction
 int ui_display_reduce_init_pos_tx() {
-    return ui_display_reduce_init_pos_tx_bs_choice();
+    return ui_display_reduce_init_pos_tx_choice();
 }
 
 //changeMaxAuthorization
@@ -516,7 +516,7 @@ static uint8_t changeMaxAuthorizationTagValuePairs(void) {
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
-int ui_display_change_max_authorization_tx_bs_choice() {
+int ui_display_change_max_authorization_tx_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || G_context.tx_type != CHANGE_MAX_AUTHORIZATION) {
         G_context.state = STATE_NONE;
@@ -538,7 +538,7 @@ int ui_display_change_max_authorization_tx_bs_choice() {
 
 // Flow used to display a clear-signed transaction
 int ui_display_change_max_authorization_tx() {
-    return ui_display_change_max_authorization_tx_bs_choice();
+    return ui_display_change_max_authorization_tx_choice();
 }
 
 
@@ -604,7 +604,7 @@ static uint8_t setFeePercentageTagValuePairs(void) {
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
-int ui_display_set_fee_percentage_tx_bs_choice() {
+int ui_display_set_fee_percentage_tx_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || G_context.tx_type != SET_FEE_PERCENTAGE) {
         G_context.state = STATE_NONE;
@@ -627,7 +627,7 @@ int ui_display_set_fee_percentage_tx_bs_choice() {
 
 // Flow used to display a clear-signed transaction
 int ui_display_set_fee_percentage_tx() {
-    return ui_display_set_fee_percentage_tx_bs_choice();
+    return ui_display_set_fee_percentage_tx_choice();
 }
 
 
@@ -694,7 +694,7 @@ static uint8_t setAuthorizeForPeerTagValuePairs(void) {
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
-int ui_display_authorize_for_peer_tx_bs_choice() {
+int ui_display_authorize_for_peer_tx_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || G_context.tx_type != AUTHORIZE_FOR_PEER) {
         G_context.state = STATE_NONE;
@@ -716,7 +716,7 @@ int ui_display_authorize_for_peer_tx_bs_choice() {
 
 // Flow used to display a clear-signed transaction
 int ui_display_authorize_for_peer_tx() {
-    return ui_display_authorize_for_peer_tx_bs_choice();
+    return ui_display_authorize_for_peer_tx_choice();
 }
 
 //unAuthorizeForPeer
@@ -781,7 +781,7 @@ static uint8_t setunAuthorizeForPeerTagValuePairs(void) {
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
-int ui_display_un_authorize_for_peer_tx_bs_choice() {
+int ui_display_un_authorize_for_peer_tx_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || G_context.tx_type != UN_AUTHORIZE_FOR_PEER) {
         G_context.state = STATE_NONE;
@@ -803,73 +803,8 @@ int ui_display_un_authorize_for_peer_tx_bs_choice() {
 
 // Flow used to display a clear-signed transaction
 int ui_display_un_authorize_for_peer_tx() {
-    return ui_display_un_authorize_for_peer_tx_bs_choice();
+    return ui_display_un_authorize_for_peer_tx_choice();
 }
-
-//withdrawOng
-// called when long press button on 3rd page is long-touched or when reject footer is touched
-static void withdraw_ong_tx_review_choice(bool confirm) {
-    // Answer, display a status page and go back to main
-    validate_withdraw_ong_transaction(confirm);
-    if (confirm) {
-        nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_SIGNED, ui_menu_main);
-    } else {
-        nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_REJECTED, ui_menu_main);
-    }
-}
-
-static uint8_t setwithdrawOngTagValuePairs(void) {
-    uint8_t nbPairs = 0;
-    explicit_bzero(pairs, sizeof(pairs));
-    //account
-    memset(g_addr, 0, sizeof(g_addr));
-    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.tx_info.withdraw_fee_tx_info.account) ==
-        -1) {
-           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
-        }
-    pairs[nbPairs].item = "account";
-    pairs[nbPairs].value = g_addr;
-    nbPairs++;
-
-    memset(g_signer, 0, sizeof(g_signer));
-    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
-        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
-    }
-    pairs[nbPairs].item = "signer";
-    pairs[nbPairs].value = g_signer;
-    nbPairs++;
-
-    return nbPairs;
-}
-// Public function to start the transaction review
-// - Check if the app is in the right state for transaction review
-// - Format the amount and address strings in g_amount and g_address buffers
-// - Display the first screen of the transaction review
-int ui_display_withdraw_ong_tx_bs_choice() {
-    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
-        || G_context.tx_type != WITHDRAW_ONG) {
-        G_context.state = STATE_NONE;
-        return io_send_sw(SW_BAD_STATE);
-    }
-    explicit_bzero(&pairsList, sizeof(pairsList));
-    pairsList.nbPairs = setwithdrawOngTagValuePairs();
-    pairsList.pairs = pairs;
-    nbgl_useCaseReview(TYPE_TRANSACTION,
-                           &pairsList,
-                           &C_icon_ont_64px,
-                           "Review withdrawOng transaction",
-                           NULL,
-                           "Sign withdrawOng transaction",
-                           withdraw_ong_tx_review_choice);
-
-    return 0;
-}
-
-// Flow used to display a clear-signed transaction
-int ui_display_withdraw_ong_tx() {
-    return ui_display_withdraw_ong_tx_bs_choice();
-}
-
 
 //withdrawFee
 // called when long press button on 3rd page is long-touched or when reject footer is touched
@@ -910,7 +845,7 @@ static uint8_t setwithdrawFeeTagValuePairs(void) {
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
-int ui_display_withdraw_fee_tx_bs_choice() {
+int ui_display_withdraw_fee_tx_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || G_context.tx_type != WITHDRAW_FEE) {
         G_context.state = STATE_NONE;
@@ -932,7 +867,7 @@ int ui_display_withdraw_fee_tx_bs_choice() {
 
 // Flow used to display a clear-signed transaction
 int ui_display_withdraw_fee_tx() {
-    return ui_display_withdraw_fee_tx_bs_choice();
+    return ui_display_withdraw_fee_tx_choice();
 }
 
 #endif

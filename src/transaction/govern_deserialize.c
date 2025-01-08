@@ -695,38 +695,6 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf, un_authorize
 }
 
 
-parser_status_e withdraw_ong_tx_deserialize(buffer_t *buf, withdraw_ong_t *tx) {
-    LEDGER_ASSERT(buf != NULL, "NULL buf");
-    LEDGER_ASSERT(tx != NULL, "NULL tx");
-
-    parser_status_e status = transaction_deserialize_header(buf,&tx->header);
-    if (status != PARSING_OK) {
-        return status;
-    }
-    uint8_t  op_code_size;
-    if(!buffer_read_u8(buf,&op_code_size)) {
-        return OPCODE_PARSING_ERROR;
-    }
-    if(!buffer_can_read(buf,op_code_size)) {
-        return DATA_END_PARSING_ERROR;
-    } 
-    if(getBytesValueByLen(buf,3) != 7063040) { //00c66b
-        return VALUE_PARSING_ERROR;
-    }
-    uint8_t pre_pub;
-    if(!buffer_read_u8(buf,&pre_pub)) {
-        return VALUE_PARSING_ERROR;
-    }
-    if (pre_pub != 20) { //14
-        return BUFFER_OFFSET_MOVE_ERROR;
-    }
-    tx->account = (uint8_t*)(buf->ptr+buf->offset);
-    if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
-        return FROM_PARSING_ERROR;
-    }
-    return check_govern_end_data(buf,WithdrawOng);  
-}
-
 parser_status_e withdraw_fee_tx_deserialize(buffer_t *buf, withdraw_fee_t *tx) {
     LEDGER_ASSERT(buf != NULL, "NULL buf");
     LEDGER_ASSERT(tx != NULL, "NULL tx");

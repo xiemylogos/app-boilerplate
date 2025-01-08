@@ -53,7 +53,7 @@ static void personal_msg_review_choice(bool confirm) {
 // Public function to start the personal msg review
 // - Check if the app is in the right state for personal msg review
 // - Display the first screen of the personal msg review
-int ui_display_personal_msg_bs_choice() {
+int ui_display_personal_msg_choice() {
     if (G_context.req_type != CONFIRM_MESSAGE || G_context.state != STATE_PARSED) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
@@ -96,7 +96,7 @@ int ui_display_personal_msg_bs_choice() {
 
 // Flow used to display a clear-signed personal msg
 int ui_display_personal_msg() {
-    return ui_display_personal_msg_bs_choice();
+    return ui_display_personal_msg_choice();
 }
 
 #endif

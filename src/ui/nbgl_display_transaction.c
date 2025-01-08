@@ -183,7 +183,7 @@ static uint8_t setTagValuePairs(void) {
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
 // - Display the first screen of the transaction review
-int ui_display_transaction_bs_choice() {
+int ui_display_transaction_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || (G_context.tx_type != TRANSFER_V2_TRANSACTION &&
             G_context.tx_type != TRANSFER_TRANSACTION)) {
@@ -216,7 +216,7 @@ int ui_display_transaction_bs_choice() {
 
 // Flow used to display a clear-signed transaction
 int ui_display_transaction() {
-    return ui_display_transaction_bs_choice();
+    return ui_display_transaction_choice();
 }
 
 int ui_display_blind_transaction_bs_choice() {
@@ -375,7 +375,7 @@ static uint8_t setTagApproveValuePairs(void) {
     return nbPairs;
 }
 
-int ui_display_approve_transaction_bs_choice() {
+int ui_display_approve_transaction_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || (G_context.tx_type != APPROVE &&
             G_context.tx_type != APPROVE_V2)) {
@@ -407,7 +407,7 @@ int ui_display_approve_transaction_bs_choice() {
 }
 
 int ui_display_approve_tx() {
-    return ui_display_approve_transaction_bs_choice();
+    return ui_display_approve_transaction_choice();
 }
 
 
@@ -541,7 +541,7 @@ static uint8_t setTagFromValuePairs(void) {
     return nbPairs;
 }
 
-int ui_display_transaction_from_bs_choice() {
+int ui_display_transaction_from_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || (G_context.tx_type != TRANSFER_FROM_V2_TRANSACTION &&
             G_context.tx_type != TRANSFER_FROM_TRANSACTION)) {
@@ -574,7 +574,7 @@ int ui_display_transaction_from_bs_choice() {
 
 
 int ui_display_transaction_from() {
-    return ui_display_transaction_from_bs_choice();
+    return ui_display_transaction_from_choice();
 }
 
 #endif

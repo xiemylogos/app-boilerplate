@@ -37,7 +37,7 @@ parser_status_e personal_msg_deserialize(buffer_t *buf, personal_msg_info *info)
     info->personal_msg = (uint8_t *) (buf->ptr + buf->offset);
 
     if (!buffer_seek_cur(buf, buf->size)) {
-        return PERSON_MESSAGE_PARSING_ERROR;
+        return PERSONAL_MESSAGE_PARSING_ERROR;
     }
 
     return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;

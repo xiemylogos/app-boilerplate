@@ -281,22 +281,6 @@ void validate_un_authorize_for_peer_transaction(bool choice) {
     }
 }
 
-void validate_withdraw_ong_transaction(bool choice) {
-    if (choice) {
-        G_context.state = STATE_APPROVED;
-
-        if (crypto_sign_tx() != 0) {
-            G_context.state = STATE_NONE;
-            io_send_sw(SW_SIGNATURE_FAIL);
-        } else {
-            helper_tx_send_response_sig();
-        }
-    } else {
-        G_context.state = STATE_NONE;
-        io_send_sw(SW_DENY);
-    }
-}
-
 void validate_withdraw_fee_transaction(bool choice) {
     if (choice) {
         G_context.state = STATE_APPROVED;

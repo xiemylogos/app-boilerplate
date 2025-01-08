@@ -31,9 +31,6 @@ parser_status_e authorize_for_peer_tx_deserialize(buffer_t *buf, authorize_for_p
 
 parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf, un_authorize_for_peer_t *tx);
 
-
-parser_status_e withdraw_ong_tx_deserialize(buffer_t *buf, withdraw_ong_t *tx);
-
 parser_status_e withdraw_fee_tx_deserialize(buffer_t *buf, withdraw_fee_t *tx);
 
 parser_status_e check_govern_end_data(buffer_t *buf,const char* param_name);

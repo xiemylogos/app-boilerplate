@@ -28,7 +28,6 @@
 #define  SetFeePercentage "setFeePercentage"
 #define  AuthorizeForPeer "authorizeForPeer"
 #define  UnAuthorizeForPeer "unAuthorizeForPeer"
-#define  WithdrawOng "withdrawOng"
 #define  WithdrawFee "withdrawFee"
 #define  Approve   "approve"
 #define  TransferFromV2  "transferFromV2"
@@ -147,11 +146,6 @@ typedef struct {
     uint8_t  pos_list_len;
     uint8_t *pos_list;
 }un_authorize_for_peer_t;
-
-typedef struct {
-    transaction_header_t header;
-    uint8_t *account;
-}withdraw_ong_t;
 
 typedef struct {
     transaction_header_t header;
