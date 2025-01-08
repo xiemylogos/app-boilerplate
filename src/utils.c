@@ -147,6 +147,10 @@ bool ont_address_from_pubkey(char* out, size_t out_len) {
     if (error != CX_OK) {
         return false;
     }
+    return ont_address_by_pubkey(uncompressed_key,out,out_len);
+}
+
+bool ont_address_by_pubkey(const uint8_t uncompressed_key[static 65],char* out, size_t out_len) {
     uint8_t verification_script[VERIFICATION_SCRIPT_LENGTH] = {0};
     if(!create_signature_redeem_script(uncompressed_key, verification_script,sizeof verification_script)) {
         return false;

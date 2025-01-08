@@ -32,7 +32,6 @@
 #include "constants.h"
 #include "../globals.h"
 #include "../sw.h"
-#include "../address.h"
 #include "action/validate.h"
 #include "../transaction/types.h"
 #include "../menu.h"

@@ -31,7 +31,6 @@
 #include "constants.h"
 #include "../globals.h"
 #include "../sw.h"
-#include "../address.h"
 #include "action/validate.h"
 #include "../transaction/types.h"
 #include "../menu.h"
@@ -288,13 +287,8 @@ int ui_display_address() {
         return io_send_sw(SW_BAD_STATE);
     }
     memset(g_address, 0, sizeof(g_address));
-    uint8_t address[ADDRESS_LEN] = {0};
-    if (!address_from_pubkey(G_context.pk_info.raw_public_key, address, sizeof(address))) {
+    if (!ont_address_by_pubkey(G_context.pk_info.raw_public_key, g_address, sizeof(g_address))) {
         return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
-    }
-
-    if (script_hash_to_address(g_address,sizeof(g_address),address) == -1) {
-           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
 
     g_validate_callback = &ui_action_validate_pubkey;

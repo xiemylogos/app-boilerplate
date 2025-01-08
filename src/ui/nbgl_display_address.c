@@ -31,13 +31,12 @@
 #include "constants.h"
 #include "../globals.h"
 #include "../sw.h"
-#include "../address.h"
 #include "action/validate.h"
 #include "../transaction/types.h"
 #include "../menu.h"
 #include "../utils.h"
 
-static char g_address[43];
+static char g_address[40];
 
 static void review_choice(bool confirm) {
     // Answer, display a status page and go back to main
@@ -56,14 +55,9 @@ int ui_display_address() {
     }
 
     memset(g_address, 0, sizeof(g_address));
-    uint8_t address[ADDRESS_LEN] = {0};
-    if (!address_from_pubkey(G_context.pk_info.raw_public_key, address, sizeof(address))) {
+    if (!ont_address_by_pubkey(G_context.pk_info.raw_public_key, g_address, sizeof(g_address))) {
         return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
-    if (script_hash_to_address(g_address,sizeof(g_address),address) == -1) {
-           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
-    }
-
     nbgl_useCaseAddressReview(g_address,
                               NULL,
                               &C_icon_ont_64px,

@@ -6,16 +6,6 @@
 #include <string.h>
 #include <stdbool.h>  // bool
 
-#define ARRAY_LEN(a) (sizeof(a) / sizeof((a)[0]))
-#define BAIL_IF(x)           \
-    do {                     \
-        int err = x;         \
-        if (err) return err; \
-    } while (0)
-
-#define assert_string_equal(actual, expected) assert(strcmp(actual, expected) == 0)
-
-
 int script_hash_to_address(char* out, size_t out_len, const unsigned char* script_hash);
 
 size_t utf8_strlen(const uint8_t* str);
@@ -27,3 +17,18 @@ bool create_signature_redeem_script(const uint8_t *uncompressed_key, uint8_t* ou
 void generate_address_from_public_key(const uint8_t *compressed_key, size_t key_len, uint8_t *output_hash);
 
 bool ont_address_from_pubkey(char* out, size_t out_len);
+/**
+ * Convert public key to ont address.
+ * @param[in]  public_key
+ *   Pointer to byte buffer with public key.
+ *   The public key is represented as 65 bytes with 1 byte for format and 32 bytes for
+ *   each coordinate.
+ * @param[out] out
+ *   Pointer to output byte buffer for address.
+ * @param[in]  out_len
+ *   Length of output byte buffer.
+ *
+ * @return true if success, false otherwise.
+ *
+ */
+bool ont_address_by_pubkey(const uint8_t public_key[static 65],char* out, size_t out_len);
