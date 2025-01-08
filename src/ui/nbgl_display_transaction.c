@@ -36,7 +36,6 @@
 #include "../transaction/types.h"
 #include "../menu.h"
 #include "../utils.h"
-#include "../uint128.h"
 
 // Buffer where the transaction amount string is written
 static char g_amount[40];
@@ -77,50 +76,19 @@ static uint8_t setTagValuePairs(void) {
         if(G_context.tx_type == TRANSFER_V2_TRANSACTION) {
               decimals = 9;
         }
-         if (G_context.tx_info.tx_info.payload.value_len >= 81) {
-             format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.tx_info.payload.value[0],decimals);
-         } else {
-            if (G_context.tx_info.tx_info.payload.value_len <= 8) {
-                format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.tx_info.payload.value[0],decimals);
-            } else {
-                char amount[41];
-                uint128_t values;
-                values.elements[0] = G_context.tx_info.tx_info.payload.value[1];
-                values.elements[1] = G_context.tx_info.tx_info.payload.value[0];
-                tostring128(&values,10,amount,sizeof(amount));
-                process_precision(amount,decimals,g_amount,sizeof(g_amount));
-                explicit_bzero(&amount, sizeof(amount));
-                clear128(&values);
-            }
-         }
-
+       if(!get_token_amount(G_context.tx_info.tx_info.payload.value_len,G_context.tx_info.tx_info.payload.value,
+                         decimals,g_amount,sizeof(g_amount))) {
+                return io_send_sw(SW_DISPLAY_TOKEN_AMOUNT_FAIL);
+       }
     } else if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONG_ADDR,20) == 0) {
         pairs[nbPairs].item = "ONG Amount";
         uint decimals = 9;
         if(G_context.tx_type == TRANSFER_V2_TRANSACTION) {
             decimals = 18;
         }
-        if (G_context.tx_info.tx_info.payload.value_len >= 81) {
-           format_fpu64_trimmed(g_amount,
-                                     sizeof(g_amount),
-                                     G_context.tx_info.tx_info.payload.value[0],
-                                     decimals);
-        } else {
-            if (G_context.tx_info.tx_info.payload.value_len <= 8) {
-                format_fpu64_trimmed(g_amount,
-                                     sizeof(g_amount),
-                                     G_context.tx_info.tx_info.payload.value[0],
-                                     decimals);
-            } else {
-                char amount[41];
-                uint128_t values;
-                values.elements[0] = G_context.tx_info.tx_info.payload.value[1];
-                values.elements[1] = G_context.tx_info.tx_info.payload.value[0];
-                tostring128(&values, 10, amount, sizeof(amount));
-                process_precision(amount, decimals, g_amount, sizeof(g_amount));
-                explicit_bzero(&amount, sizeof(amount));
-                clear128(&values);
-            }
+        if(!get_token_amount(G_context.tx_info.tx_info.payload.value_len,G_context.tx_info.tx_info.payload.value,
+                         decimals,g_amount,sizeof(g_amount))) {
+            return io_send_sw(SW_DISPLAY_TOKEN_AMOUNT_FAIL);
         }
     }
 
@@ -274,49 +242,19 @@ static uint8_t setTagApproveValuePairs(void) {
         if(G_context.tx_type == APPROVE_V2) {
               decimals = 9;
         }
-         if (G_context.tx_info.tx_info.payload.value_len >= 81) {
-             format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.tx_info.payload.value[0],decimals);
-         } else {
-            if (G_context.tx_info.tx_info.payload.value_len <= 8) {
-                format_fpu64_trimmed(g_amount,sizeof(g_amount),G_context.tx_info.tx_info.payload.value[0],decimals);
-            } else {
-                char amount[41];
-                uint128_t values;
-                values.elements[0] = G_context.tx_info.tx_info.payload.value[1];
-                values.elements[1] = G_context.tx_info.tx_info.payload.value[0];
-                tostring128(&values,10,amount,sizeof(amount));
-                process_precision(amount,decimals,g_amount,sizeof(g_amount));
-                explicit_bzero(&amount, sizeof(amount));
-                clear128(&values);
-            }
-         }
+        if(!get_token_amount(G_context.tx_info.tx_info.payload.value_len,G_context.tx_info.tx_info.payload.value,
+                         decimals,g_amount,sizeof(g_amount))) {
+            return io_send_sw(SW_DISPLAY_TOKEN_AMOUNT_FAIL);
+        }
     } else if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONG_ADDR,20) == 0) {
         pairs[nbPairs].item = "ONG value";
          uint decimals = 9;
         if(G_context.tx_type == APPROVE_V2) {
               decimals = 18;
         }
-        if (G_context.tx_info.tx_info.payload.value_len >= 81) {
-           format_fpu64_trimmed(g_amount,
-                                     sizeof(g_amount),
-                                     G_context.tx_info.tx_info.payload.value[0],
-                                     decimals);
-        } else {
-            if (G_context.tx_info.tx_info.payload.value_len <= 8) {
-                format_fpu64_trimmed(g_amount,
-                                     sizeof(g_amount),
-                                     G_context.tx_info.tx_info.payload.value[0],
-                                     decimals);
-            } else {
-                char amount[41];
-                uint128_t values;
-                values.elements[0] = G_context.tx_info.tx_info.payload.value[1];
-                values.elements[1] = G_context.tx_info.tx_info.payload.value[0];
-                tostring128(&values, 10, amount, sizeof(amount));
-                process_precision(amount,decimals, g_amount, sizeof(g_amount));
-                explicit_bzero(&amount, sizeof(amount));
-                clear128(&values);
-            }
+        if(!get_token_amount(G_context.tx_info.tx_info.payload.value_len,G_context.tx_info.tx_info.payload.value,
+                         decimals,g_amount,sizeof(g_amount))) {
+            return io_send_sw(SW_DISPLAY_TOKEN_AMOUNT_FAIL);
         }
     }
 
@@ -422,60 +360,21 @@ static uint8_t setTagFromValuePairs(void) {
         if(G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION) {
               decimals = 9;
         }
-         if (G_context.tx_info.from_tx_info.payload.value_len >= 81) {
-                 format_fpu64_trimmed(g_amount,
-                                      sizeof(g_amount),
-                                      G_context.tx_info.from_tx_info.payload.value[0],
-                                      decimals);
-         } else {
-            if (G_context.tx_info.from_tx_info.payload.value_len <= 8) {
-                    format_fpu64_trimmed(g_amount,
-                                         sizeof(g_amount),
-                                         G_context.tx_info.from_tx_info.payload.value[0],
-                                         decimals);
-            } else {
-                    char amount[41];
-                    uint128_t values;
-                    values.elements[0] = G_context.tx_info.from_tx_info.payload.value[1];
-                    values.elements[1] = G_context.tx_info.from_tx_info.payload.value[0];
-                    tostring128(&values, 10, amount, sizeof(amount));
-                    process_precision(amount, decimals, g_amount, sizeof(g_amount));
-                    explicit_bzero(&amount, sizeof(amount));
-                    clear128(&values);
-            }
-         }
-
+        if(!get_token_amount(G_context.tx_info.from_tx_info.payload.value_len,G_context.tx_info.from_tx_info.payload.value,
+                         decimals,g_amount,sizeof(g_amount))) {
+            return io_send_sw(SW_DISPLAY_TOKEN_AMOUNT_FAIL);
+        }
     } else if (memcmp(G_context.tx_info.from_tx_info.payload.contract_addr,ONG_ADDR,20) == 0) {
         pairs[nbPairs].item = "ONG Amount";
         uint decimals = 9;
         if(G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION) {
               decimals = 18;
         }
-        if (G_context.tx_info.from_tx_info.payload.value_len >= 81) {
-           format_fpu64_trimmed(g_amount,
-                                     sizeof(g_amount),
-                                     G_context.tx_info.from_tx_info.payload.value[0],
-                                     decimals);
-        } else {
-            if (G_context.tx_info.from_tx_info.payload.value_len <= 8) {
-                format_fpu64_trimmed(g_amount,
-                                     sizeof(g_amount),
-                                     G_context.tx_info.from_tx_info.payload.value[0],
-                                     decimals);
-            } else {
-                char amount[41];
-                uint128_t values;
-                values.elements[0] = G_context.tx_info.from_tx_info.payload.value[1];
-                values.elements[1] = G_context.tx_info.from_tx_info.payload.value[0];
-                tostring128(&values, 10, amount, sizeof(amount));
-                process_precision(amount, decimals, g_amount, sizeof(g_amount));
-                explicit_bzero(&amount, sizeof(amount));
-                clear128(&values);
-            }
+        if(!get_token_amount(G_context.tx_info.from_tx_info.payload.value_len,G_context.tx_info.from_tx_info.payload.value,
+                         decimals,g_amount,sizeof(g_amount))) {
+            return io_send_sw(SW_DISPLAY_TOKEN_AMOUNT_FAIL);
         }
     }
-
-
 
     pairs[nbPairs].value = g_amount;
     nbPairs++;

@@ -36,7 +36,6 @@
 #include "../transaction/types.h"
 #include "../menu.h"
 #include "../utils.h"
-#include "../uint128.h"
 
 
 // Buffer where the oep4 transaction amount string is written
@@ -97,33 +96,13 @@ static uint8_t setTagValuePairs(void) {
 
 
     memset(g_amount, 0, sizeof(g_amount));
-    if (G_context.tx_info.oep4_tx_info.payload.value_len >= 81) {
-           format_fpu64_trimmed(g_amount,
-                                     sizeof(g_amount),
-                                     G_context.tx_info.oep4_tx_info.payload.value[0],
-                                     decimals);
-        } else {
-            if (G_context.tx_info.oep4_tx_info.payload.value_len <= 8) {
-                format_fpu64_trimmed(g_amount,
-                                     sizeof(g_amount),
-                                     G_context.tx_info.oep4_tx_info.payload.value[0],
-                                     decimals);
-            } else {
-                char amount[41];
-                uint128_t values;
-                values.elements[0] = G_context.tx_info.oep4_tx_info.payload.value[1];
-                values.elements[1] = G_context.tx_info.oep4_tx_info.payload.value[0];
-                tostring128(&values, 10, amount, sizeof(amount));
-                process_precision(amount, decimals, g_amount, sizeof(g_amount));
-                explicit_bzero(&amount, sizeof(amount));
-                clear128(&values);
-            }
-        }
-
+    if(!get_token_amount(G_context.tx_info.oep4_tx_info.payload.value_len,G_context.tx_info.oep4_tx_info.payload.value,
+                         decimals,g_amount,sizeof(g_amount))) {
+            return io_send_sw(SW_DISPLAY_TOKEN_AMOUNT_FAIL);
+    }
     pairs[nbPairs].item = "amount";
     pairs[nbPairs].value = g_amount;
     nbPairs++;
-
 
     //fromAddr
     memset(g_fromAddr, 0, sizeof(g_fromAddr));
@@ -224,6 +203,7 @@ static uint8_t setTagOep4ApproveValuePairs(void) {
     }
     pairs[nbPairs].item = "decimals";
     memset(g_decimals, 0, sizeof(g_decimals));
+
     if (know_decimals) {
         if (!format_u64(g_decimals, sizeof(g_decimals), decimals)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
@@ -236,29 +216,10 @@ static uint8_t setTagOep4ApproveValuePairs(void) {
 
 
     memset(g_amount, 0, sizeof(g_amount));
-    if (G_context.tx_info.oep4_tx_info.payload.value_len >= 81) {
-           format_fpu64_trimmed(g_amount,
-                                     sizeof(g_amount),
-                                     G_context.tx_info.oep4_tx_info.payload.value[0],
-                                     decimals);
-        } else {
-            if (G_context.tx_info.oep4_tx_info.payload.value_len <= 8) {
-                format_fpu64_trimmed(g_amount,
-                                     sizeof(g_amount),
-                                     G_context.tx_info.oep4_tx_info.payload.value[0],
-                                     decimals);
-            } else {
-                char amount[41];
-                uint128_t values;
-                values.elements[0] = G_context.tx_info.oep4_tx_info.payload.value[1];
-                values.elements[1] = G_context.tx_info.oep4_tx_info.payload.value[0];
-                tostring128(&values, 10, amount, sizeof(amount));
-                process_precision(amount, decimals, g_amount, sizeof(g_amount));
-                explicit_bzero(&amount, sizeof(amount));
-                clear128(&values);
-            }
-        }
-
+    if(!get_token_amount(G_context.tx_info.oep4_tx_info.payload.value_len,G_context.tx_info.oep4_tx_info.payload.value,
+                         decimals,g_amount,sizeof(g_amount))) {
+            return io_send_sw(SW_DISPLAY_TOKEN_AMOUNT_FAIL);
+    }
     pairs[nbPairs].item = "amount";
     pairs[nbPairs].value = g_amount;
     nbPairs++;
@@ -371,29 +332,10 @@ static uint8_t setTagTransferFromValuePairs(void) {
 
 
     memset(g_amount, 0, sizeof(g_amount));
-    if (G_context.tx_info.oep4_from_tx_info.payload.value_len >= 81) {
-           format_fpu64_trimmed(g_amount,
-                                     sizeof(g_amount),
-                                     G_context.tx_info.oep4_from_tx_info.payload.value[0],
-                                     decimals);
-        } else {
-            if (G_context.tx_info.oep4_from_tx_info.payload.value_len <= 8) {
-                format_fpu64_trimmed(g_amount,
-                                     sizeof(g_amount),
-                                     G_context.tx_info.oep4_from_tx_info.payload.value[0],
-                                     decimals);
-            } else {
-                char amount[41];
-                uint128_t values;
-                values.elements[0] = G_context.tx_info.oep4_from_tx_info.payload.value[1];
-                values.elements[1] = G_context.tx_info.oep4_from_tx_info.payload.value[0];
-                tostring128(&values, 10, amount, sizeof(amount));
-                process_precision(amount, decimals, g_amount, sizeof(g_amount));
-                explicit_bzero(&amount, sizeof(amount));
-                clear128(&values);
-            }
-        }
-
+    if(!get_token_amount(G_context.tx_info.oep4_from_tx_info.payload.value_len,G_context.tx_info.oep4_from_tx_info.payload.value,
+                         decimals,g_amount,sizeof(g_amount))) {
+            return io_send_sw(SW_DISPLAY_TOKEN_AMOUNT_FAIL);
+    }
     pairs[nbPairs].item = "amount";
     pairs[nbPairs].value = g_amount;
     nbPairs++;

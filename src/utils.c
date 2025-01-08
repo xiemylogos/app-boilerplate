@@ -5,6 +5,8 @@
 #include "lcx_ripemd160.h"
 #include "crypto_helpers.h"
 #include "globals.h"
+#include "format.h"
+#include "uint128.h"
 
 
 /** the length of a SHA256 hash */
@@ -159,4 +161,23 @@ bool ont_address_by_pubkey(const uint8_t uncompressed_key[static 65],char* out, 
     generate_address_from_public_key(verification_script, sizeof verification_script, ripemd160_hash);
     script_hash_to_address(out, out_len,ripemd160_hash);
     return true;
+}
+bool get_token_amount(const uint8_t value_len,const uint64_t value[2],const uint8_t decimals,char* amount,size_t amount_len) {
+    if (value_len >= 81) {
+        return format_fpu64_trimmed(amount,amount_len,value[0],decimals);
+    } else {
+        if (value_len <= 8) {
+            return format_fpu64_trimmed(amount,amount_len,value[0],decimals);
+        } else {
+            char totalAmount[41];
+            uint128_t values;
+            values.elements[0] = value[1];
+            values.elements[1] = value[0];
+            tostring128(&values,10,totalAmount,sizeof(totalAmount));
+            process_precision(totalAmount,decimals,amount,amount_len);
+            explicit_bzero(&totalAmount, sizeof(totalAmount));
+            clear128(&values);
+            return true;
+        }
+    }
 }

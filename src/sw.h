@@ -88,6 +88,8 @@
  * Status word for display signer failed.
  */
 #define SW_DISPLAY_SIGNER_FAIL 0xB00F
-
-
+/**
+ * Status word for display signer failed.
+ */
+#define SW_DISPLAY_TOKEN_AMOUNT_FAIL 0xB010
 
