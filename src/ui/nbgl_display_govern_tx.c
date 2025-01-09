@@ -40,17 +40,11 @@
 #include "types.h"
 
 // Buffer where the transaction address string is written
-static char g_addr[40];
-static char g_peerPubkey[200];
-static char g_posList[200];
-static char g_peerCost[30];
-static char g_stakeCost[30];
-static char g_maxAuthorize[30];
-static char g_pos[30];
-static char g_withdrawList[200];
-static char g_initPost[30];
-static char g_ontId[100];
-static char g_keyNo[30];
+static char g_address[40];
+static char g_content[66];
+static char g_content_two[66];
+static char g_content_three[66];
+static char g_content_four[30];
 static char g_signer[40];
 
 #define MAX_PAIRS        10
@@ -74,41 +68,41 @@ static uint8_t registerCandidateTagValuePairs(void) {
     uint8_t nbPairs = 0;
     explicit_bzero(pairs, sizeof(pairs));
 
-    memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.tx_info.register_candidate_tx_info.peer_pubkey,66);
+    memset(g_content, 0, sizeof(g_content));
+    memcpy(g_content, G_context.tx_info.register_candidate_tx_info.peer_pubkey,66);
     pairs[nbPairs].item = PEER_PUBKEY;
-    pairs[nbPairs].value = g_peerPubkey;
+    pairs[nbPairs].value = g_content;
     nbPairs++;
 
-    memset(g_addr, 0, sizeof(g_addr));
-    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.tx_info.register_candidate_tx_info.account) ==
+    memset(g_address, 0, sizeof(g_address));
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.register_candidate_tx_info.account) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
     pairs[nbPairs].item = ACCOUNT;
-    pairs[nbPairs].value = g_addr;
+    pairs[nbPairs].value = g_address;
     nbPairs++;
 
-    memset(g_initPost,0,sizeof(g_initPost));
-    if (!format_u64(g_initPost,sizeof(g_initPost),G_context.tx_info.register_candidate_tx_info.init_pos)) {
+    memset(g_content_two,0,sizeof(g_content_two));
+    if (!format_u64(g_content_two,sizeof(g_content_two),G_context.tx_info.register_candidate_tx_info.init_pos)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = INIT_POS;
-    pairs[nbPairs].value = g_initPost;
+    pairs[nbPairs].value = g_content_two;
     nbPairs++;
 
-    memset(g_ontId,0,sizeof(g_ontId));
-    memcpy(g_ontId, G_context.tx_info.register_candidate_tx_info.ont_id, G_context.tx_info.register_candidate_tx_info.ont_id_len);
+    memset(g_content_three,0,sizeof(g_content_three));
+    memcpy(g_content_three, G_context.tx_info.register_candidate_tx_info.ont_id, G_context.tx_info.register_candidate_tx_info.ont_id_len);
     pairs[nbPairs].item = ONT_ID;
-    pairs[nbPairs].value = g_ontId;
+    pairs[nbPairs].value = g_content_three;
     nbPairs++;
 
-    memset(g_keyNo,0,sizeof(g_keyNo));
-    if (!format_u64(g_keyNo,sizeof(g_keyNo),G_context.tx_info.register_candidate_tx_info.key_no)) {
+    memset(g_content_four,0,sizeof(g_content_four));
+    if (!format_u64(g_content_four,sizeof(g_content_four),G_context.tx_info.register_candidate_tx_info.key_no)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = KEY_NO;
-    pairs[nbPairs].value = g_keyNo;
+    pairs[nbPairs].value = g_content_four;
     nbPairs++;
 
     memset(g_signer, 0, sizeof(g_signer));
@@ -167,27 +161,46 @@ static uint8_t withdrawTagValuePairs(void) {
     uint8_t nbPairs = 0;
     explicit_bzero(pairs, sizeof(pairs));
     //account
-    memset(g_addr, 0, sizeof(g_addr));
-    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.tx_info.withdraw_tx_info.account) ==
+    memset(g_address, 0, sizeof(g_address));
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.withdraw_tx_info.account) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
     pairs[nbPairs].item = ACCOUNT;
-    pairs[nbPairs].value = g_addr;
+    pairs[nbPairs].value = g_address;
     nbPairs++;
-
-    memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.tx_info.withdraw_tx_info.peer_pubkey,66);
-    pairs[nbPairs].item = PEER_PUBKEY;
-    pairs[nbPairs].value = g_peerPubkey;
-    nbPairs++;
-
-    memset(g_withdrawList,0,sizeof(g_withdrawList));
-     if (!format_u64(g_withdrawList, sizeof(g_withdrawList), G_context.tx_info.withdraw_tx_info.withdraw_value)) {
+    for(uint8_t i=0;i<G_context.tx_info.withdraw_tx_info.peer_pubkey_number;i++) {
+        if(i>2) {
+            break;
+        }
+        if (i==0) {
+            memset(g_content, 0, sizeof(g_content));
+            memcpy(g_content, G_context.tx_info.withdraw_tx_info.peer_pubkey[i], 66);
+            pairs[nbPairs].item = PEER_PUBKEY;
+            pairs[nbPairs].value = g_content;
+            nbPairs++;
+        }
+        if (i==1) {
+           memset(g_content_two, 0, sizeof(g_content_two));
+            memcpy(g_content_two, G_context.tx_info.withdraw_tx_info.peer_pubkey[i], 66);
+            pairs[nbPairs].item = PEER_PUBKEY;
+            pairs[nbPairs].value = g_content_two;
+            nbPairs++;
+        }
+        if (i==2) {
+            memset(g_content_three, 0, sizeof(g_content_three));
+            memcpy(g_content_three, G_context.tx_info.withdraw_tx_info.peer_pubkey[i], 66);
+            pairs[nbPairs].item = PEER_PUBKEY;
+            pairs[nbPairs].value = g_content_three;
+            nbPairs++;
+        }
+    }
+    memset(g_content_four,0,sizeof(g_content_four));
+     if (!format_u64(g_content_four, sizeof(g_content_four), G_context.tx_info.withdraw_tx_info.withdraw_value)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
         }
     pairs[nbPairs].item = TOTAL_WITHDRAW;
-    pairs[nbPairs].value = g_withdrawList;
+    pairs[nbPairs].value = g_content_four;
     nbPairs++;
 
     memset(g_signer, 0, sizeof(g_signer));
@@ -249,19 +262,19 @@ static uint8_t quitNodeTagValuePairs(void) {
     uint8_t nbPairs = 0;
     explicit_bzero(pairs, sizeof(pairs));
 
-    memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.tx_info.quit_node_tx_info.peer_pubkey,66);
+    memset(g_content, 0, sizeof(g_content));
+    memcpy(g_content, G_context.tx_info.quit_node_tx_info.peer_pubkey,66);
     pairs[nbPairs].item = PEER_PUBKEY;
-    pairs[nbPairs].value = g_peerPubkey;
+    pairs[nbPairs].value = g_content;
     nbPairs++;
 
-    memset(g_addr, 0, sizeof(g_addr));
-    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.tx_info.quit_node_tx_info.account) ==
+    memset(g_address, 0, sizeof(g_address));
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.quit_node_tx_info.account) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
     pairs[nbPairs].item = ACCOUNT;
-    pairs[nbPairs].value = g_addr;
+    pairs[nbPairs].value = g_address;
     nbPairs++;
 
     memset(g_signer, 0, sizeof(g_signer));
@@ -321,27 +334,27 @@ static uint8_t addInitPosTagValuePairs(void) {
     uint8_t nbPairs = 0;
     explicit_bzero(pairs, sizeof(pairs));
 
-    memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.tx_info.add_init_pos_tx_info.peer_pubkey,66);
+    memset(g_content, 0, sizeof(g_content));
+    memcpy(g_content, G_context.tx_info.add_init_pos_tx_info.peer_pubkey,66);
     pairs[nbPairs].item = PEER_PUBKEY;
-    pairs[nbPairs].value = g_peerPubkey;
+    pairs[nbPairs].value = g_content;
     nbPairs++;
 
-    memset(g_addr, 0, sizeof(g_addr));
-    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.tx_info.add_init_pos_tx_info.account) ==
+    memset(g_address, 0, sizeof(g_address));
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.add_init_pos_tx_info.account) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
     pairs[nbPairs].item = ACCOUNT;
-    pairs[nbPairs].value = g_addr;
+    pairs[nbPairs].value = g_address;
     nbPairs++;
 
-    memset(g_pos,0,sizeof(g_pos));
-    if (!format_u64(g_pos,sizeof(g_pos),G_context.tx_info.add_init_pos_tx_info.pos)) {
+    memset(g_content_two,0,sizeof(g_content_two));
+    if (!format_u64(g_content_two,sizeof(g_content_two),G_context.tx_info.add_init_pos_tx_info.pos)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = POS;
-    pairs[nbPairs].value = g_pos;
+    pairs[nbPairs].value = g_content_two;
     nbPairs++;
 
     memset(g_signer, 0, sizeof(g_signer));
@@ -400,27 +413,27 @@ static uint8_t reduceInitPosTagValuePairs(void) {
     uint8_t nbPairs = 0;
     explicit_bzero(pairs, sizeof(pairs));
 
-    memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.tx_info.reduce_init_pos_tx_info.peer_pubkey,66);
+    memset(g_content, 0, sizeof(g_content));
+    memcpy(g_content, G_context.tx_info.reduce_init_pos_tx_info.peer_pubkey,66);
     pairs[nbPairs].item = PEER_PUBKEY;
-    pairs[nbPairs].value = g_peerPubkey;
+    pairs[nbPairs].value = g_content;
     nbPairs++;
 
-    memset(g_addr, 0, sizeof(g_addr));
-    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.tx_info.reduce_init_pos_tx_info.account) ==
+    memset(g_address, 0, sizeof(g_address));
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.reduce_init_pos_tx_info.account) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
     pairs[nbPairs].item = ACCOUNT;
-    pairs[nbPairs].value = g_addr;
+    pairs[nbPairs].value = g_address;
     nbPairs++;
 
-    memset(g_pos,0,sizeof(g_pos));
-    if (!format_u64(g_pos,sizeof(g_pos),G_context.tx_info.reduce_init_pos_tx_info.pos)) {
+    memset(g_content_two,0,sizeof(g_content_two));
+    if (!format_u64(g_content_two,sizeof(g_content_two),G_context.tx_info.reduce_init_pos_tx_info.pos)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = POS;
-    pairs[nbPairs].value = g_pos;
+    pairs[nbPairs].value = g_content_two;
     nbPairs++;
 
     memset(g_signer, 0, sizeof(g_signer));
@@ -478,27 +491,27 @@ static uint8_t changeMaxAuthorizationTagValuePairs(void) {
     uint8_t nbPairs = 0;
     explicit_bzero(pairs, sizeof(pairs));
 
-    memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.tx_info.change_max_authorization_tx_info.peer_pubkey,66);
+    memset(g_content, 0, sizeof(g_content));
+    memcpy(g_content, G_context.tx_info.change_max_authorization_tx_info.peer_pubkey,66);
     pairs[nbPairs].item = PEER_PUBKEY;
-    pairs[nbPairs].value = g_peerPubkey;
+    pairs[nbPairs].value = g_content;
     nbPairs++;
 
-    memset(g_addr, 0, sizeof(g_addr));
-    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.tx_info.change_max_authorization_tx_info.account) ==
+    memset(g_address, 0, sizeof(g_address));
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.change_max_authorization_tx_info.account) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
     pairs[nbPairs].item = ACCOUNT;
-    pairs[nbPairs].value = g_addr;
+    pairs[nbPairs].value = g_address;
     nbPairs++;
 
-    memset(g_maxAuthorize,0,sizeof(g_maxAuthorize));
-    if (!format_u64(g_maxAuthorize,sizeof(g_maxAuthorize),G_context.tx_info.change_max_authorization_tx_info.max_authorize)) {
+    memset(g_content_two,0,sizeof(g_content_two));
+    if (!format_u64(g_content_two,sizeof(g_content_two),G_context.tx_info.change_max_authorization_tx_info.max_authorize)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = MAX_AUTHORIZE;
-    pairs[nbPairs].value = g_maxAuthorize;
+    pairs[nbPairs].value = g_content_two;
     nbPairs++;
 
     memset(g_signer, 0, sizeof(g_signer));
@@ -558,35 +571,35 @@ static uint8_t setFeePercentageTagValuePairs(void) {
     uint8_t nbPairs = 0;
     explicit_bzero(pairs, sizeof(pairs));
     //account
-    memset(g_addr, 0, sizeof(g_addr));
-    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.tx_info.set_fee_percentage_tx_info.account) ==
+    memset(g_address, 0, sizeof(g_address));
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.set_fee_percentage_tx_info.account) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
     pairs[nbPairs].item = ACCOUNT;
-    pairs[nbPairs].value = g_addr;
+    pairs[nbPairs].value = g_address;
     nbPairs++;
 
-    memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.tx_info.set_fee_percentage_tx_info.peer_pubkey,66);
+    memset(g_content, 0, sizeof(g_content));
+    memcpy(g_content, G_context.tx_info.set_fee_percentage_tx_info.peer_pubkey,66);
     pairs[nbPairs].item = PEER_PUBKEY;
-    pairs[nbPairs].value = g_peerPubkey;
+    pairs[nbPairs].value = g_content;
     nbPairs++;
 
-    memset(g_peerCost,0,sizeof(g_peerCost));
-    if (!format_u64(g_peerCost,sizeof(g_peerCost),G_context.tx_info.set_fee_percentage_tx_info.peer_cost)) {
+    memset(g_content_two,0,sizeof(g_content_two));
+    if (!format_u64(g_content_two,sizeof(g_content_two),G_context.tx_info.set_fee_percentage_tx_info.peer_cost)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = PEER_COST;
-    pairs[nbPairs].value = g_peerCost;
+    pairs[nbPairs].value = g_content_two;
     nbPairs++;
 
-    memset(g_stakeCost,0,sizeof(g_stakeCost));
-    if (!format_u64(g_stakeCost,sizeof(g_stakeCost),G_context.tx_info.set_fee_percentage_tx_info.stake_cost)) {
+    memset(g_content_three,0,sizeof(g_content_three));
+    if (!format_u64(g_content_three,sizeof(g_content_three),G_context.tx_info.set_fee_percentage_tx_info.stake_cost)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     pairs[nbPairs].item = STAKE_COST;
-    pairs[nbPairs].value = g_stakeCost;
+    pairs[nbPairs].value = g_content_three;
     nbPairs++;
 
     memset(g_signer, 0, sizeof(g_signer));
@@ -647,35 +660,35 @@ static uint8_t setAuthorizeForPeerTagValuePairs(void) {
     uint8_t nbPairs = 0;
     explicit_bzero(pairs, sizeof(pairs));
     //account
-    memset(g_addr, 0, sizeof(g_addr));
-    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.tx_info.authorize_for_peer_tx_info.account) ==
+    memset(g_address, 0, sizeof(g_address));
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.authorize_for_peer_tx_info.account) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
     pairs[nbPairs].item = ACCOUNT;
-    pairs[nbPairs].value = g_addr;
+    pairs[nbPairs].value = g_address;
     nbPairs++;
 
-    memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey_length*66);
+    memset(g_content, 0, sizeof(g_content));
+    memcpy(g_content, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey_length*66);
     pairs[nbPairs].item = PEER_PUBKEY;
-    pairs[nbPairs].value = g_peerPubkey;
+    pairs[nbPairs].value = g_content;
     nbPairs++;
 
 
-    memset(g_posList,0,sizeof(g_posList));
+    memset(g_content_two,0,sizeof(g_content_two));
     if (G_context.tx_info.authorize_for_peer_tx_info.pos_list_len < 81) {
         uint64_t value = getValueByLen(G_context.tx_info.authorize_for_peer_tx_info.pos_list,G_context.tx_info.authorize_for_peer_tx_info.pos_list_len);
-        if (!format_u64(g_posList,sizeof(g_posList),value)) {
+        if (!format_u64(g_content_two,sizeof(g_content_two),value)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
         }
    } else {
-      if (!format_u64(g_posList,sizeof(g_posList),G_context.tx_info.authorize_for_peer_tx_info.pos_list_len-80)) {
+      if (!format_u64(g_content_two,sizeof(g_content_two),G_context.tx_info.authorize_for_peer_tx_info.pos_list_len-80)) {
              return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
         }
    }
     pairs[nbPairs].item = POS_LIST;
-    pairs[nbPairs].value = g_posList;
+    pairs[nbPairs].value = g_content_two;
     nbPairs++;
 
     memset(g_signer, 0, sizeof(g_signer));
@@ -735,35 +748,35 @@ static uint8_t setunAuthorizeForPeerTagValuePairs(void) {
     uint8_t nbPairs = 0;
     explicit_bzero(pairs, sizeof(pairs));
     //account
-    memset(g_addr, 0, sizeof(g_addr));
-    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.tx_info.un_authorize_for_peer_tx_info.account) ==
+    memset(g_address, 0, sizeof(g_address));
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.un_authorize_for_peer_tx_info.account) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
     pairs[nbPairs].item = ACCOUNT;
-    pairs[nbPairs].value = g_addr;
+    pairs[nbPairs].value = g_address;
     nbPairs++;
 
-    memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey, G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey_length*66);
+    memset(g_content, 0, sizeof(g_content));
+    memcpy(g_content, G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey, G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey_length*66);
     pairs[nbPairs].item = PEER_PUBKEY;
-    pairs[nbPairs].value = g_peerPubkey;
+    pairs[nbPairs].value = g_content;
     nbPairs++;
 
 
-   memset(g_posList,0,sizeof(g_posList));
+   memset(g_content_two,0,sizeof(g_content_two));
    if (G_context.tx_info.un_authorize_for_peer_tx_info.pos_list_len < 81) {
     uint64_t value = getValueByLen(G_context.tx_info.un_authorize_for_peer_tx_info.pos_list,G_context.tx_info.un_authorize_for_peer_tx_info.pos_list_len);
-    if (!format_u64(g_posList,sizeof(g_posList),value)) {
+    if (!format_u64(g_content_two,sizeof(g_content_two),value)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
    } else {
-      if (!format_u64(g_posList,sizeof(g_posList),G_context.tx_info.un_authorize_for_peer_tx_info.pos_list_len-80)) {
+      if (!format_u64(g_content_two,sizeof(g_content_two),G_context.tx_info.un_authorize_for_peer_tx_info.pos_list_len-80)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
    }
     pairs[nbPairs].item = POS_LIST;
-    pairs[nbPairs].value = g_posList;
+    pairs[nbPairs].value = g_content_two;
     nbPairs++;
 
     memset(g_signer, 0, sizeof(g_signer));
@@ -822,13 +835,13 @@ static uint8_t setwithdrawFeeTagValuePairs(void) {
     uint8_t nbPairs = 0;
     explicit_bzero(pairs, sizeof(pairs));
     //account
-    memset(g_addr, 0, sizeof(g_addr));
-    if (script_hash_to_address(g_addr,sizeof(g_addr),G_context.tx_info.withdraw_fee_tx_info.account) ==
+    memset(g_address, 0, sizeof(g_address));
+    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.withdraw_fee_tx_info.account) ==
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
     pairs[nbPairs].item = ACCOUNT;
-    pairs[nbPairs].value = g_addr;
+    pairs[nbPairs].value = g_address;
     nbPairs++;
 
     memset(g_signer, 0, sizeof(g_signer));

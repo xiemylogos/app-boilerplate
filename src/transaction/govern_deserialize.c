@@ -200,9 +200,15 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
             if (!buffer_read_u8(buf, &tx->peer_pubkey_length)) {
                 return VALUE_PARSING_ERROR;
             }
-            tx->peer_pubkey = (uint8_t *) (buf->ptr + buf->offset);
-            if (!buffer_seek_cur(buf, tx->peer_pubkey_length)) {
-                return FROM_PARSING_ERROR;
+            if(i<3) {
+                tx->peer_pubkey[i] = (uint8_t *) (buf->ptr + buf->offset);
+                if (!buffer_seek_cur(buf, tx->peer_pubkey_length)) {
+                    return FROM_PARSING_ERROR;
+                }
+            } else {
+                if (!buffer_seek_cur(buf, tx->peer_pubkey_length)) {
+                    return FROM_PARSING_ERROR;
+                }
             }
             if (getBytesValueByLen(buf, 3) != 13139050) {  // 6a7cc8
                 return VALUE_PARSING_ERROR;
@@ -239,7 +245,7 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
     } else {
         if (op_code_value == 66) { //42
            tx->peer_pubkey_length = op_code_value;
-            tx->peer_pubkey = (uint8_t*)(buf->ptr+buf->offset);
+            tx->peer_pubkey[0] = (uint8_t*)(buf->ptr+buf->offset);
             if (!buffer_seek_cur(buf,tx->peer_pubkey_length)) {
                 return FROM_PARSING_ERROR;
             }

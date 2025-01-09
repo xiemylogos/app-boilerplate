@@ -46,7 +46,7 @@ static char g_amount[41];
 static char g_address[40];
 static char g_fromAddr[40];
 static char g_content[40];
-static char g_content2[30];
+static char g_content_two[30];
 static char g_signer[40];
 
 static char g_peerPubkey[66];
@@ -217,7 +217,7 @@ UX_STEP_NOCB(ux_display_stake_cost_step,
              bnnn_paging,
              {
                  .title = STAKE_COST,
-                 .text = g_content2,
+                 .text = g_content_two,
              });
 
 UX_STEP_NOCB(ux_display_max_authorize_step,
@@ -231,7 +231,7 @@ UX_STEP_NOCB(ux_display_pos_step,
              bnnn_paging,
              {
                  .title = POS,
-                 .text = g_content2,
+                 .text = g_content_two,
              });
 
 UX_STEP_NOCB(ux_display_with_draw_step,
@@ -253,7 +253,7 @@ UX_STEP_NOCB(ux_display_key_no_step,
              bnnn_paging,
              {
                  .title = KEY_NO,
-                 .text = g_content2,
+                 .text = g_content_two,
              });
 
 UX_STEP_NOCB(ux_display_personal_msg_step,
@@ -267,7 +267,7 @@ UX_STEP_NOCB(ux_display_decimals_step,
              bnnn_paging,
              {
                  .title = DECIMALS,
-                 .text = g_content2,
+                 .text = g_content_two,
              });
 
 // FLOW to display address:
@@ -670,13 +670,13 @@ int ui_bagl_display_oep4_transaction_choice() {
         decimals = 9;
         know_decimals = true;
     }
-    memset(g_content2, 0, sizeof(g_content2));
+    memset(g_content_two, 0, sizeof(g_content_two));
     if (know_decimals) {
-       if (!format_u64(g_content2, sizeof(g_content), decimals)) {
+       if (!format_u64(g_content_two, sizeof(g_content_two), decimals)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
         }
     } else {
-        memcpy(g_content2,DECIMALS_UNKNOWN,sizeof(DECIMALS_UNKNOWN));
+        memcpy(g_content_two,DECIMALS_UNKNOWN,sizeof(DECIMALS_UNKNOWN));
     }
     memset(g_amount, 0, sizeof(g_amount));
     if(!get_token_amount(G_context.tx_info.oep4_tx_info.payload.value_len,G_context.tx_info.oep4_tx_info.payload.value,
@@ -744,13 +744,13 @@ int ui_bagl_display_oep4_approve_choice() {
         decimals = 9;
         know_decimals = true;
     }
-    memset(g_content2, 0, sizeof(g_content2));
+    memset(g_content_two, 0, sizeof(g_content_two));
     if (know_decimals) {
-       if (!format_u64(g_content2, sizeof(g_content), decimals)) {
+       if (!format_u64(g_content_two, sizeof(g_content), decimals)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
         }
     } else {
-        memcpy(g_content2,DECIMALS_UNKNOWN,sizeof(DECIMALS_UNKNOWN));
+        memcpy(g_content_two,DECIMALS_UNKNOWN,sizeof(DECIMALS_UNKNOWN));
     }
     memset(g_amount, 0, sizeof(g_amount));
     if(!get_token_amount(G_context.tx_info.oep4_tx_info.payload.value_len,G_context.tx_info.oep4_tx_info.payload.value,
@@ -818,13 +818,13 @@ int ui_display_oep4_transfer_from_transaction_choice() {
         decimals = 9;
         know_decimals = true;
     }
-    memset(g_content2, 0, sizeof(g_content2));
+    memset(g_content_two, 0, sizeof(g_content_two));
     if (know_decimals) {
-       if (!format_u64(g_content2, sizeof(g_content2), decimals)) {
+       if (!format_u64(g_content_two, sizeof(g_content_two), decimals)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
         }
     } else {
-        memcpy(g_content2,DECIMALS_UNKNOWN,sizeof(DECIMALS_UNKNOWN));
+        memcpy(g_content_two,DECIMALS_UNKNOWN,sizeof(DECIMALS_UNKNOWN));
     }
     memset(g_amount, 0, sizeof(g_amount));
     if(!get_token_amount(G_context.tx_info.oep4_from_tx_info.payload.value_len,G_context.tx_info.oep4_from_tx_info.payload.value,
@@ -903,9 +903,9 @@ int ui_bagl_display_register_candidate_tx_choice() {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
 
-    memset(g_content2, 0, sizeof(g_content2));
-    if (!format_u64(g_content2,
-                        sizeof(g_content2),
+    memset(g_content_two, 0, sizeof(g_content_two));
+    if (!format_u64(g_content_two,
+                        sizeof(g_content_two),
                         G_context.tx_info.register_candidate_tx_info.key_no)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
@@ -948,8 +948,9 @@ int ui_bagl_display_withdraw_tx_choice() {
     }
 
     memset(g_peerPubkey, 0, sizeof(g_peerPubkey));
-    memcpy(g_peerPubkey, G_context.tx_info.withdraw_tx_info.peer_pubkey, 66);
-
+    if (G_context.tx_info.withdraw_tx_info.peer_pubkey_number >0) {
+        memcpy(g_peerPubkey, G_context.tx_info.withdraw_tx_info.peer_pubkey[0], 66);
+    }
     memset(g_content, 0, sizeof(g_content));
      if (!format_u64(g_content, sizeof(g_content), G_context.tx_info.withdraw_tx_info.withdraw_value)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
@@ -1035,8 +1036,8 @@ int ui_bagl_display_add_init_pos_tx_choice() {
             return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
 
-    memset(g_content2, 0, sizeof(g_content2));
-    if (!format_u64(g_content2, sizeof(g_content2), G_context.tx_info.add_init_pos_tx_info.pos)) {
+    memset(g_content_two, 0, sizeof(g_content_two));
+    if (!format_u64(g_content_two, sizeof(g_content_two), G_context.tx_info.add_init_pos_tx_info.pos)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
 
@@ -1081,8 +1082,8 @@ int ui_bagl_display_reduce_init_pos_tx_choice() {
             return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
     }
 
-    memset(g_content2, 0, sizeof(g_content2));
-    if (!format_u64(g_content2, sizeof(g_content2), G_context.tx_info.reduce_init_pos_tx_info.pos)) {
+    memset(g_content_two, 0, sizeof(g_content_two));
+    if (!format_u64(g_content_two, sizeof(g_content_two), G_context.tx_info.reduce_init_pos_tx_info.pos)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
     memset(g_signer, 0, sizeof(g_signer));
@@ -1185,9 +1186,9 @@ int ui_display_bagl_set_fee_percentage_tx_choice() {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
 
-    memset(g_content2, 0, sizeof(g_content2));
-    if (!format_u64(g_content2,
-                    sizeof(g_content2),
+    memset(g_content_two, 0, sizeof(g_content_two));
+    if (!format_u64(g_content_two,
+                    sizeof(g_content_two),
                     G_context.tx_info.set_fee_percentage_tx_info.stake_cost)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
