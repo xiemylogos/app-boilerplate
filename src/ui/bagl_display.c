@@ -659,19 +659,10 @@ int ui_bagl_display_oep4_transaction_choice() {
     }
     memset(g_amount, 0, sizeof(g_amount));
     uint8_t decimals = 0;
-    bool know_decimals = false;
-   if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,WTK_ADDR,20) == 0) {
-       decimals = 9;
-       know_decimals = true;
-    } else if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,MYT_ADDR,20) == 0 ) {
-        decimals = 18;
-        know_decimals = true;
-    } else if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,WING_ADDR,20) == 0 ) {
-        decimals = 9;
-        know_decimals = true;
-    }
+    decimals = get_oep4_token_decimals(G_context.tx_info.oep4_tx_info.payload.contract_addr);
+
     memset(g_content_two, 0, sizeof(g_content_two));
-    if (know_decimals) {
+    if (decimals !=0) {
        if (!format_u64(g_content_two, sizeof(g_content_two), decimals)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
         }
@@ -733,19 +724,10 @@ int ui_bagl_display_oep4_approve_choice() {
     }
     memset(g_amount, 0, sizeof(g_amount));
     uint8_t decimals = 0;
-    bool know_decimals = false;
-   if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,WTK_ADDR,20) == 0) {
-       decimals = 9;
-       know_decimals = true;
-    } else if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,MYT_ADDR,20) == 0 ) {
-        decimals = 18;
-        know_decimals = true;
-    } else if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,WING_ADDR,20) == 0 ) {
-        decimals = 9;
-        know_decimals = true;
-    }
+    decimals = get_oep4_token_decimals(G_context.tx_info.oep4_tx_info.payload.contract_addr);
+
     memset(g_content_two, 0, sizeof(g_content_two));
-    if (know_decimals) {
+    if (decimals !=0) {
        if (!format_u64(g_content_two, sizeof(g_content), decimals)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
         }
@@ -807,19 +789,10 @@ int ui_display_oep4_transfer_from_transaction_choice() {
     }
     memset(g_amount, 0, sizeof(g_amount));
     uint8_t decimals = 0;
-    bool know_decimals = false;
-   if (memcmp(G_context.tx_info.oep4_from_tx_info.payload.contract_addr,WTK_ADDR,20) == 0) {
-       decimals = 9;
-       know_decimals = true;
-    } else if (memcmp(G_context.tx_info.oep4_from_tx_info.payload.contract_addr,MYT_ADDR,20) == 0 ) {
-        decimals = 18;
-        know_decimals = true;
-    } else if (memcmp(G_context.tx_info.oep4_from_tx_info.payload.contract_addr,WING_ADDR,20) == 0 ) {
-        decimals = 9;
-        know_decimals = true;
-    }
+    decimals = get_oep4_token_decimals(G_context.tx_info.oep4_from_tx_info.payload.contract_addr);
+
     memset(g_content_two, 0, sizeof(g_content_two));
-    if (know_decimals) {
+    if (decimals !=0) {
        if (!format_u64(g_content_two, sizeof(g_content_two), decimals)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
         }

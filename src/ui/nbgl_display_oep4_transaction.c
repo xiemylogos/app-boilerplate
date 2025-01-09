@@ -72,20 +72,11 @@ static uint8_t setTagValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
 
     uint8_t decimals = 0;
-    bool know_decimals = false;
-   if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,WTK_ADDR,20) == 0) {
-       decimals = 9;
-       know_decimals = true;
-    } else if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,MYT_ADDR,20) == 0 ) {
-        decimals = 18;
-        know_decimals = true;
-    } else if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,WING_ADDR,20) == 0 ) {
-        decimals = 9;
-        know_decimals = true;
-    }
+    decimals = get_oep4_token_decimals(G_context.tx_info.oep4_tx_info.payload.contract_addr);
+
     pairs[nbPairs].item = DECIMALS;
     memset(g_decimals, 0, sizeof(g_decimals));
-    if (know_decimals) {
+    if (decimals !=0) {
         if (!format_u64(g_decimals, sizeof(g_decimals), decimals)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
         }
@@ -191,21 +182,11 @@ static uint8_t setTagOep4ApproveValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
 
     uint8_t decimals = 0;
-    bool know_decimals = false;
-   if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,WTK_ADDR,20) == 0) {
-       decimals = 9;
-       know_decimals = true;
-    } else if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,MYT_ADDR,20) == 0 ) {
-        decimals = 18;
-        know_decimals = true;
-    } else if (memcmp(G_context.tx_info.oep4_tx_info.payload.contract_addr,WING_ADDR,20) == 0 ) {
-        decimals = 9;
-        know_decimals = true;
-    }
+    decimals = get_oep4_token_decimals(G_context.tx_info.oep4_tx_info.payload.contract_addr);
+
     pairs[nbPairs].item = DECIMALS;
     memset(g_decimals, 0, sizeof(g_decimals));
-
-    if (know_decimals) {
+    if (decimals !=0) {
         if (!format_u64(g_decimals, sizeof(g_decimals), decimals)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
         }
@@ -308,20 +289,11 @@ static uint8_t setTagTransferFromValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
 
     uint8_t decimals = 0;
-    bool know_decimals = false;
-   if (memcmp(G_context.tx_info.oep4_from_tx_info.payload.contract_addr,WTK_ADDR,20) == 0) {
-       decimals = 9;
-       know_decimals = true;
-    } else if (memcmp(G_context.tx_info.oep4_from_tx_info.payload.contract_addr,MYT_ADDR,20) == 0 ) {
-        decimals = 18;
-        know_decimals = true;
-    } else if (memcmp(G_context.tx_info.oep4_from_tx_info.payload.contract_addr,WING_ADDR,20) == 0 ) {
-        decimals = 9;
-        know_decimals = true;
-    }
+    decimals = get_oep4_token_decimals(G_context.tx_info.oep4_from_tx_info.payload.contract_addr);
+
     pairs[nbPairs].item = DECIMALS;
     memset(g_decimals, 0, sizeof(g_decimals));
-    if (know_decimals) {
+    if (decimals != 0) {
         if (!format_u64(g_decimals, sizeof(g_decimals), decimals)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
         }

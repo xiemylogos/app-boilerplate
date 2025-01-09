@@ -34,3 +34,5 @@ bool ont_address_from_pubkey(char* out, size_t out_len);
 bool ont_address_by_pubkey(const uint8_t public_key[static 65],char* out, size_t out_len);
 
 bool get_token_amount(const uint8_t value_len,const uint64_t value[2],const uint8_t decimals,char* amount,size_t amount_len);
+
+uint8_t get_oep4_token_decimals(uint8_t  *contract_addr);

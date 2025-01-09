@@ -181,3 +181,15 @@ bool get_token_amount(const uint8_t value_len,const uint64_t value[2],const uint
         }
     }
 }
+
+uint8_t get_oep4_token_decimals(uint8_t  *contract_addr) {
+    uint8_t decimals = 0;
+    if (memcmp(contract_addr,WTK_ADDR,ADDRESS_LEN) == 0) {
+        decimals = 9;
+    } else if (memcmp(contract_addr,MYT_ADDR,ADDRESS_LEN) == 0 ) {
+        decimals = 18;
+    } else if (memcmp(contract_addr,WING_ADDR,ADDRESS_LEN) == 0 ) {
+        decimals = 9;
+    }
+    return decimals;
+}
