@@ -3,9 +3,7 @@
 #include <stddef.h>  // size_t
 #include <stdint.h>  // uint*_t
 
-#define MAX_TX_LEN   510 //todo unused
 #define ADDRESS_LEN  20
-#define MAX_MEMO_LEN 465  // 510 - ADDRESS_LEN - 2*SIZE(U64) - SIZE(MAX_VARINT)
 #define PAYLOAD_MIN_LENGTH_LIMIT 44
 #define PAYLOAD_TRANSFER_LEN  54
 #define PAYLOAD_TRANSFER_FROM_LEN  58

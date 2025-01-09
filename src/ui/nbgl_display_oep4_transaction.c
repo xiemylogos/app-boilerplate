@@ -36,6 +36,7 @@
 #include "../transaction/types.h"
 #include "../menu.h"
 #include "../utils.h"
+#include "types.h"
 
 
 // Buffer where the oep4 transaction amount string is written
@@ -82,7 +83,7 @@ static uint8_t setTagValuePairs(void) {
         decimals = 9;
         know_decimals = true;
     }
-    pairs[nbPairs].item = "decimals";
+    pairs[nbPairs].item = DECIMALS;
     memset(g_decimals, 0, sizeof(g_decimals));
     if (know_decimals) {
         if (!format_u64(g_decimals, sizeof(g_decimals), decimals)) {
@@ -90,7 +91,7 @@ static uint8_t setTagValuePairs(void) {
         }
         pairs[nbPairs].value = g_decimals;
     } else {
-        pairs[nbPairs].value = "decimals unknown";
+        pairs[nbPairs].value = DECIMALS_UNKNOWN;
     }
     nbPairs++;
 
@@ -100,7 +101,7 @@ static uint8_t setTagValuePairs(void) {
                          decimals,g_amount,sizeof(g_amount))) {
             return io_send_sw(SW_DISPLAY_TOKEN_AMOUNT_FAIL);
     }
-    pairs[nbPairs].item = "amount";
+    pairs[nbPairs].item = AMOUNT;
     pairs[nbPairs].value = g_amount;
     nbPairs++;
 
@@ -110,7 +111,7 @@ static uint8_t setTagValuePairs(void) {
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
-    pairs[nbPairs].item = "from";
+    pairs[nbPairs].item = FROM;
     pairs[nbPairs].value = g_fromAddr;
     nbPairs++;
      //toAddr
@@ -119,13 +120,13 @@ static uint8_t setTagValuePairs(void) {
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
-    pairs[nbPairs].item = "to";
+    pairs[nbPairs].item = TO;
     pairs[nbPairs].value = g_toAddr;
     nbPairs++;
     //fee
     memset(g_fee, 0, sizeof(g_fee));
     format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.oep4_tx_info.header.gas_price*G_context.tx_info.oep4_tx_info.header.gas_limit,9);
-    pairs[nbPairs].item = "Fee:ONG";
+    pairs[nbPairs].item = FEE_ONG;
     pairs[nbPairs].value = g_fee;
     nbPairs++;
     //gasPrice
@@ -133,7 +134,7 @@ static uint8_t setTagValuePairs(void) {
     if (!format_u64(g_gasPrice,sizeof(g_gasPrice),G_context.tx_info.oep4_tx_info.header.gas_price)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
-    pairs[nbPairs].item = "gasPrice";
+    pairs[nbPairs].item = GAS_PRICE;
     pairs[nbPairs].value = g_gasPrice;
     nbPairs++;
     //gasLimit
@@ -141,7 +142,7 @@ static uint8_t setTagValuePairs(void) {
     if (!format_u64(g_gasLimit,sizeof(g_gasLimit),G_context.tx_info.oep4_tx_info.header.gas_limit)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
-    pairs[nbPairs].item = "gasLimit";
+    pairs[nbPairs].item = GAS_LIMIT;
     pairs[nbPairs].value = g_gasLimit;
     nbPairs++;
 
@@ -149,7 +150,7 @@ static uint8_t setTagValuePairs(void) {
     if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
         return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
     }
-    pairs[nbPairs].item = "signer";
+    pairs[nbPairs].item = SIGNER;
     pairs[nbPairs].value = g_signer;
     nbPairs++;
 
@@ -201,7 +202,7 @@ static uint8_t setTagOep4ApproveValuePairs(void) {
         decimals = 9;
         know_decimals = true;
     }
-    pairs[nbPairs].item = "decimals";
+    pairs[nbPairs].item = DECIMALS;
     memset(g_decimals, 0, sizeof(g_decimals));
 
     if (know_decimals) {
@@ -210,7 +211,7 @@ static uint8_t setTagOep4ApproveValuePairs(void) {
         }
         pairs[nbPairs].value = g_decimals;
     } else {
-        pairs[nbPairs].value = "decimals unknown";
+        pairs[nbPairs].value = DECIMALS_UNKNOWN;
     }
     nbPairs++;
 
@@ -220,7 +221,7 @@ static uint8_t setTagOep4ApproveValuePairs(void) {
                          decimals,g_amount,sizeof(g_amount))) {
             return io_send_sw(SW_DISPLAY_TOKEN_AMOUNT_FAIL);
     }
-    pairs[nbPairs].item = "amount";
+    pairs[nbPairs].item = AMOUNT;
     pairs[nbPairs].value = g_amount;
     nbPairs++;
 
@@ -231,7 +232,7 @@ static uint8_t setTagOep4ApproveValuePairs(void) {
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
-    pairs[nbPairs].item = "from";
+    pairs[nbPairs].item = FROM;
     pairs[nbPairs].value = g_fromAddr;
     nbPairs++;
      //toAddr
@@ -240,13 +241,13 @@ static uint8_t setTagOep4ApproveValuePairs(void) {
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
-    pairs[nbPairs].item = "to";
+    pairs[nbPairs].item = TO;
     pairs[nbPairs].value = g_toAddr;
     nbPairs++;
     //fee
     memset(g_fee, 0, sizeof(g_fee));
     format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.oep4_tx_info.header.gas_price*G_context.tx_info.oep4_tx_info.header.gas_limit,9);
-    pairs[nbPairs].item = "Fee:ONG";
+    pairs[nbPairs].item = FEE_ONG;
     pairs[nbPairs].value = g_fee;
     nbPairs++;
     //gasPrice
@@ -254,7 +255,7 @@ static uint8_t setTagOep4ApproveValuePairs(void) {
     if (!format_u64(g_gasPrice,sizeof(g_gasPrice),G_context.tx_info.oep4_tx_info.header.gas_price)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
-    pairs[nbPairs].item = "gasPrice";
+    pairs[nbPairs].item = GAS_PRICE;
     pairs[nbPairs].value = g_gasPrice;
     nbPairs++;
     //gasLimit
@@ -262,7 +263,7 @@ static uint8_t setTagOep4ApproveValuePairs(void) {
     if (!format_u64(g_gasLimit,sizeof(g_gasLimit),G_context.tx_info.oep4_tx_info.header.gas_limit)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
-    pairs[nbPairs].item = "gasLimit";
+    pairs[nbPairs].item = GAS_LIMIT;
     pairs[nbPairs].value = g_gasLimit;
     nbPairs++;
 
@@ -270,7 +271,7 @@ static uint8_t setTagOep4ApproveValuePairs(void) {
     if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
         return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
     }
-    pairs[nbPairs].item = "signer";
+    pairs[nbPairs].item = SIGNER;
     pairs[nbPairs].value = g_signer;
     nbPairs++;
 
@@ -318,7 +319,7 @@ static uint8_t setTagTransferFromValuePairs(void) {
         decimals = 9;
         know_decimals = true;
     }
-    pairs[nbPairs].item = "decimals";
+    pairs[nbPairs].item = DECIMALS;
     memset(g_decimals, 0, sizeof(g_decimals));
     if (know_decimals) {
         if (!format_u64(g_decimals, sizeof(g_decimals), decimals)) {
@@ -326,7 +327,7 @@ static uint8_t setTagTransferFromValuePairs(void) {
         }
         pairs[nbPairs].value = g_decimals;
     } else {
-        pairs[nbPairs].value = "decimals unknown";
+        pairs[nbPairs].value = DECIMALS_UNKNOWN;
     }
     nbPairs++;
 
@@ -336,7 +337,7 @@ static uint8_t setTagTransferFromValuePairs(void) {
                          decimals,g_amount,sizeof(g_amount))) {
             return io_send_sw(SW_DISPLAY_TOKEN_AMOUNT_FAIL);
     }
-    pairs[nbPairs].item = "amount";
+    pairs[nbPairs].item = AMOUNT;
     pairs[nbPairs].value = g_amount;
     nbPairs++;
 
@@ -346,7 +347,7 @@ static uint8_t setTagTransferFromValuePairs(void) {
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
-    pairs[nbPairs].item = "sender";
+    pairs[nbPairs].item = SENDER;
     pairs[nbPairs].value = g_fromAddr;
     nbPairs++;
     //fromAddr
@@ -355,7 +356,7 @@ static uint8_t setTagTransferFromValuePairs(void) {
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
-    pairs[nbPairs].item = "from";
+    pairs[nbPairs].item = FROM;
     pairs[nbPairs].value = g_fromAddr;
     nbPairs++;
      //toAddr
@@ -364,13 +365,13 @@ static uint8_t setTagTransferFromValuePairs(void) {
         -1) {
            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
         }
-    pairs[nbPairs].item = "to";
+    pairs[nbPairs].item = TO;
     pairs[nbPairs].value = g_toAddr;
     nbPairs++;
     //fee
     memset(g_fee, 0, sizeof(g_fee));
     format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.oep4_from_tx_info.header.gas_price*G_context.tx_info.oep4_from_tx_info.header.gas_limit,9);
-    pairs[nbPairs].item = "Fee:ONG";
+    pairs[nbPairs].item = FEE_ONG;
     pairs[nbPairs].value = g_fee;
     nbPairs++;
     //gasPrice
@@ -378,7 +379,7 @@ static uint8_t setTagTransferFromValuePairs(void) {
     if (!format_u64(g_gasPrice,sizeof(g_gasPrice),G_context.tx_info.oep4_from_tx_info.header.gas_price)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
-    pairs[nbPairs].item = "gasPrice";
+    pairs[nbPairs].item = GAS_PRICE;
     pairs[nbPairs].value = g_gasPrice;
     nbPairs++;
     //gasLimit
@@ -386,7 +387,7 @@ static uint8_t setTagTransferFromValuePairs(void) {
     if (!format_u64(g_gasLimit,sizeof(g_gasLimit),G_context.tx_info.oep4_from_tx_info.header.gas_limit)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
-    pairs[nbPairs].item = "gasLimit";
+    pairs[nbPairs].item = GAS_LIMIT;
     pairs[nbPairs].value = g_gasLimit;
     nbPairs++;
 
@@ -394,7 +395,7 @@ static uint8_t setTagTransferFromValuePairs(void) {
     if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
         return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
     }
-    pairs[nbPairs].item = "signer";
+    pairs[nbPairs].item = SIGNER;
     pairs[nbPairs].value = g_signer;
     nbPairs++;
 

@@ -33,6 +33,7 @@
 #include "action/validate.h"
 #include "../menu.h"
 #include "utils.h"
+#include "types.h"
 
 static char g_msg[1060];
 
@@ -75,7 +76,7 @@ int ui_display_personal_msg_choice() {
     }
     g_msg[totalLength-1] = '\0';
 
-    pairs[0].item = "msg";
+    pairs[0].item = MSG;
     pairs[0].value = g_msg;
     // Setup list
     pairList.nbMaxLinesForValue = 0;

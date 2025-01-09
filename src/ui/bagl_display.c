@@ -36,6 +36,7 @@
 #include "../menu.h"
 #include "../utils.h"
 #include "../transaction/utils.h"
+#include "types.h"
 
 #define BLIND_SIGN_TX "Blind signing Transaction"
 #define BLIND_SIGN_TX_MSG "Accept risk and send"
@@ -137,35 +138,35 @@ UX_STEP_NOCB(ux_display_confirm_addr_step, pn, {&C_icon_eye, "Confirm Address"})
 UX_STEP_NOCB(ux_display_from_address_step,
              bnnn_paging,
              {
-                 .title = "fromAddr",
+                 .title = FROM,
                  .text = g_fromAddr,
              });
 
 UX_STEP_NOCB(ux_display_to_address_step,
              bnnn_paging,
              {
-                 .title = "toAddr",
+                 .title = TO,
                  .text = g_address,
              });
 
 UX_STEP_NOCB(ux_display_sender_address_step,
              bnnn_paging,
              {
-                 .title = "sender",
+                 .title = SENDER,
                  .text = g_content,
              });
 
 UX_STEP_NOCB(ux_display_signer_address_step,
              bnnn_paging,
              {
-                 .title = "signer",
+                 .title = SIGNER,
                  .text = g_signer,
              });
 
 UX_STEP_NOCB(ux_display_address_step,
              bnnn_paging,
              {
-                 .title = "Address",
+                 .title = ADDRESS,
                  .text = g_address,
              });
 // Step with approve button
@@ -188,62 +189,62 @@ UX_STEP_CB(ux_display_reject_step,
 UX_STEP_NOCB(ux_display_account_step,
              bnnn_paging,
              {
-                 .title = "account",
+                 .title = ACCOUNT,
                  .text = g_address,
              });
 UX_STEP_NOCB(ux_display_peer_pubkey_step,
              bnnn_paging,
              {
-                 .title = "peerPubkey",
+                 .title = PEER_PUBKEY,
                  .text = g_peerPubkey,
              });
 
 UX_STEP_NOCB(ux_display_pos_list_step,
              bnnn_paging,
              {
-                 .title = "posList",
+                 .title = POS_LIST,
                  .text = g_content,
              });
 
 UX_STEP_NOCB(ux_display_peer_cost_step,
              bnnn_paging,
              {
-                 .title = "peerCost",
+                 .title = PEER_COST,
                  .text = g_content,
              });
 
 UX_STEP_NOCB(ux_display_stake_cost_step,
              bnnn_paging,
              {
-                 .title = "stakeCost",
+                 .title = STAKE_COST,
                  .text = g_content2,
              });
 
 UX_STEP_NOCB(ux_display_max_authorize_step,
              bnnn_paging,
              {
-                 .title = "maxAuthorize",
+                 .title = MAX_AUTHORIZE,
                  .text = g_content,
              });
 
 UX_STEP_NOCB(ux_display_pos_step,
              bnnn_paging,
              {
-                 .title = "pos",
+                 .title = POS,
                  .text = g_content2,
              });
 
 UX_STEP_NOCB(ux_display_with_draw_step,
              bnnn_paging,
              {
-                 .title = "total withdraw",
+                 .title = TOTAL_WITHDRAW,
                  .text = g_content,
              });
 
 UX_STEP_NOCB(ux_display_init_pos_step,
              bnnn_paging,
              {
-                 .title = "initPos",
+                 .title = INIT_POS,
                  .text = g_content,
              });
 
@@ -251,21 +252,21 @@ UX_STEP_NOCB(ux_display_init_pos_step,
 UX_STEP_NOCB(ux_display_key_no_step,
              bnnn_paging,
              {
-                 .title = "keyNo",
+                 .title = KEY_NO,
                  .text = g_content2,
              });
 
 UX_STEP_NOCB(ux_display_personal_msg_step,
              bnnn_paging,
              {
-                 .title = "msg",
+                 .title = MSG,
                  .text = g_peerPubkey,
              });
 
 UX_STEP_NOCB(ux_display_decimals_step,
              bnnn_paging,
              {
-                 .title = "decimals",
+                 .title = DECIMALS,
                  .text = g_content2,
              });
 
@@ -318,21 +319,21 @@ UX_STEP_NOCB(ux_display_approve_review_step,
 UX_STEP_NOCB(ux_display_amount_step,
              bnnn_paging,
              {
-                 .title = "Amount",
+                 .title = AMOUNT,
                  .text = g_amount,
              });
 
 UX_STEP_NOCB(ux_display_review_blind_signed_step,
               bnnn_paging,
              {
-                 .title = "blind siging",
+                 .title = BLIND_SIGNING,
                  .text = g_peerPubkey,
              });
 
 UX_STEP_NOCB(ux_display_review_blind_msg_signed_step,
              bnnn_paging,
              {
-                 .title = "blind siging",
+                 .title = BLIND_SIGNING,
                  .text = g_peerPubkey,
              });
 
@@ -669,13 +670,13 @@ int ui_bagl_display_oep4_transaction_choice() {
         decimals = 9;
         know_decimals = true;
     }
-    memset(g_content, 0, sizeof(g_content));
+    memset(g_content2, 0, sizeof(g_content2));
     if (know_decimals) {
-       if (!format_u64(g_content, sizeof(g_content), decimals)) {
+       if (!format_u64(g_content2, sizeof(g_content), decimals)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
         }
     } else {
-        memcpy(g_content,"decimals unknown",sizeof("decimals unknown"));
+        memcpy(g_content2,DECIMALS_UNKNOWN,sizeof(DECIMALS_UNKNOWN));
     }
     memset(g_amount, 0, sizeof(g_amount));
     if(!get_token_amount(G_context.tx_info.oep4_tx_info.payload.value_len,G_context.tx_info.oep4_tx_info.payload.value,
@@ -743,13 +744,13 @@ int ui_bagl_display_oep4_approve_choice() {
         decimals = 9;
         know_decimals = true;
     }
-    memset(g_content, 0, sizeof(g_content));
+    memset(g_content2, 0, sizeof(g_content2));
     if (know_decimals) {
-       if (!format_u64(g_content, sizeof(g_content), decimals)) {
+       if (!format_u64(g_content2, sizeof(g_content), decimals)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
         }
     } else {
-        memcpy(g_content,"decimals unknown",sizeof("decimals unknown"));
+        memcpy(g_content2,DECIMALS_UNKNOWN,sizeof(DECIMALS_UNKNOWN));
     }
     memset(g_amount, 0, sizeof(g_amount));
     if(!get_token_amount(G_context.tx_info.oep4_tx_info.payload.value_len,G_context.tx_info.oep4_tx_info.payload.value,
@@ -823,7 +824,7 @@ int ui_display_oep4_transfer_from_transaction_choice() {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
         }
     } else {
-        memcpy(g_content,"decimals unknown",sizeof("decimals unknown"));
+        memcpy(g_content2,DECIMALS_UNKNOWN,sizeof(DECIMALS_UNKNOWN));
     }
     memset(g_amount, 0, sizeof(g_amount));
     if(!get_token_amount(G_context.tx_info.oep4_from_tx_info.payload.value_len,G_context.tx_info.oep4_from_tx_info.payload.value,
