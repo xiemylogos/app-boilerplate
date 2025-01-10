@@ -10,7 +10,7 @@ This documentation describes the APDU messages interface to communicate with the
 The application covers the following functionalities :
 
   - Get a public Ont address given a BIP 32 path
-  - Sign a basic Ont transaction given a BIP 32 path and raw transaction
+  - Sign a Ont transaction given a BIP 32 path and raw transaction
   - Retrieve the Ont app version
   - Retrieve the Ont app name
 
@@ -54,11 +54,11 @@ The address can be optionally checked on the device before being returned.
 | Chain code                                                       | var    |
 
 
-### SIGN Ont/Ong TRANSACTION
+### SIGN Ont/Ong,Oep4 TRANSACTION
 
 #### Description
 
-This command signs a Ont transaction after having the user validate the transactions parameters.
+This command signs Ont、ONG、Oep4 transaction after having the user validate the transactions parameters.
 
 The input data is the RLP encoded transaction streamed to the device in 255 bytes maximum data chunks.
 
@@ -122,13 +122,6 @@ The input data is the RLP encoded transaction streamed to the device in 255 byte
 | ...                                                  | 4        |
 | Last derivation index (little endian)                | 4        |
 
-```
-for example
-uint32_t msg_length = 11;
-uint8_t msg_content[] = {'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd'};
-[0x00, 0x00, 0x00, 0x0B] [0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64]
-|      msg length       |                      message content                            |
-```
 ##### `Input data (other personal msg data block)`
 
 | Description                                          | Length   |
@@ -266,4 +259,6 @@ The following standard Status Words are returned for all APDUs.
 |   B00C   | SW_TX_PAYLOAD_PARSING_FAIL  | Failed to parse tx payload                            |
 |   B00D   | SW_OEP4_TX_PARSING_FAIL     | Failed to parse oep4 tx                               |
 |   B00E   | SW_OEP4_TX_PAYLOAD_PARSING_FAIL | Failed to parse tx payload                        |
+|   B00F   | SW_DISPLAY_SIGNER_FAIL          | Failed to display signer                       |
+|   B010   | SW_DISPLAY_TOKEN_AMOUNT_FAIL | Failed to display token amount                        |
 |   9000   | OK	                         | Success                                               |
