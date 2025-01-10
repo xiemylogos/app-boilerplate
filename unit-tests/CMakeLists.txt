@@ -44,25 +44,28 @@ add_library(base58 SHARED $ENV{BOLOS_SDK}/lib_standard_app/base58.c)
 add_library(bip32 SHARED $ENV{BOLOS_SDK}/lib_standard_app/bip32.c)
 add_library(buffer SHARED $ENV{BOLOS_SDK}/lib_standard_app/buffer.c)
 add_library(read SHARED $ENV{BOLOS_SDK}/lib_standard_app/read.c)
-add_library(write SHARED $ENV{BOLOS_SDK}/lib_standard_app/write.c)
-add_library(format SHARED $ENV{BOLOS_SDK}/lib_standard_app/format.c)
-add_library(varint SHARED $ENV{BOLOS_SDK}/lib_standard_app/varint.c)
 add_library(apdu_parser SHARED $ENV{BOLOS_SDK}/lib_standard_app/parser.c)
-add_library(transaction_deserialize ../src/transaction/deserialize.c)
-add_library(oep4_transaction_deserialize ../src/transaction/oep4_deserialize.c)
+add_library(varint SHARED $ENV{BOLOS_SDK}/lib_standard_app/varint.c)
+add_library(write SHARED $ENV{BOLOS_SDK}/lib_standard_app/write.c)
+add_library(getBytesValueByLen ../src/transaction/utils.c)
+add_library(getValueByLen ../src/transaction/utils.c)
+add_library(transaction_deserialize_header ../src/transaction/utils.c)
+add_library(transaction_native_transfer_deserialize ../src/transaction/deserialize.c)
+add_library(oep4_neo_vm_transaction_deserialize ../src/transaction/oep4_deserialize.c)
 
 target_link_libraries(test_tx_parser PUBLIC
-                      transaction_deserialize
-                      oep4_transaction_deserialize
+                      transaction_native_transfer_deserialize
+	   	     getBytesValueByLen
+	      	      getValueByLen
+		      transaction_deserialize_header
+                      oep4_neo_vm_transaction_deserialize
                       buffer
 		              base58
                       bip32
                       cmocka
                       gcov
-                      write
                       read
-		              format
-                      varint
-                      transaction_utils)
+		      varint
+		      write)
 
 add_test(test_tx_parser test_tx_parser)
