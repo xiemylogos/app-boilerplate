@@ -191,89 +191,54 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
     if (!buffer_read_u8(buf, &op_code_value)) {
         return VALUE_PARSING_ERROR;
     }
-    if (op_code_value >= 81) {
-        tx->peer_pubkey_number = op_code_value - 80;
-        if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
+    tx->peer_pubkey_number = op_code_value - 80;
+    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
+        return VALUE_PARSING_ERROR;
+    }
+    for(int i=0;i<tx->peer_pubkey_number;i++) {
+        if (!buffer_read_u8(buf, &tx->peer_pubkey_length)) {
             return VALUE_PARSING_ERROR;
         }
-        for(int i=0;i<tx->peer_pubkey_number;i++) {
-            if (!buffer_read_u8(buf, &tx->peer_pubkey_length)) {
-                return VALUE_PARSING_ERROR;
+        if(i<3) {
+            tx->peer_pubkey[i] = (uint8_t *) (buf->ptr + buf->offset);
+            if (!buffer_seek_cur(buf, tx->peer_pubkey_length)) {
+                return PEER_PUBKEY_PARSING_ERROR;
             }
-            if(i<3) {
-                tx->peer_pubkey[i] = (uint8_t *) (buf->ptr + buf->offset);
-                if (!buffer_seek_cur(buf, tx->peer_pubkey_length)) {
-                    return PEER_PUBKEY_PARSING_ERROR;
-                }
-            } else {
-                if (!buffer_seek_cur(buf, tx->peer_pubkey_length)) {
-                    return PEER_PUBKEY_PARSING_ERROR;
-                }
-            }
-            if (getBytesValueByLen(buf, 3) != 13139050) {  // 6a7cc8
-                return VALUE_PARSING_ERROR;
-            }
-        }
-        if (!buffer_read_u8(buf, &tx->withdraw_number)) {
-            return VALUE_PARSING_ERROR;
-        }
-        if (tx->withdraw_number >= 81) {
-            tx->withdraw_number =  tx->withdraw_number-80;
-        }
-        if (tx->peer_pubkey_number != tx->withdraw_number) {
-            return VALUE_PARSING_ERROR;
-        }
-        if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
-            return VALUE_PARSING_ERROR;
-        }
-        tx->withdraw_value = 0;
-        for(int j=0;j<tx->withdraw_number;j++) {
-            if (!buffer_read_u8(buf, &tx->withdraw_list_len)) {
-                return VALUE_PARSING_ERROR;
-            }
-            if (tx->withdraw_list_len >= 81) {
-                tx->withdraw_value += tx->withdraw_list_len - 80;
-            } else {
-                tx->withdraw_value += getBytesValueByLen(buf, tx->withdraw_list_len);
-            }
-            if (j+1 < tx->withdraw_number) {
-                if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
-                    return VALUE_PARSING_ERROR;
-                }
-            }
-        }
-    } else {
-        if (op_code_value == 66) { //42
-           tx->peer_pubkey_length = op_code_value;
-            tx->peer_pubkey[0] = (uint8_t*)(buf->ptr+buf->offset);
-            if (!buffer_seek_cur(buf,tx->peer_pubkey_length)) {
+        } else {
+            if (!buffer_seek_cur(buf, tx->peer_pubkey_length)) {
                 return PEER_PUBKEY_PARSING_ERROR;
             }
         }
-        if(getBytesValueByLen(buf,2) != 49489) { //51c1
+        if (getBytesValueByLen(buf, 3) != 13139050) {  // 6a7cc8
             return VALUE_PARSING_ERROR;
         }
-        if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
+    }
+    if (!buffer_read_u8(buf, &tx->withdraw_number)) {
+        return VALUE_PARSING_ERROR;
+    }
+    if (tx->withdraw_number >= 81) {
+        tx->withdraw_number =  tx->withdraw_number-80;
+    }
+    if (tx->peer_pubkey_number != tx->withdraw_number) {
+        return VALUE_PARSING_ERROR;
+    }
+    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
+        return VALUE_PARSING_ERROR;
+    }
+    tx->withdraw_value = 0;
+    for(int j=0;j<tx->withdraw_number;j++) {
+        if (!buffer_read_u8(buf, &tx->withdraw_list_len)) {
             return VALUE_PARSING_ERROR;
         }
-        tx->withdraw_value = 0;
-        for(int j=0;j<tx->peer_pubkey_number;j++) {
-            uint8_t withdraw_len_opcode;
-            if (!buffer_read_u8(buf, &withdraw_len_opcode)) {
+        if (tx->withdraw_list_len >= 81) {
+            tx->withdraw_value += tx->withdraw_list_len - 80;
+        } else {
+            tx->withdraw_value += getBytesValueByLen(buf, tx->withdraw_list_len);
+        }
+        if (j+1 < tx->withdraw_number) {
+            if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
                 return VALUE_PARSING_ERROR;
             }
-            if (tx->withdraw_list_len >= 81) {
-                tx->withdraw_value += tx->withdraw_list_len - 80;
-            } else {
-                tx->withdraw_value += getBytesValueByLen(buf, tx->withdraw_list_len);
-            }
-        }
-        //0x51 // The number 1 is pushed onto the stack
-        if(getBytesValueByLen(buf,1) != 80 + tx->peer_pubkey_number) {
-            return VALUE_PARSING_ERROR;
-        }
-        if(getBytesValueByLen(buf,1) != 193) { //c1
-            return VALUE_PARSING_ERROR;
         }
     }
     return check_govern_end_data(buf,Withdraw);
@@ -566,63 +531,90 @@ parser_status_e authorize_for_peer_tx_deserialize(buffer_t *buf, authorize_for_p
     }
     if(!buffer_can_read(buf,op_code_size)) {
         return OPCODE_PARSING_ERROR;
-    } 
+    }
+    if (op_code_size >= 253) {//fd
+        uint16_t code_size;
+        if (!buffer_read_u16(buf, &code_size,LE)) {
+            return OPCODE_PARSING_ERROR;
+        }
+        if (!buffer_can_read(buf, code_size)) {
+            return DATA_END_PARSING_ERROR;
+        }
+    }
     if(getBytesValueByLen(buf,3) != 7063040) { //00c66b
         return VALUE_PARSING_ERROR;
     }
-    uint8_t pre_pub;
-    if(!buffer_read_u8(buf,&pre_pub)) {
+    uint8_t addr_len;
+    if (!buffer_read_u8(buf, &addr_len)) {
         return VALUE_PARSING_ERROR;
     }
-    if (pre_pub != ADDRESS_LEN) { //14
+    if (addr_len != ADDRESS_LEN) {  // 14
         return BUFFER_OFFSET_MOVE_ERROR;
-    } 
-
+    }
     tx->account = (uint8_t*)(buf->ptr+buf->offset);
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return ACCOUNT_PARSING_ERROR;
     }
     if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
-    }  
-    if(!buffer_read_varint(buf,&tx->peer_pubkey_length)) {
-        return DATA_PARSING_ERROR;
     }
-    if (tx->peer_pubkey_length >= 81) {
-        tx->peer_pubkey_length = tx->peer_pubkey_length -80;
-    }
-   if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
-        return VALUE_PARSING_ERROR;
-    } 
-    uint8_t pre_pub_len;
-    if(!buffer_read_u8(buf,&pre_pub_len)) {
+    uint8_t op_code_value;
+    if (!buffer_read_u8(buf, &op_code_value)) {
         return VALUE_PARSING_ERROR;
     }
-    tx->peer_pubkey = (uint8_t*)(buf->ptr+buf->offset);
-    if (!buffer_seek_cur(buf, pre_pub_len*tx->peer_pubkey_length)) {
-        return PEER_PUBKEY_PARSING_ERROR;
-    } 
-    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
-        return VALUE_PARSING_ERROR;
-    } 
-    if(!buffer_read_u8(buf,&tx->pos_list_number)) {
-        return DATA_PARSING_ERROR;
+    if (op_code_value >= 81) {
+        tx->peer_pubkey_number = op_code_value - 80;
     }
-    if (tx->pos_list_number >= 81) {
-        tx->pos_list_number = tx->pos_list_number -80;
-    } 
     if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }
-    if(!buffer_read_u8(buf,&tx->pos_list_len)) {
-        return VALUE_PARSING_ERROR;
-    }
-    if (tx->pos_list_len < 81) {
-        tx->pos_list = (uint8_t *) (buf->ptr + buf->offset);
-        if (!buffer_seek_cur(buf, tx->pos_list_len * tx->pos_list_number)) {
-            return DATA_PARSING_ERROR;
+    for(int i=0;i<tx->peer_pubkey_number;i++) {
+        if (!buffer_read_u8(buf, &tx->peer_pubkey_length)) {
+            return VALUE_PARSING_ERROR;
+        }
+        if(i<3) {
+            tx->peer_pubkey[i] = (uint8_t *) (buf->ptr + buf->offset);
+            if (!buffer_seek_cur(buf, tx->peer_pubkey_length)) {
+                return PEER_PUBKEY_PARSING_ERROR;
+            }
+        } else {
+            if (!buffer_seek_cur(buf, tx->peer_pubkey_length)) {
+                return PEER_PUBKEY_PARSING_ERROR;
+            }
+        }
+        if (getBytesValueByLen(buf, 3) != 13139050) {  // 6a7cc8
+            return VALUE_PARSING_ERROR;
         }
     }
+    if (!buffer_read_u8(buf, &tx->pos_list_number)) {
+        return VALUE_PARSING_ERROR;
+    }
+    if (tx->pos_list_number >= 81) {
+        tx->pos_list_number =  tx->pos_list_number-80;
+    }
+    if (tx->peer_pubkey_number != tx->pos_list_number) {
+        return VALUE_PARSING_ERROR;
+    }
+    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
+        return VALUE_PARSING_ERROR;
+    }
+    tx->pos_list_value = 0;
+    for(int j=0;j<tx->pos_list_number;j++) {
+        if (!buffer_read_u8(buf, &tx->pos_list_len)) {
+            return VALUE_PARSING_ERROR;
+        }
+        if (tx->pos_list_len >= 81) {
+            tx->pos_list_value += tx->pos_list_len - 80;
+        } else {
+            tx->pos_list_value += getBytesValueByLen(buf, tx->pos_list_len);
+        }
+        if (j+1 < tx->pos_list_number) {
+            if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
+                return VALUE_PARSING_ERROR;
+            }
+        }
+    }
+
     return check_govern_end_data(buf,AuthorizeForPeer);  
 }
 
@@ -641,60 +633,87 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf, un_authorize
     }
     if(!buffer_can_read(buf,op_code_size)) {
         return OPCODE_PARSING_ERROR;
-    } 
+    }
+    if (op_code_size >= 253) {//fd
+        uint16_t code_size;
+        if (!buffer_read_u16(buf, &code_size,LE)) {
+            return OPCODE_PARSING_ERROR;
+        }
+        if (!buffer_can_read(buf, code_size)) {
+            return DATA_END_PARSING_ERROR;
+        }
+    }
     if(getBytesValueByLen(buf,3) != 7063040) { //00c66b
         return VALUE_PARSING_ERROR;
     }
-    uint8_t pre_pub;
-    if(!buffer_read_u8(buf,&pre_pub)) {
+    uint8_t addr_len;
+    if (!buffer_read_u8(buf, &addr_len)) {
         return VALUE_PARSING_ERROR;
     }
-    if (pre_pub != ADDRESS_LEN) { //14
+    if (addr_len != ADDRESS_LEN) {  // 14
         return BUFFER_OFFSET_MOVE_ERROR;
-    } 
+    }
     tx->account = (uint8_t*)(buf->ptr+buf->offset);
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return ACCOUNT_PARSING_ERROR;
     }
     if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
-    }  
-    if(!buffer_read_varint(buf,&tx->peer_pubkey_length)) {
-        return DATA_PARSING_ERROR;
     }
-    if (tx->peer_pubkey_length >= 81) {
-        tx->peer_pubkey_length = tx->peer_pubkey_length -80;
+    uint8_t op_code_value;
+    if (!buffer_read_u8(buf, &op_code_value)) {
+        return VALUE_PARSING_ERROR;
+    }
+    if (op_code_value >= 81) {
+        tx->peer_pubkey_number = op_code_value - 80;
     }
     if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }
-    uint8_t pre_pub_len;
-    if(!buffer_read_u8(buf,&pre_pub_len)) {
-        return VALUE_PARSING_ERROR;
+    for(int i=0;i<tx->peer_pubkey_number;i++) {
+        if (!buffer_read_u8(buf, &tx->peer_pubkey_length)) {
+            return VALUE_PARSING_ERROR;
+        }
+        if(i<3) {
+            tx->peer_pubkey[i] = (uint8_t *) (buf->ptr + buf->offset);
+            if (!buffer_seek_cur(buf, tx->peer_pubkey_length)) {
+                return PEER_PUBKEY_PARSING_ERROR;
+            }
+        } else {
+            if (!buffer_seek_cur(buf, tx->peer_pubkey_length)) {
+                return PEER_PUBKEY_PARSING_ERROR;
+            }
+        }
+        if (getBytesValueByLen(buf, 3) != 13139050) {  // 6a7cc8
+            return VALUE_PARSING_ERROR;
+        }
     }
-    tx->peer_pubkey = (uint8_t*)(buf->ptr+buf->offset);
-    if (!buffer_seek_cur(buf, pre_pub_len*tx->peer_pubkey_length)) {
-        return PEER_PUBKEY_PARSING_ERROR;
-    }
-    if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
+    if (!buffer_read_u8(buf, &tx->pos_list_number)) {
         return VALUE_PARSING_ERROR;
-    } 
-    if(!buffer_read_u8(buf,&tx->pos_list_number)) {
-        return DATA_PARSING_ERROR;
     }
     if (tx->pos_list_number >= 81) {
-        tx->pos_list_number = tx->pos_list_number -80;
+        tx->pos_list_number =  tx->pos_list_number-80;
+    }
+    if (tx->peer_pubkey_number != tx->pos_list_number) {
+        return VALUE_PARSING_ERROR;
     }
     if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
         return VALUE_PARSING_ERROR;
     }
-    if(!buffer_read_u8(buf,&tx->pos_list_len)) {
-        return VALUE_PARSING_ERROR;
-    }
-    if (tx->pos_list_len < 81) {
-        tx->pos_list = (uint8_t *) (buf->ptr + buf->offset);
-        if (!buffer_seek_cur(buf, tx->pos_list_len * tx->pos_list_number)) {
-            return DATA_PARSING_ERROR;
+    tx->pos_list_value = 0;
+    for(int j=0;j<tx->pos_list_number;j++) {
+        if (!buffer_read_u8(buf, &tx->pos_list_len)) {
+            return VALUE_PARSING_ERROR;
+        }
+        if (tx->pos_list_len >= 81) {
+            tx->pos_list_value += tx->pos_list_len - 80;
+        } else {
+            tx->pos_list_value += getBytesValueByLen(buf, tx->pos_list_len);
+        }
+        if (j+1 < tx->pos_list_number) {
+            if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
+                return VALUE_PARSING_ERROR;
+            }
         }
     }
     return check_govern_end_data(buf,UnAuthorizeForPeer);  

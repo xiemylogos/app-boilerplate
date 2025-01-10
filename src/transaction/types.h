@@ -128,21 +128,23 @@ typedef struct {
 typedef struct {
     transaction_header_t header;
     uint8_t *account;
-    uint64_t peer_pubkey_length;
-    uint8_t *peer_pubkey;
+    uint8_t peer_pubkey_number;
+    uint8_t peer_pubkey_length;
+    uint8_t *peer_pubkey[3];
     uint8_t pos_list_number;
     uint8_t  pos_list_len;
-    uint8_t *pos_list;
+    uint64_t pos_list_value;
 }authorize_for_peer_t;
 
 typedef struct {
     transaction_header_t header;
     uint8_t *account;
-    uint64_t peer_pubkey_length;
-    uint8_t *peer_pubkey;
+    uint8_t peer_pubkey_number;
+    uint8_t peer_pubkey_length;
+    uint8_t *peer_pubkey[3];
     uint8_t pos_list_number;
     uint8_t  pos_list_len;
-    uint8_t *pos_list;
+    uint64_t pos_list_value;
 }un_authorize_for_peer_t;
 
 typedef struct {

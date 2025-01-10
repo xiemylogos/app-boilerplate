@@ -26,3 +26,4 @@
 #define POS_LIST            "posList"
 #define ADDRESS             "Address"
 #define BLIND_SIGNING       "blind signing"
+#define TOTAL_POS           "total pos"
