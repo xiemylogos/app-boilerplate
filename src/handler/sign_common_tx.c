@@ -77,26 +77,14 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
             uint8_t version;
             uint8_t tx_type;
             if(!buffer_read_u8(&buf,&version)) {
-                if (N_storage.blind_signed_allowed) {
-                    return handler_hash_tx_and_display_tx(VERSION_PARSING_ERROR);
-                } else {
-                    return io_send_sw(SW_TX_PARSING_FAIL);
-                }
+                return io_send_sw(SW_TX_PARSING_FAIL);
             }
             if(version != 0x00) {
-                if (N_storage.blind_signed_allowed) {
-                    return handler_hash_tx_and_display_tx(VERSION_PARSING_ERROR);
-                } else {
-                    return io_send_sw(SW_TX_PARSING_FAIL);
-                }
+                return io_send_sw(SW_TX_PARSING_FAIL);
             }
             //txType
             if(!buffer_read_u8(&buf,&tx_type)) {
-                if (N_storage.blind_signed_allowed) {
-                    return handler_hash_tx_and_display_tx(TXTYPE_PARSING_ERROR);
-                } else {
-                    return io_send_sw(SW_TX_PARSING_FAIL);
-                }
+                   return io_send_sw(SW_TX_PARSING_FAIL);
             }
             parser_status_e status = PARSING_OK;
             //parse transaction
@@ -238,7 +226,7 @@ int handler_hash_tx_and_display_tx(int status) {
     PRINTF("Hash: %.*H\n", sizeof(G_context.tx_info.m_hash), G_context.tx_info.m_hash);
     if (status != PARSING_OK) {
         if (N_storage.blind_signed_allowed) {
-            return ui_display_blind_signed_transaction();
+            return ui_display_blind_signing_transaction();
         }
     } else {
         if (G_context.tx_type == TRANSFER_V2_TRANSACTION ||

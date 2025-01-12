@@ -41,8 +41,6 @@
 // Buffer where the transaction amount string is written
 static char g_amount[40];
 static char g_fee[40];
-static char g_gasPrice[40];
-static char g_gasLimit[40];
 // Buffer where the transaction address string is written
 static char g_fromAddr[40];
 static char g_toAddr[40];
@@ -81,6 +79,7 @@ static uint8_t setTagValuePairs(void) {
                          decimals,g_amount,sizeof(g_amount))) {
                 return io_send_sw(SW_DISPLAY_TOKEN_AMOUNT_FAIL);
        }
+       strcat(g_amount,ONT_VIEW);
     } else if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONG_ADDR,20) == 0) {
         pairs[nbPairs].item = ONG_AMOUNT;
         uint decimals = 9;
@@ -91,6 +90,7 @@ static uint8_t setTagValuePairs(void) {
                          decimals,g_amount,sizeof(g_amount))) {
             return io_send_sw(SW_DISPLAY_TOKEN_AMOUNT_FAIL);
         }
+        strcat(g_amount,ONG_VIEW);
     }
 
     pairs[nbPairs].value = g_amount;
@@ -113,27 +113,12 @@ static uint8_t setTagValuePairs(void) {
     pairs[nbPairs].item = TO;
     pairs[nbPairs].value = g_toAddr;
     nbPairs++;
-    //fee
+   //fee
     memset(g_fee, 0, sizeof(g_fee));
     format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.tx_info.header.gas_price*G_context.tx_info.tx_info.header.gas_limit,9);
+    strcat(g_fee,ONG_VIEW);
     pairs[nbPairs].item = FEE_ONG;
     pairs[nbPairs].value = g_fee;
-    nbPairs++;
-    //gasPrice
-    memset(g_gasPrice, 0, sizeof(g_gasPrice));
-    if (!format_u64(g_gasPrice,sizeof(g_gasPrice),G_context.tx_info.tx_info.header.gas_price)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
-    pairs[nbPairs].item = GAS_PRICE;
-    pairs[nbPairs].value = g_gasPrice;
-    nbPairs++;
-    //gasLimit
-    memset(g_gasLimit, 0, sizeof(g_gasLimit));
-    if (!format_u64(g_gasLimit,sizeof(g_gasLimit),G_context.tx_info.tx_info.header.gas_limit)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
-    pairs[nbPairs].item = GAS_LIMIT;
-    pairs[nbPairs].value = g_gasLimit;
     nbPairs++;
 
     memset(g_signer, 0, sizeof(g_signer));
@@ -217,7 +202,7 @@ int ui_display_blind_transaction_bs_choice() {
     return 0;
 }
 
-int ui_display_blind_signed_transaction() {
+int ui_display_blind_signing_transaction() {
     return ui_display_blind_transaction_bs_choice();
 }
 
@@ -238,7 +223,7 @@ static uint8_t setTagApproveValuePairs(void) {
     memset(g_amount, 0, sizeof(g_amount));
 
     if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONT_ADDR,20) == 0) {
-         pairs[nbPairs].item = ONT_AMOUNT;
+         pairs[nbPairs].item = AMOUNT;
          uint decimals = 0;
         if(G_context.tx_type == APPROVE_V2) {
               decimals = 9;
@@ -247,8 +232,9 @@ static uint8_t setTagApproveValuePairs(void) {
                          decimals,g_amount,sizeof(g_amount))) {
             return io_send_sw(SW_DISPLAY_TOKEN_AMOUNT_FAIL);
         }
+        strcat(g_amount,ONT_VIEW);
     } else if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONG_ADDR,20) == 0) {
-        pairs[nbPairs].item = ONG_AMOUNT;
+        pairs[nbPairs].item = AMOUNT;
          uint decimals = 9;
         if(G_context.tx_type == APPROVE_V2) {
               decimals = 18;
@@ -257,6 +243,7 @@ static uint8_t setTagApproveValuePairs(void) {
                          decimals,g_amount,sizeof(g_amount))) {
             return io_send_sw(SW_DISPLAY_TOKEN_AMOUNT_FAIL);
         }
+        strcat(g_amount,ONG_VIEW);
     }
 
     pairs[nbPairs].value = g_amount;
@@ -282,24 +269,9 @@ static uint8_t setTagApproveValuePairs(void) {
     //fee
     memset(g_fee, 0, sizeof(g_fee));
     format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.tx_info.header.gas_price*G_context.tx_info.tx_info.header.gas_limit,9);
+     strcat(g_fee,ONG_VIEW);
     pairs[nbPairs].item = FEE_ONG;
     pairs[nbPairs].value = g_fee;
-    nbPairs++;
-    //gasPrice
-    memset(g_gasPrice, 0, sizeof(g_gasPrice));
-    if (!format_u64(g_gasPrice,sizeof(g_gasPrice),G_context.tx_info.tx_info.header.gas_price)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
-    pairs[nbPairs].item = GAS_PRICE;
-    pairs[nbPairs].value = g_gasPrice;
-    nbPairs++;
-    //gasLimit
-    memset(g_gasLimit, 0, sizeof(g_gasLimit));
-    if (!format_u64(g_gasLimit,sizeof(g_gasLimit),G_context.tx_info.tx_info.header.gas_limit)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
-    pairs[nbPairs].item = GAS_LIMIT;
-    pairs[nbPairs].value = g_gasLimit;
     nbPairs++;
 
     memset(g_signer, 0, sizeof(g_signer));
@@ -365,6 +337,7 @@ static uint8_t setTagFromValuePairs(void) {
                          decimals,g_amount,sizeof(g_amount))) {
             return io_send_sw(SW_DISPLAY_TOKEN_AMOUNT_FAIL);
         }
+        strcat(g_amount,ONT_VIEW);
     } else if (memcmp(G_context.tx_info.from_tx_info.payload.contract_addr,ONG_ADDR,20) == 0) {
         pairs[nbPairs].item = ONG_AMOUNT;
         uint decimals = 9;
@@ -375,6 +348,7 @@ static uint8_t setTagFromValuePairs(void) {
                          decimals,g_amount,sizeof(g_amount))) {
             return io_send_sw(SW_DISPLAY_TOKEN_AMOUNT_FAIL);
         }
+        strcat(g_amount,ONG_VIEW);
     }
 
     pairs[nbPairs].value = g_amount;
@@ -409,24 +383,9 @@ static uint8_t setTagFromValuePairs(void) {
     //fee
     memset(g_fee, 0, sizeof(g_fee));
     format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.from_tx_info.header.gas_price*G_context.tx_info.from_tx_info.header.gas_limit,9);
+    strcat(g_fee,ONG_VIEW);
     pairs[nbPairs].item = FEE_ONG;
     pairs[nbPairs].value = g_fee;
-    nbPairs++;
-    //gasPrice
-    memset(g_gasPrice, 0, sizeof(g_gasPrice));
-    if (!format_u64(g_gasPrice,sizeof(g_gasPrice),G_context.tx_info.from_tx_info.header.gas_price)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
-    pairs[nbPairs].item = GAS_PRICE;
-    pairs[nbPairs].value = g_gasPrice;
-    nbPairs++;
-    //gasLimit
-    memset(g_gasLimit, 0, sizeof(g_gasLimit));
-    if (!format_u64(g_gasLimit,sizeof(g_gasLimit),G_context.tx_info.from_tx_info.header.gas_limit)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
-    pairs[nbPairs].item = GAS_LIMIT;
-    pairs[nbPairs].value = g_gasLimit;
     nbPairs++;
 
     memset(g_signer, 0, sizeof(g_signer));

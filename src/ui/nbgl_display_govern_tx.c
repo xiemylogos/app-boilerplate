@@ -45,9 +45,14 @@ static char g_content[66];
 static char g_content_two[66];
 static char g_content_three[66];
 static char g_content_four[30];
+static char g_content_five[20];
 static char g_signer[40];
+static char g_fee[40];
+static char g_title[60];
+static char g_title_two[40];
+static char g_title_three[40];
 
-#define MAX_PAIRS        10
+#define MAX_PAIRS        11
 
 static nbgl_contentTagValue_t pairs[MAX_PAIRS];
 static nbgl_contentTagValueList_t pairsList;
@@ -87,22 +92,21 @@ static uint8_t registerCandidateTagValuePairs(void) {
     if (!format_u64(g_content_two,sizeof(g_content_two),G_context.tx_info.register_candidate_tx_info.init_pos)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
-    pairs[nbPairs].item = INIT_POS;
+    strcat(g_content_two,ONT_VIEW);
+    pairs[nbPairs].item = POS;
     pairs[nbPairs].value = g_content_two;
     nbPairs++;
 
-    memset(g_content_three,0,sizeof(g_content_three));
-    memcpy(g_content_three, G_context.tx_info.register_candidate_tx_info.ont_id, G_context.tx_info.register_candidate_tx_info.ont_id_len);
-    pairs[nbPairs].item = ONT_ID;
-    pairs[nbPairs].value = g_content_three;
+    pairs[nbPairs].item = STAKE_FEE;
+    pairs[nbPairs].value = STAKE_FEE_ONG;
     nbPairs++;
 
-    memset(g_content_four,0,sizeof(g_content_four));
-    if (!format_u64(g_content_four,sizeof(g_content_four),G_context.tx_info.register_candidate_tx_info.key_no)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
-    pairs[nbPairs].item = KEY_NO;
-    pairs[nbPairs].value = g_content_four;
+    //fee
+    memset(g_fee, 0, sizeof(g_fee));
+    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.register_candidate_tx_info.header.gas_price*G_context.tx_info.register_candidate_tx_info.header.gas_limit,9);
+    strcat(g_fee,ONG_VIEW);
+    pairs[nbPairs].item = FEE_ONG;
+    pairs[nbPairs].value = g_fee;
     nbPairs++;
 
     memset(g_signer, 0, sizeof(g_signer));
@@ -197,12 +201,37 @@ static uint8_t withdrawTagValuePairs(void) {
         }
     }
 
+
+
     memset(g_content_four,0,sizeof(g_content_four));
      if (!format_u64(g_content_four, sizeof(g_content_four), G_context.tx_info.withdraw_tx_info.withdraw_value)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
         }
-    pairs[nbPairs].item = TOTAL_WITHDRAW;
-    pairs[nbPairs].value = g_content_four;
+
+    strcat(g_content_four,ONT_VIEW);
+    if (G_context.tx_info.withdraw_tx_info.withdraw_number ==1) {
+        pairs[nbPairs].item = AMOUNT;
+        pairs[nbPairs].value = g_content_four;
+        nbPairs++;
+    } else {
+        pairs[nbPairs].item = TOTAL_WITHDRAW;
+        pairs[nbPairs].value = g_content_four;
+        nbPairs++;
+
+        memset(g_content_five,0,sizeof(g_content_five));
+       if (!format_u64(g_content_five, sizeof(g_content_five), G_context.tx_info.withdraw_tx_info.peer_pubkey_number)) {
+            return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+        }
+        pairs[nbPairs].item = NODE_AMOUNT;
+        pairs[nbPairs].value = g_content_five;
+        nbPairs++;
+    }
+     //fee
+    memset(g_fee, 0, sizeof(g_fee));
+    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.withdraw_tx_info.header.gas_price*G_context.tx_info.withdraw_tx_info.header.gas_limit,9);
+    strcat(g_fee,ONG_VIEW);
+    pairs[nbPairs].item = FEE_ONG;
+    pairs[nbPairs].value = g_fee;
     nbPairs++;
 
     memset(g_signer, 0, sizeof(g_signer));
@@ -264,12 +293,6 @@ static uint8_t quitNodeTagValuePairs(void) {
     uint8_t nbPairs = 0;
     explicit_bzero(pairs, sizeof(pairs));
 
-    memset(g_content, 0, sizeof(g_content));
-    memcpy(g_content, G_context.tx_info.quit_node_tx_info.peer_pubkey,66);
-    pairs[nbPairs].item = PEER_PUBKEY;
-    pairs[nbPairs].value = g_content;
-    nbPairs++;
-
     memset(g_address, 0, sizeof(g_address));
     if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.quit_node_tx_info.account) ==
         -1) {
@@ -278,6 +301,21 @@ static uint8_t quitNodeTagValuePairs(void) {
     pairs[nbPairs].item = ACCOUNT;
     pairs[nbPairs].value = g_address;
     nbPairs++;
+
+    memset(g_content, 0, sizeof(g_content));
+    memcpy(g_content, G_context.tx_info.quit_node_tx_info.peer_pubkey,66);
+    pairs[nbPairs].item = NBGL_PEER_PUBKEY;
+    pairs[nbPairs].value = g_content;
+    nbPairs++;
+
+    //fee
+    memset(g_fee, 0, sizeof(g_fee));
+    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.quit_node_tx_info.header.gas_price*G_context.tx_info.oep4_from_tx_info.header.gas_limit,9);
+    strcat(g_fee,ONG_VIEW);
+    pairs[nbPairs].item = FEE_ONG;
+    pairs[nbPairs].value = g_fee;
+    nbPairs++;
+
 
     memset(g_signer, 0, sizeof(g_signer));
     if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
@@ -336,12 +374,6 @@ static uint8_t addInitPosTagValuePairs(void) {
     uint8_t nbPairs = 0;
     explicit_bzero(pairs, sizeof(pairs));
 
-    memset(g_content, 0, sizeof(g_content));
-    memcpy(g_content, G_context.tx_info.add_init_pos_tx_info.peer_pubkey,66);
-    pairs[nbPairs].item = PEER_PUBKEY;
-    pairs[nbPairs].value = g_content;
-    nbPairs++;
-
     memset(g_address, 0, sizeof(g_address));
     if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.add_init_pos_tx_info.account) ==
         -1) {
@@ -351,12 +383,27 @@ static uint8_t addInitPosTagValuePairs(void) {
     pairs[nbPairs].value = g_address;
     nbPairs++;
 
+    memset(g_content, 0, sizeof(g_content));
+    memcpy(g_content, G_context.tx_info.add_init_pos_tx_info.peer_pubkey,66);
+    pairs[nbPairs].item = NBGL_PEER_PUBKEY;
+    pairs[nbPairs].value = g_content;
+    nbPairs++;
+
     memset(g_content_two,0,sizeof(g_content_two));
     if (!format_u64(g_content_two,sizeof(g_content_two),G_context.tx_info.add_init_pos_tx_info.pos)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
+    strcat(g_content_two,ONT_VIEW);
     pairs[nbPairs].item = POS;
     pairs[nbPairs].value = g_content_two;
+    nbPairs++;
+
+    //fee
+    memset(g_fee, 0, sizeof(g_fee));
+    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.add_init_pos_tx_info.header.gas_price*G_context.tx_info.add_init_pos_tx_info.header.gas_limit,9);
+    strcat(g_fee,ONG_VIEW);
+    pairs[nbPairs].item = FEE_ONG;
+    pairs[nbPairs].value = g_fee;
     nbPairs++;
 
     memset(g_signer, 0, sizeof(g_signer));
@@ -434,8 +481,17 @@ static uint8_t reduceInitPosTagValuePairs(void) {
     if (!format_u64(g_content_two,sizeof(g_content_two),G_context.tx_info.reduce_init_pos_tx_info.pos)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
+    strcat(g_content_two,ONT_VIEW);
     pairs[nbPairs].item = POS;
     pairs[nbPairs].value = g_content_two;
+    nbPairs++;
+
+    //fee
+    memset(g_fee, 0, sizeof(g_fee));
+    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.reduce_init_pos_tx_info.header.gas_price*G_context.tx_info.reduce_init_pos_tx_info.header.gas_limit,9);
+    strcat(g_fee,ONG_VIEW);
+    pairs[nbPairs].item = FEE_ONG;
+    pairs[nbPairs].value = g_fee;
     nbPairs++;
 
     memset(g_signer, 0, sizeof(g_signer));
@@ -493,12 +549,6 @@ static uint8_t changeMaxAuthorizationTagValuePairs(void) {
     uint8_t nbPairs = 0;
     explicit_bzero(pairs, sizeof(pairs));
 
-    memset(g_content, 0, sizeof(g_content));
-    memcpy(g_content, G_context.tx_info.change_max_authorization_tx_info.peer_pubkey,66);
-    pairs[nbPairs].item = PEER_PUBKEY;
-    pairs[nbPairs].value = g_content;
-    nbPairs++;
-
     memset(g_address, 0, sizeof(g_address));
     if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.change_max_authorization_tx_info.account) ==
         -1) {
@@ -508,12 +558,28 @@ static uint8_t changeMaxAuthorizationTagValuePairs(void) {
     pairs[nbPairs].value = g_address;
     nbPairs++;
 
+    memset(g_content, 0, sizeof(g_content));
+    memcpy(g_content, G_context.tx_info.change_max_authorization_tx_info.peer_pubkey,66);
+    pairs[nbPairs].item = NBGL_PEER_PUBKEY;
+    pairs[nbPairs].value = g_content;
+    nbPairs++;
+
+
     memset(g_content_two,0,sizeof(g_content_two));
     if (!format_u64(g_content_two,sizeof(g_content_two),G_context.tx_info.change_max_authorization_tx_info.max_authorize)) {
         return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
     }
+    strcat(g_content_two,ONT_VIEW);
     pairs[nbPairs].item = MAX_AUTHORIZE;
     pairs[nbPairs].value = g_content_two;
+    nbPairs++;
+
+     //fee
+    memset(g_fee, 0, sizeof(g_fee));
+    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.change_max_authorization_tx_info.header.gas_price*G_context.tx_info.change_max_authorization_tx_info.header.gas_limit,9);
+    strcat(g_fee,ONG_VIEW);
+    pairs[nbPairs].item = FEE_ONG;
+    pairs[nbPairs].value = g_fee;
     nbPairs++;
 
     memset(g_signer, 0, sizeof(g_signer));
@@ -604,6 +670,14 @@ static uint8_t setFeePercentageTagValuePairs(void) {
     pairs[nbPairs].value = g_content_three;
     nbPairs++;
 
+    //fee
+    memset(g_fee, 0, sizeof(g_fee));
+    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.set_fee_percentage_tx_info.header.gas_price*G_context.tx_info.set_fee_percentage_tx_info.header.gas_limit,9);
+    strcat(g_fee,ONG_VIEW);
+    pairs[nbPairs].item = FEE_ONG;
+    pairs[nbPairs].value = g_fee;
+    nbPairs++;
+
     memset(g_signer, 0, sizeof(g_signer));
     if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
         return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
@@ -678,21 +752,30 @@ static uint8_t setAuthorizeForPeerTagValuePairs(void) {
         if (i==0) {
             memset(g_content, 0, sizeof(g_content));
             memcpy(g_content, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey[i], 66);
-            pairs[nbPairs].item = PEER_PUBKEY;
+            memset(g_title,0,sizeof(g_title));
+            memcpy(g_title,NBGL_PEER_PUBKEY,sizeof(NBGL_PEER_PUBKEY));
+            strcat(g_title,ONE);
+            pairs[nbPairs].item = g_title;
             pairs[nbPairs].value = g_content;
             nbPairs++;
         }
         if (i==1) {
            memset(g_content_two, 0, sizeof(g_content_two));
             memcpy(g_content_two, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey[i], 66);
-            pairs[nbPairs].item = PEER_PUBKEY;
+            memset(g_title_two,0,sizeof(g_title_two));
+            memcpy(g_title_two,NBGL_PEER_PUBKEY,sizeof(NBGL_PEER_PUBKEY));
+            strcat(g_title,TWO);
+            pairs[nbPairs].item = g_title_two;
             pairs[nbPairs].value = g_content_two;
             nbPairs++;
         }
         if (i==2) {
             memset(g_content_three, 0, sizeof(g_content_three));
             memcpy(g_content_three, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey[i], 66);
-            pairs[nbPairs].item = PEER_PUBKEY;
+            memset(g_title_three,0,sizeof(g_title_three));
+            memcpy(g_title_three,NBGL_PEER_PUBKEY,sizeof(NBGL_PEER_PUBKEY));
+            strcat(g_title,THREE);
+            pairs[nbPairs].item = g_title_three;
             pairs[nbPairs].value = g_content_three;
             nbPairs++;
         }
@@ -701,11 +784,19 @@ static uint8_t setAuthorizeForPeerTagValuePairs(void) {
     memset(g_content_four,0,sizeof(g_content_four));
      if (!format_u64(g_content_four, sizeof(g_content_four), G_context.tx_info.authorize_for_peer_tx_info.pos_list_value)) {
             return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-        }
-    pairs[nbPairs].item = TOTAL_POS;
+     }
+    strcat(g_content_four,ONT_VIEW);
+    pairs[nbPairs].item = POS;
     pairs[nbPairs].value = g_content_four;
     nbPairs++;
 
+    //fee
+    memset(g_fee, 0, sizeof(g_fee));
+    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.tx_info.header.gas_price*G_context.tx_info.tx_info.header.gas_limit,9);
+     strcat(g_fee,ONG_VIEW);
+    pairs[nbPairs].item = FEE_ONG;
+    pairs[nbPairs].value = g_fee;
+    nbPairs++;
 
     memset(g_signer, 0, sizeof(g_signer));
     if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
@@ -808,6 +899,14 @@ static uint8_t setunAuthorizeForPeerTagValuePairs(void) {
     pairs[nbPairs].value = g_content_four;
     nbPairs++;
 
+    //fee
+    memset(g_fee, 0, sizeof(g_fee));
+    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.tx_info.header.gas_price*G_context.tx_info.tx_info.header.gas_limit,9);
+     strcat(g_fee,ONG_VIEW);
+    pairs[nbPairs].item = FEE_ONG;
+    pairs[nbPairs].value = g_fee;
+    nbPairs++;
+
     memset(g_signer, 0, sizeof(g_signer));
     if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
         return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
@@ -871,6 +970,14 @@ static uint8_t setwithdrawFeeTagValuePairs(void) {
         }
     pairs[nbPairs].item = ACCOUNT;
     pairs[nbPairs].value = g_address;
+    nbPairs++;
+
+    //fee
+    memset(g_fee, 0, sizeof(g_fee));
+    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.tx_info.header.gas_price*G_context.tx_info.tx_info.header.gas_limit,9);
+    strcat(g_fee,ONG_VIEW);
+    pairs[nbPairs].item = FEE_ONG;
+    pairs[nbPairs].value = g_fee;
     nbPairs++;
 
     memset(g_signer, 0, sizeof(g_signer));

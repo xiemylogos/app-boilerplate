@@ -115,7 +115,7 @@ int ui_display_withdraw_fee_tx(void);
  * @return 0 if success, negative integer otherwise.
  *
  */
-int ui_display_blind_signed_transaction(void);
+int ui_display_blind_signing_transaction(void);
 /**
  * Display approve transaction information on the device and ask confirmation to sign.
  *
