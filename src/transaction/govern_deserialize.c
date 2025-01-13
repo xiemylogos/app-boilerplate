@@ -21,6 +21,9 @@
 #include "utils.h"
 #include "types.h"
 #include "constants.h"
+#include "format.h"
+#include "../ui/utils.h"
+#include "../globals.h"
 
 #if defined(TEST) || defined(FUZZ)
 #include "assert.h"
@@ -143,6 +146,20 @@ parser_status_e register_candidate_tx_deserialize(buffer_t *buf, register_candid
     } else {
         tx->key_no = getBytesValueByLen(buf,tx->key_no_len);
     }
+    memcpy(G_context.display_data.peer_pubkey, tx->peer_pubkey, 66);
+    if (script_hash_to_address(G_context.display_data.content,
+                               sizeof(G_context.display_data.content),
+                               tx->account) == -1) {
+        return DATA_PARSING_ERROR;
+    }
+    if(!convert_uint64_to_char(G_context.display_data.amount,
+                               sizeof (G_context.display_data.amount),
+                               tx->init_pos)) {
+        return DATA_PARSING_ERROR;
+    }
+
+
+
     return check_govern_end_data(buf,RegisterCandidate);
 }
 
@@ -241,6 +258,19 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
             }
         }
     }
+    if (tx->peer_pubkey_number>0) {
+        memcpy(G_context.display_data.peer_pubkey, tx->peer_pubkey[0], 66);
+    }
+    if (script_hash_to_address(G_context.display_data.content,
+                               sizeof(G_context.display_data.content),
+                               tx->account) == -1) {
+        return DATA_PARSING_ERROR;
+    }
+    if(!convert_uint64_to_char(G_context.display_data.amount,
+                               sizeof (G_context.display_data.amount),
+                               tx->withdraw_value)) {
+        return DATA_PARSING_ERROR;
+    }
     return check_govern_end_data(buf,Withdraw);
 }
 
@@ -284,6 +314,12 @@ parser_status_e quit_node_tx_deserialize(buffer_t *buf, quit_node_t *tx) {
     tx->account = (uint8_t*)(buf->ptr+buf->offset);
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return ACCOUNT_PARSING_ERROR;
+    }
+    memcpy(G_context.display_data.peer_pubkey, tx->peer_pubkey, 66);
+    if (script_hash_to_address(G_context.display_data.content,
+                               sizeof(G_context.display_data.content),
+                               tx->account) == -1) {
+        return DATA_PARSING_ERROR;
     }
     return check_govern_end_data(buf,QuitNode);
 }
@@ -341,6 +377,17 @@ parser_status_e add_init_pos_tx_deserialize(buffer_t *buf, add_init_pos_t *tx) {
     } else {
         tx->pos = getBytesValueByLen(buf, pos_len);
     }
+    memcpy(G_context.display_data.peer_pubkey, tx->peer_pubkey, 66);
+    if (script_hash_to_address(G_context.display_data.content,
+                               sizeof(G_context.display_data.content),
+                               tx->account) == -1) {
+        return DATA_PARSING_ERROR;
+    }
+    if(!convert_uint64_to_char(G_context.display_data.amount,
+                               sizeof (G_context.display_data.amount),
+                               tx->pos)) {
+        return DATA_PARSING_ERROR;
+    }
     return check_govern_end_data(buf,AddInitPos);
 }
 
@@ -395,6 +442,17 @@ parser_status_e reduce_init_pos_tx_deserialize(buffer_t *buf, reduce_init_pos_t 
         tx->pos = pos_len - 80;
     } else {
         tx->pos = getBytesValueByLen(buf, pos_len);
+    }
+    memcpy(G_context.display_data.peer_pubkey, tx->peer_pubkey, 66);
+    if (script_hash_to_address(G_context.display_data.content,
+                               sizeof(G_context.display_data.content),
+                               tx->account) == -1) {
+        return DATA_PARSING_ERROR;
+    }
+    if(!convert_uint64_to_char(G_context.display_data.amount,
+                               sizeof (G_context.display_data.amount),
+                               tx->pos)) {
+        return DATA_PARSING_ERROR;
     }
     return check_govern_end_data(buf,ReduceInitPos);
 }
@@ -452,6 +510,17 @@ parser_status_e  change_max_authorization_tx_deserialize(buffer_t *buf, change_m
         return VALUE_PARSING_ERROR;
     }
     tx->max_authorize = value;
+    memcpy(G_context.display_data.peer_pubkey, tx->peer_pubkey, 66);
+    if (script_hash_to_address(G_context.display_data.content,
+                               sizeof(G_context.display_data.content),
+                               tx->account) == -1) {
+        return DATA_PARSING_ERROR;
+    }
+    if(!convert_uint64_to_char(G_context.display_data.amount,
+                               sizeof (G_context.display_data.amount),
+                               tx->max_authorize)) {
+        return DATA_PARSING_ERROR;
+    }
     return check_govern_end_data(buf,ChangeMaxAuthorization);
 }
 
@@ -513,7 +582,23 @@ parser_status_e  set_fee_percentage_tx_deserialize(buffer_t *buf, set_fee_percen
         return VALUE_PARSING_ERROR;
     }
     tx->stake_cost = getBytesValueByLen(buf,stake_cost_len);
-    return check_govern_end_data(buf,SetFeePercentage); 
+    memcpy(G_context.display_data.peer_pubkey, tx->peer_pubkey, 66);
+    if (script_hash_to_address(G_context.display_data.content,
+                               sizeof(G_context.display_data.content),
+                               tx->account) == -1) {
+        return DATA_PARSING_ERROR;
+    }
+    if(!convert_uint64_to_char(G_context.display_data.amount,
+                               sizeof (G_context.display_data.amount),
+                               tx->peer_cost)) {
+        return DATA_PARSING_ERROR;
+    }
+    if(!convert_uint64_to_char(G_context.display_data.content_two,
+                               sizeof (G_context.display_data.content_two),
+                               tx->stake_cost)) {
+        return DATA_PARSING_ERROR;
+    }
+    return check_govern_end_data(buf,SetFeePercentage);
 }
 
 
@@ -614,7 +699,19 @@ parser_status_e authorize_for_peer_tx_deserialize(buffer_t *buf, authorize_for_p
             }
         }
     }
-
+    if(tx->peer_pubkey_number >0) {
+        memcpy(G_context.display_data.peer_pubkey, tx->peer_pubkey, 66);
+    }
+    if (script_hash_to_address(G_context.display_data.content,
+                               sizeof(G_context.display_data.content),
+                               tx->account) == -1) {
+        return DATA_PARSING_ERROR;
+    }
+    if(!convert_uint64_to_char(G_context.display_data.amount,
+                               sizeof (G_context.display_data.amount),
+                               tx->pos_list_value)) {
+        return DATA_PARSING_ERROR;
+    }
     return check_govern_end_data(buf,AuthorizeForPeer);  
 }
 
@@ -716,6 +813,19 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf, un_authorize
             }
         }
     }
+    if(tx->peer_pubkey_number >0) {
+        memcpy(G_context.display_data.peer_pubkey, tx->peer_pubkey, 66);
+    }
+    if (script_hash_to_address(G_context.display_data.content,
+                               sizeof(G_context.display_data.content),
+                               tx->account) == -1) {
+        return DATA_PARSING_ERROR;
+    }
+    if(!convert_uint64_to_char(G_context.display_data.amount,
+                               sizeof (G_context.display_data.amount),
+                               tx->pos_list_value)) {
+        return DATA_PARSING_ERROR;
+    }
     return check_govern_end_data(buf,UnAuthorizeForPeer);  
 }
 
@@ -748,6 +858,11 @@ parser_status_e withdraw_fee_tx_deserialize(buffer_t *buf, withdraw_fee_t *tx) {
     tx->account = (uint8_t*)(buf->ptr+buf->offset);
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return ACCOUNT_PARSING_ERROR;
+    }
+    if (script_hash_to_address(G_context.display_data.content,
+                               sizeof(G_context.display_data.content),
+                               tx->account) == -1) {
+        return DATA_PARSING_ERROR;
     }
     return check_govern_end_data(buf,WithdrawFee);  
 }

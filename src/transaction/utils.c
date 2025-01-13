@@ -30,6 +30,8 @@
 #endif
 
 #include "types.h"
+#include "../globals.h"
+#include "../ui/utils.h"
 
 uint64_t getBytesValueByLen(buffer_t *buf,uint8_t len) {
     uint8_t *value;
@@ -63,6 +65,10 @@ parser_status_e transaction_deserialize_header(buffer_t *buf,transaction_header_
     //gasLimit
     if(!buffer_read_u64(buf,&tx->gas_limit,LE)) {
         return GASLIMIT_PARSING_ERROR;
+    }
+    get_ong_fee(tx->gas_price,tx->gas_limit,G_context.display_data.fee,sizeof(G_context.display_data.fee));
+    if (!ont_address_from_pubkey(G_context.display_data.signer,sizeof(G_context.display_data.signer))) {
+        return DATA_PARSING_ERROR;
     }
     //payer
     tx->payer = (uint8_t *) (buf->ptr + buf->offset);

@@ -4,9 +4,12 @@
 #include "lcx_sha256.h"
 #include "lcx_ripemd160.h"
 #include "crypto_helpers.h"
-#include "globals.h"
+#include "../globals.h"
 #include "format.h"
 #include "uint128.h"
+#include "format.h"
+#include "types.h"
+#include "../types.h"
 
 
 /** the length of a SHA256 hash */
@@ -192,4 +195,53 @@ uint8_t get_oep4_token_decimals(uint8_t  *contract_addr) {
         decimals = 9;
     }
     return decimals;
+}
+
+void get_ong_fee(uint64_t gas_price,uint64_t gas_limit,char* out, size_t out_len) {
+    format_fpu64_trimmed(out,sizeof(out_len),gas_price*gas_limit,9);
+    strcat(out,ONG_VIEW);
+}
+
+bool get_native_token_amount(uint8_t *contract_addr,const uint8_t value_len,const uint64_t value[2],char* out, size_t out_len) {
+    if (memcmp(contract_addr, ONT_ADDR, 20) == 0) {
+        uint8_t decimals = 0;
+        if(G_context.tx_type == TRANSFER_V2_TRANSACTION ||
+            G_context.tx_type == APPROVE_V2 ||
+            G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION) {
+            decimals = 9;
+        }
+        if(!get_token_amount(value_len,value,decimals,out,out_len)) {
+            return false;
+        }
+        strcat(out,ONT_VIEW);
+    } else if (memcmp(contract_addr, ONG_ADDR, 20) == 0) {
+        uint decimals = 9;
+        if(G_context.tx_type == TRANSFER_V2_TRANSACTION ||
+            G_context.tx_type == APPROVE_V2 ||
+            G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION) {
+            decimals = 18;
+        }
+        if(!get_token_amount(value_len,value,decimals,out,out_len)) {
+            return false;
+        }
+        strcat(out,ONG_VIEW);
+    }
+    return true;
+}
+
+bool get_oep4_token_amount(const uint8_t value_len,const uint64_t value[2],char* out, size_t out_len) {
+    uint8_t decimals = 0;
+    decimals = get_oep4_token_decimals(G_context.tx_info.oep4_tx_info.payload.contract_addr);
+    if(!get_token_amount(value_len,value,decimals,out,out_len)) {
+        return false;
+    }
+    return true;
+}
+
+bool convert_uint64_to_char(char* out, size_t out_len,uint64_t amount) {
+    if(!format_u64(out,out_len,amount)) {
+        return false;
+    }
+    strcat(out,ONT_VIEW);
+    return true;
 }

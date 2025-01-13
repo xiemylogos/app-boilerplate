@@ -56,6 +56,7 @@ typedef struct{
 }ont_transaction_from_t;
 
 typedef struct {
+    uint8_t *sender;
     uint8_t *from;
     uint8_t *to;
     uint8_t value_len;

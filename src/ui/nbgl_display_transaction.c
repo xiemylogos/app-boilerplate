@@ -39,14 +39,6 @@
 #include "types.h"
 
 // Buffer where the transaction amount string is written
-static char g_amount[40];
-static char g_fee[40];
-// Buffer where the transaction address string is written
-static char g_fromAddr[40];
-static char g_toAddr[40];
-static char g_signer[40];
-static char g_sender[40];
-
 #define MAX_PAIRS        8
 
 static nbgl_contentTagValue_t pairs[MAX_PAIRS];
@@ -66,67 +58,63 @@ static void tx_review_choice(bool confirm) {
 static uint8_t setTagValuePairs(void) {
     uint8_t nbPairs = 0;
     explicit_bzero(pairs, sizeof(pairs));
-     // Format amount and address to g_amount and g_address buffers
-    memset(g_amount, 0, sizeof(g_amount));
-    // Setup data to display
-    if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONT_ADDR,20) == 0) {
-         pairs[nbPairs].item = ONT_AMOUNT;
-         uint decimals = 0;
-        if(G_context.tx_type == TRANSFER_V2_TRANSACTION) {
-              decimals = 9;
+    if(G_context.tx_type == OEP4_TRANSACTION ||
+        G_context.tx_type == NEO_VM_OEP4_APPROVE ||
+        G_context.tx_type == WASM_VM_OEP4_APPROVE ||
+        G_context.tx_type == NEO_VM_OEP4_TRANSFER_FROM ||
+        G_context.tx_type == WASM_VM_OEP4_TRANSFER_FROM) {
+        uint8_t decimals = 0;
+        decimals = get_oep4_token_decimals(G_context.tx_info.oep4_tx_info.payload.contract_addr);
+        if (decimals == 0) {
+            pairs[nbPairs].item = DECIMALS;
+            pairs[nbPairs].value = DECIMALS_UNKNOWN;
+            nbPairs++;
         }
-       if(!get_token_amount(G_context.tx_info.tx_info.payload.value_len,G_context.tx_info.tx_info.payload.value,
-                         decimals,g_amount,sizeof(g_amount))) {
-                return io_send_sw(SW_DISPLAY_TOKEN_AMOUNT_FAIL);
-       }
-       strcat(g_amount,ONT_VIEW);
-    } else if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONG_ADDR,20) == 0) {
-        pairs[nbPairs].item = ONG_AMOUNT;
-        uint decimals = 9;
-        if(G_context.tx_type == TRANSFER_V2_TRANSACTION) {
-            decimals = 18;
+        pairs[nbPairs].item = AMOUNT;
+        pairs[nbPairs].value = G_context.display_data.amount;
+        nbPairs++;
+    } else {
+       if (G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION ||
+        G_context.tx_type == TRANSFER_FROM_TRANSACTION) {
+            if (memcmp(G_context.tx_info.from_tx_info.payload.contract_addr,ONT_ADDR,20) == 0) {
+                pairs[nbPairs].item = ONT_AMOUNT;
+            } else if (memcmp(G_context.tx_info.from_tx_info.payload.contract_addr,ONG_ADDR,20) == 0) {
+                pairs[nbPairs].item = ONG_AMOUNT;
+            }
+        } else {
+            if (memcmp(G_context.tx_info.tx_info.payload.contract_addr, ONT_ADDR, 20) == 0) {
+                pairs[nbPairs].item = ONT_AMOUNT;
+            } else if (memcmp(G_context.tx_info.tx_info.payload.contract_addr, ONG_ADDR, 20) == 0) {
+                pairs[nbPairs].item = ONG_AMOUNT;
+            }
         }
-        if(!get_token_amount(G_context.tx_info.tx_info.payload.value_len,G_context.tx_info.tx_info.payload.value,
-                         decimals,g_amount,sizeof(g_amount))) {
-            return io_send_sw(SW_DISPLAY_TOKEN_AMOUNT_FAIL);
-        }
-        strcat(g_amount,ONG_VIEW);
+        pairs[nbPairs].value = G_context.display_data.amount;
+        nbPairs++;
     }
 
-    pairs[nbPairs].value = g_amount;
-    nbPairs++;
+    if(G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION ||
+        G_context.tx_type == TRANSFER_FROM_TRANSACTION ||
+        G_context.tx_type == NEO_VM_OEP4_TRANSFER_FROM ||
+        G_context.tx_type == WASM_VM_OEP4_TRANSFER_FROM) {
+      pairs[nbPairs].item = SENDER;
+      pairs[nbPairs].value = G_context.display_data.content;
+      nbPairs++;
+    }
     //fromAddr
-    memset(g_fromAddr, 0, sizeof(g_fromAddr));
-    if (script_hash_to_address(g_fromAddr,sizeof(g_fromAddr),G_context.tx_info.tx_info.payload.from) ==
-        -1) {
-           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
-        }
     pairs[nbPairs].item = FROM;
-    pairs[nbPairs].value = g_fromAddr;
+    pairs[nbPairs].value = G_context.display_data.from;
     nbPairs++;
      //toAddr
-    memset(g_toAddr, 0, sizeof(g_toAddr));
-    if (script_hash_to_address(g_toAddr,sizeof(g_toAddr),G_context.tx_info.tx_info.payload.to) ==
-        -1) {
-           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
-        }
     pairs[nbPairs].item = TO;
-    pairs[nbPairs].value = g_toAddr;
+    pairs[nbPairs].value = G_context.display_data.to;
     nbPairs++;
    //fee
-    memset(g_fee, 0, sizeof(g_fee));
-    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.tx_info.header.gas_price*G_context.tx_info.tx_info.header.gas_limit,9);
-    strcat(g_fee,ONG_VIEW);
     pairs[nbPairs].item = FEE_ONG;
-    pairs[nbPairs].value = g_fee;
+    pairs[nbPairs].value = G_context.display_data.fee;
     nbPairs++;
-
-    memset(g_signer, 0, sizeof(g_signer));
-    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
-        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
-    }
+    //sender
     pairs[nbPairs].item = SIGNER;
-    pairs[nbPairs].value = g_signer;
+    pairs[nbPairs].value = G_context.display_data.signer;
     nbPairs++;
 
     return nbPairs;
@@ -181,12 +169,8 @@ int ui_display_blind_transaction_bs_choice() {
     pairs[0].item = "transaction";
     pairs[0].value = "transaction blind signing";
 
-    memset(g_signer, 0, sizeof(g_signer));
-    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
-        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
-    }
     pairs[1].item = SIGNER;
-    pairs[1].value = g_signer;
+    pairs[1].value = G_context.display_data.signer;
 
     pairsList.pairs = pairs;
     pairsList.nbPairs = 2;
@@ -206,85 +190,6 @@ int ui_display_blind_signing_transaction() {
     return ui_display_blind_transaction_bs_choice();
 }
 
-static void approve_tx_review_choice(bool confirm) {
-    // Answer, display a status page and go back to main
-    validate_approve_transaction(confirm);
-    if (confirm) {
-        nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_SIGNED, ui_menu_main);
-    } else {
-        nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_REJECTED, ui_menu_main);
-    }
-}
-
-static uint8_t setTagApproveValuePairs(void) {
-    uint8_t nbPairs = 0;
-    explicit_bzero(pairs, sizeof(pairs));
-     // Format amount and address to g_amount and g_address buffers
-    memset(g_amount, 0, sizeof(g_amount));
-
-    if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONT_ADDR,20) == 0) {
-         pairs[nbPairs].item = AMOUNT;
-         uint decimals = 0;
-        if(G_context.tx_type == APPROVE_V2) {
-              decimals = 9;
-        }
-        if(!get_token_amount(G_context.tx_info.tx_info.payload.value_len,G_context.tx_info.tx_info.payload.value,
-                         decimals,g_amount,sizeof(g_amount))) {
-            return io_send_sw(SW_DISPLAY_TOKEN_AMOUNT_FAIL);
-        }
-        strcat(g_amount,ONT_VIEW);
-    } else if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONG_ADDR,20) == 0) {
-        pairs[nbPairs].item = AMOUNT;
-         uint decimals = 9;
-        if(G_context.tx_type == APPROVE_V2) {
-              decimals = 18;
-        }
-        if(!get_token_amount(G_context.tx_info.tx_info.payload.value_len,G_context.tx_info.tx_info.payload.value,
-                         decimals,g_amount,sizeof(g_amount))) {
-            return io_send_sw(SW_DISPLAY_TOKEN_AMOUNT_FAIL);
-        }
-        strcat(g_amount,ONG_VIEW);
-    }
-
-    pairs[nbPairs].value = g_amount;
-    nbPairs++;
-    //fromAddr
-    memset(g_fromAddr, 0, sizeof(g_fromAddr));
-    if (script_hash_to_address(g_fromAddr,sizeof(g_fromAddr),G_context.tx_info.tx_info.payload.from) ==
-        -1) {
-           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
-        }
-    pairs[nbPairs].item = FROM;
-    pairs[nbPairs].value = g_fromAddr;
-    nbPairs++;
-     //toAddr
-    memset(g_toAddr, 0, sizeof(g_toAddr));
-    if (script_hash_to_address(g_toAddr,sizeof(g_toAddr),G_context.tx_info.tx_info.payload.to) ==
-        -1) {
-           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
-        }
-    pairs[nbPairs].item = TO;
-    pairs[nbPairs].value = g_toAddr;
-    nbPairs++;
-    //fee
-    memset(g_fee, 0, sizeof(g_fee));
-    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.tx_info.header.gas_price*G_context.tx_info.tx_info.header.gas_limit,9);
-     strcat(g_fee,ONG_VIEW);
-    pairs[nbPairs].item = FEE_ONG;
-    pairs[nbPairs].value = g_fee;
-    nbPairs++;
-
-    memset(g_signer, 0, sizeof(g_signer));
-    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
-        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
-    }
-    pairs[nbPairs].item = SIGNER;
-    pairs[nbPairs].value = g_signer;
-    nbPairs++;
-
-    return nbPairs;
-}
-
 int ui_display_approve_transaction_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
         || (G_context.tx_type != APPROVE &&
@@ -293,7 +198,7 @@ int ui_display_approve_transaction_choice() {
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
-    pairsList.nbPairs = setTagApproveValuePairs();
+    pairsList.nbPairs = setTagValuePairs();
     pairsList.pairs = pairs;
 
     if (memcmp(G_context.tx_info.from_tx_info.payload.contract_addr,ONT_ADDR,20) == 0) {
@@ -303,7 +208,7 @@ int ui_display_approve_transaction_choice() {
                               "Review transaction Approve ONT",
                               NULL,
                               "Sign transaction Aprove ONT",
-                              approve_tx_review_choice);
+                              tx_review_choice);
    } else if (memcmp(G_context.tx_info.from_tx_info.payload.contract_addr,ONG_ADDR,20) == 0) {
           nbgl_useCaseReview(TYPE_TRANSACTION,
                               &pairsList,
@@ -311,92 +216,13 @@ int ui_display_approve_transaction_choice() {
                               "Review transaction Approve ONG",
                               NULL,
                                "Sign transaction Aprove ONG",
-                              approve_tx_review_choice);
+                              tx_review_choice);
    }
     return 0;
 }
 
 int ui_display_approve_tx() {
     return ui_display_approve_transaction_choice();
-}
-
-
-static uint8_t setTagFromValuePairs(void) {
-    uint8_t nbPairs = 0;
-    explicit_bzero(pairs, sizeof(pairs));
-     // Format amount and address to g_amount and g_address buffers
-    memset(g_amount, 0, sizeof(g_amount));
-    // Setup data to display
-    if (memcmp(G_context.tx_info.from_tx_info.payload.contract_addr,ONT_ADDR,20) == 0) {
-        pairs[nbPairs].item = ONT_AMOUNT;
-        uint decimals = 0;
-        if(G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION) {
-              decimals = 9;
-        }
-        if(!get_token_amount(G_context.tx_info.from_tx_info.payload.value_len,G_context.tx_info.from_tx_info.payload.value,
-                         decimals,g_amount,sizeof(g_amount))) {
-            return io_send_sw(SW_DISPLAY_TOKEN_AMOUNT_FAIL);
-        }
-        strcat(g_amount,ONT_VIEW);
-    } else if (memcmp(G_context.tx_info.from_tx_info.payload.contract_addr,ONG_ADDR,20) == 0) {
-        pairs[nbPairs].item = ONG_AMOUNT;
-        uint decimals = 9;
-        if(G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION) {
-              decimals = 18;
-        }
-        if(!get_token_amount(G_context.tx_info.from_tx_info.payload.value_len,G_context.tx_info.from_tx_info.payload.value,
-                         decimals,g_amount,sizeof(g_amount))) {
-            return io_send_sw(SW_DISPLAY_TOKEN_AMOUNT_FAIL);
-        }
-        strcat(g_amount,ONG_VIEW);
-    }
-
-    pairs[nbPairs].value = g_amount;
-    nbPairs++;
-    //sender
-    memset(g_sender, 0, sizeof(g_sender));
-    if (script_hash_to_address(g_sender,sizeof(g_sender),G_context.tx_info.from_tx_info.payload.sender) ==
-        -1) {
-           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
-        }
-    pairs[nbPairs].item = SENDER;
-    pairs[nbPairs].value = g_fromAddr;
-    nbPairs++;
-    //fromAddr
-    memset(g_fromAddr, 0, sizeof(g_fromAddr));
-    if (script_hash_to_address(g_fromAddr,sizeof(g_fromAddr),G_context.tx_info.from_tx_info.payload.from) ==
-        -1) {
-           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
-        }
-    pairs[nbPairs].item = FROM;
-    pairs[nbPairs].value = g_fromAddr;
-    nbPairs++;
-     //toAddr
-    memset(g_toAddr, 0, sizeof(g_toAddr));
-    if (script_hash_to_address(g_toAddr,sizeof(g_toAddr),G_context.tx_info.from_tx_info.payload.to) ==
-        -1) {
-           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
-        }
-    pairs[nbPairs].item = TO;
-    pairs[nbPairs].value = g_toAddr;
-    nbPairs++;
-    //fee
-    memset(g_fee, 0, sizeof(g_fee));
-    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.from_tx_info.header.gas_price*G_context.tx_info.from_tx_info.header.gas_limit,9);
-    strcat(g_fee,ONG_VIEW);
-    pairs[nbPairs].item = FEE_ONG;
-    pairs[nbPairs].value = g_fee;
-    nbPairs++;
-
-    memset(g_signer, 0, sizeof(g_signer));
-    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
-        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
-    }
-    pairs[nbPairs].item = SIGNER;
-    pairs[nbPairs].value = g_signer;
-    nbPairs++;
-
-    return nbPairs;
 }
 
 int ui_display_transaction_from_choice() {
@@ -407,7 +233,7 @@ int ui_display_transaction_from_choice() {
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
-    pairsList.nbPairs = setTagFromValuePairs();
+    pairsList.nbPairs = setTagValuePairs();
     pairsList.pairs = pairs;
 
    if (memcmp(G_context.tx_info.from_tx_info.payload.contract_addr,ONT_ADDR,20) == 0) {
@@ -430,9 +256,83 @@ int ui_display_transaction_from_choice() {
     return 0;
 }
 
-
 int ui_display_transaction_from() {
     return ui_display_transaction_from_choice();
+}
+
+int ui_display_oep4_transaction_choice() {
+    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
+        || G_context.tx_type != OEP4_TRANSACTION) {
+        G_context.state = STATE_NONE;
+        return io_send_sw(SW_BAD_STATE);
+    }
+
+    explicit_bzero(&pairsList, sizeof(pairsList));
+    pairsList.nbPairs = setTagValuePairs();
+    pairsList.pairs = pairs;
+    nbgl_useCaseReview(TYPE_TRANSACTION,
+                           &pairsList,
+                           &C_icon_ont_64px,
+                           "Review transaction\nto send token",
+                           NULL,
+                           "Sign transaction\nto send token",
+                           tx_review_choice);
+    return 0;
+}
+
+// Flow used to display a clear-signed transaction
+int ui_display_oep4_transaction() {
+    return ui_display_oep4_transaction_choice();
+}
+
+int ui_display_oep4_approve_transaction_choice() {
+    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
+        || (G_context.tx_type != NEO_VM_OEP4_APPROVE &&
+            G_context.tx_type != WASM_VM_OEP4_APPROVE)) {
+        G_context.state = STATE_NONE;
+        return io_send_sw(SW_BAD_STATE);
+    }
+    explicit_bzero(&pairsList, sizeof(pairsList));
+    pairsList.nbPairs = setTagValuePairs();
+    pairsList.pairs = pairs;
+
+    nbgl_useCaseReview(TYPE_TRANSACTION,
+                           &pairsList,
+                           &C_icon_ont_64px,
+                           "Review approve transaction",
+                           NULL,
+                           "Sign approve transaction",
+                           tx_review_choice);
+    return 0;
+}
+
+int ui_display_oep4_approve_tx() {
+    return ui_display_oep4_approve_transaction_choice();
+}
+
+int ui_display_oep4_transfer_from_transaction_choice() {
+    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
+        || (G_context.tx_type != NEO_VM_OEP4_TRANSFER_FROM &&
+            G_context.tx_type != WASM_VM_OEP4_TRANSFER_FROM)) {
+        G_context.state = STATE_NONE;
+        return io_send_sw(SW_BAD_STATE);
+    }
+
+    explicit_bzero(&pairsList, sizeof(pairsList));
+    pairsList.nbPairs = setTagValuePairs();
+    pairsList.pairs = pairs;
+    nbgl_useCaseReview(TYPE_TRANSACTION,
+                           &pairsList,
+                           &C_icon_ont_64px,
+                           "Review transaction from\nto send token",
+                           NULL,
+                           "Sign transaction from \nto send token",
+                           tx_review_choice);
+    return 0;
+}
+
+int ui_display_oep4_transfer_from_tx() {
+    return ui_display_oep4_transfer_from_transaction_choice();
 }
 
 #endif

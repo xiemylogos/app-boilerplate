@@ -29,7 +29,7 @@
 #include "sign_personal_msg.h"
 #include "../personal-msg/deserialize.h"
 #include "../personal-msg/types.h"
-#include "utils.h"
+#include "../ui/utils.h"
 
 
 #ifdef TARGET_NANOS

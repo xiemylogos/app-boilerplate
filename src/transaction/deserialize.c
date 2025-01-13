@@ -20,6 +20,8 @@
 #include "utils.h"
 #include "types.h"
 #include "constants.h"
+#include "../ui/utils.h"
+#include "../globals.h"
 
 #if defined(TEST) || defined(FUZZ)
 #include "assert.h"
@@ -145,6 +147,21 @@ parser_status_e transaction_native_transfer_deserialize(buffer_t *buf, ont_trans
             memcmp(tx->payload.contract_addr,ONT_ADDR,ADDRESS_LEN) != 0) {
             return CONTRACT_ADDR_PARSING_ERROR;
         }
+        if (script_hash_to_address(G_context.display_data.from,
+                                   sizeof(G_context.display_data.from),
+                                   tx->payload.from) == -1) {
+            return DATA_PARSING_ERROR;
+        }
+        if (script_hash_to_address(G_context.display_data.to,
+                                   sizeof(G_context.display_data.to),
+                                   tx->payload.to) == -1) {
+            return DATA_PARSING_ERROR;
+        }
+        if(!get_native_token_amount(tx->payload.contract_addr,tx->payload.value_len,
+                                     tx->payload.value,G_context.display_data.amount,
+                                     sizeof (G_context.display_data.amount))) {
+            return DATA_PARSING_ERROR;
+        }
         return check_native_end_data(buf);
     }else{
         return TO_PARSING_ERROR;
@@ -249,6 +266,22 @@ parser_status_e transaction_native_transfer_v2_deserialize(buffer_t *buf, ont_tr
         if (memcmp(tx->payload.contract_addr, ONG_ADDR, ADDRESS_LEN) != 0 &&
             memcmp(tx->payload.contract_addr, ONT_ADDR, ADDRESS_LEN) != 0) {
             return CONTRACT_ADDR_PARSING_ERROR;
+        }
+        if (script_hash_to_address(G_context.display_data.from,
+                                   sizeof(G_context.display_data.from),
+                                   tx->payload.from) == -1) {
+            return DATA_PARSING_ERROR;
+        }
+        if (script_hash_to_address(G_context.display_data.to,
+                                   sizeof(G_context.display_data.to),
+                                   tx->payload.to) == -1) {
+            return DATA_PARSING_ERROR;
+        }
+        if(!get_native_token_amount(tx->payload.contract_addr,
+                                     tx->payload.value_len,
+                                     tx->payload.value,G_context.display_data.amount,
+                                     sizeof (G_context.display_data.amount))) {
+            return DATA_PARSING_ERROR;
         }
         return check_native_end_data(buf);
     } else {
@@ -380,6 +413,27 @@ parser_status_e transaction_native_transfer_from_deserialize(buffer_t *buf, ont_
             memcmp(tx->payload.contract_addr, ONT_ADDR, ADDRESS_LEN) != 0) {
             return CONTRACT_ADDR_PARSING_ERROR;
         }
+        if (script_hash_to_address(G_context.display_data.content,
+                                   sizeof(G_context.display_data.content),
+                                   tx->payload.sender) == -1) {
+            return DATA_PARSING_ERROR;
+        }
+        if (script_hash_to_address(G_context.display_data.from,
+                                   sizeof(G_context.display_data.from),
+                                   tx->payload.from) == -1) {
+            return DATA_PARSING_ERROR;
+        }
+        if (script_hash_to_address(G_context.display_data.to,
+                                   sizeof(G_context.display_data.to),
+                                   tx->payload.to) == -1) {
+            return DATA_PARSING_ERROR;
+        }
+        if(!get_native_token_amount(tx->payload.contract_addr,
+                                     tx->payload.value_len,
+                                     tx->payload.value,G_context.display_data.amount,
+                                     sizeof (G_context.display_data.amount))) {
+            return DATA_PARSING_ERROR;
+        }
         return check_native_end_data(buf);
     } else {
         return TX_PARSING_ERROR;
@@ -509,6 +563,28 @@ parser_status_e transaction_native_transfer_from_v2_deserialize(buffer_t *buf, o
             memcmp(tx->payload.contract_addr, ONT_ADDR, ADDRESS_LEN) != 0) {
             return CONTRACT_ADDR_PARSING_ERROR;
         }
+        if (script_hash_to_address(G_context.display_data.content,
+                                   sizeof(G_context.display_data.content),
+                                   tx->payload.sender) == -1) {
+            return DATA_PARSING_ERROR;
+        }
+        if (script_hash_to_address(G_context.display_data.from,
+                                   sizeof(G_context.display_data.from),
+                                   tx->payload.from) == -1) {
+            return DATA_PARSING_ERROR;
+        }
+        if (script_hash_to_address(G_context.display_data.to,
+                                   sizeof(G_context.display_data.to),
+                                   tx->payload.to) == -1) {
+            return DATA_PARSING_ERROR;
+        }
+        if(!get_native_token_amount(tx->payload.contract_addr,
+                                     tx->payload.value_len,
+                                     tx->payload.value,
+                                     G_context.display_data.amount,
+                                     sizeof (G_context.display_data.amount))) {
+            return DATA_PARSING_ERROR;
+        }
         return check_native_end_data(buf);
     } else {
         return TX_PARSING_ERROR;
@@ -611,6 +687,23 @@ parser_status_e transaction_approve_deserialize(buffer_t *buf, ont_transaction_t
         memcmp(tx->payload.contract_addr,ONT_ADDR,ADDRESS_LEN) != 0) {
         return CONTRACT_ADDR_PARSING_ERROR;
     }
+    if (script_hash_to_address(G_context.display_data.from,
+                               sizeof(G_context.display_data.from),
+                               tx->payload.from) == -1) {
+        return DATA_PARSING_ERROR;
+    }
+    if (script_hash_to_address(G_context.display_data.to,
+                               sizeof(G_context.display_data.to),
+                               tx->payload.to) == -1) {
+        return DATA_PARSING_ERROR;
+    }
+    if(!get_native_token_amount(tx->payload.contract_addr
+                                 ,tx->payload.value_len,
+                                 tx->payload.value,
+                                 G_context.display_data.amount,
+                                 sizeof (G_context.display_data.amount))) {
+        return DATA_PARSING_ERROR;
+    }
     return check_native_end_data(buf);
 }
 
@@ -710,6 +803,22 @@ parser_status_e transaction_approve_v2_deserialize(buffer_t *buf, ont_transactio
     if (memcmp(tx->payload.contract_addr,ONG_ADDR,ADDRESS_LEN) != 0 &&
         memcmp(tx->payload.contract_addr,ONT_ADDR,ADDRESS_LEN) != 0) {
         return CONTRACT_ADDR_PARSING_ERROR;
+    }
+    if (script_hash_to_address(G_context.display_data.from,
+                               sizeof(G_context.display_data.from),
+                               tx->payload.from) == -1) {
+        return DATA_PARSING_ERROR;
+    }
+    if (script_hash_to_address(G_context.display_data.to,
+                               sizeof(G_context.display_data.to),
+                               tx->payload.to) == -1) {
+        return DATA_PARSING_ERROR;
+    }
+    if(!get_native_token_amount(tx->payload.contract_addr,
+                                 tx->payload.value_len,
+                                 tx->payload.value,G_context.display_data.amount,
+                                 sizeof (G_context.display_data.amount))) {
+        return DATA_PARSING_ERROR;
     }
     return check_native_end_data(buf);
 }

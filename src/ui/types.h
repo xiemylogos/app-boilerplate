@@ -37,3 +37,5 @@
 #define ONE                 "1"
 #define TWO                 "2"
 #define THREE               "3"
+#define BLIND_SIGN_TX       "Blind signing Transaction"
+#define BLIND_SIGN_TX_MSG   "Accept risk and send"

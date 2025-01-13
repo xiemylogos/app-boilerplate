@@ -36,3 +36,11 @@ bool ont_address_by_pubkey(const uint8_t public_key[static 65],char* out, size_t
 bool get_token_amount(const uint8_t value_len,const uint64_t value[2],const uint8_t decimals,char* amount,size_t amount_len);
 
 uint8_t get_oep4_token_decimals(uint8_t  *contract_addr);
+
+void get_ong_fee(uint64_t gas_price,uint64_t gas_limit,char* out, size_t out_len);
+
+bool get_native_token_amount(uint8_t *contract_addr,const uint8_t value_len,const uint64_t value[2],char* out, size_t out_len);
+
+bool get_oep4_token_amount(const uint8_t value_len,const uint64_t value[2],char* out, size_t out_len);
+
+bool convert_uint64_to_char(char* out, size_t out_len,uint64_t amount);

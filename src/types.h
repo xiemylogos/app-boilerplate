@@ -89,6 +89,16 @@ typedef enum {
     WASM_VM_OEP4_TRANSFER_FROM   ///confirm oep4 wasm vm transfer from
 } tx_type_e;
 
+typedef struct {
+    char from[40];
+    char to[40];
+    char amount[40];
+    char content[40];
+    char signer[40];
+    char content_two[40];
+    char fee[20];
+    char peer_pubkey[66];
+}display_data_t;
 /**
  * Structure for public key context information.
  */
@@ -257,6 +267,7 @@ typedef struct {
     };
     tx_type_e tx_type;
     request_type_e req_type;                  /// user request
+    display_data_t display_data;
     uint32_t bip32_path[MAX_BIP32_PATH];      /// BIP32 path
     uint8_t bip32_path_len;                   /// length of BIP32 path
 } global_ctx_t;

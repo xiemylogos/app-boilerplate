@@ -40,14 +40,10 @@
 #include "types.h"
 
 // Buffer where the transaction address string is written
-static char g_address[40];
 static char g_content[66];
 static char g_content_two[66];
 static char g_content_three[66];
-static char g_content_four[30];
 static char g_content_five[20];
-static char g_signer[40];
-static char g_fee[40];
 static char g_title[60];
 static char g_title_two[40];
 static char g_title_three[40];
@@ -59,9 +55,9 @@ static nbgl_contentTagValueList_t pairsList;
 
 //registerCandidate
 // called when long press button on 3rd page is long-touched or when reject footer is touched
-static void register_candidate_tx_review_choice(bool confirm) {
+static void govern_tx_review_choice(bool confirm) {
     // Answer, display a status page and go back to main
-    validate_register_candidate_transaction(confirm);
+    validate_govern_transaction(confirm);
     if (confirm) {
         nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_SIGNED, ui_menu_main);
     } else {
@@ -69,52 +65,178 @@ static void register_candidate_tx_review_choice(bool confirm) {
     }
 }
 
-static uint8_t registerCandidateTagValuePairs(void) {
+static uint8_t governTxTagValuePairs(void) {
     uint8_t nbPairs = 0;
     explicit_bzero(pairs, sizeof(pairs));
-
-    memset(g_content, 0, sizeof(g_content));
-    memcpy(g_content, G_context.tx_info.register_candidate_tx_info.peer_pubkey,66);
-    pairs[nbPairs].item = PEER_PUBKEY;
-    pairs[nbPairs].value = g_content;
-    nbPairs++;
-
-    memset(g_address, 0, sizeof(g_address));
-    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.register_candidate_tx_info.account) ==
-        -1) {
-           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+    if (G_context.tx_type == REGISTER_CANDIDATE ||
+        G_context.tx_type == QUIT_NODE ||
+        G_context.tx_type == ADD_INIT_POS ||
+        G_context.tx_type == REDUCE_INIT_POS ||
+        G_context.tx_type == CHANGE_MAX_AUTHORIZATION ||
+        G_context.tx_type == SET_FEE_PERCENTAGE) {
+        pairs[nbPairs].item = NBGL_PEER_PUBKEY;
+        pairs[nbPairs].value = G_context.display_data.peer_pubkey;
+        nbPairs++;
+    }
+    if (G_context.tx_type == REGISTER_CANDIDATE ||
+         G_context.tx_type == QUIT_NODE ||
+        G_context.tx_type == ADD_INIT_POS ||
+        G_context.tx_type == REDUCE_INIT_POS ||
+        G_context.tx_type == CHANGE_MAX_AUTHORIZATION ||
+        G_context.tx_type == SET_FEE_PERCENTAGE ||
+        G_context.tx_type == WITHDRAW_FEE ||
+        G_context.tx_type == WITHDRAW ||
+        G_context.tx_type == AUTHORIZE_FOR_PEER ||
+        G_context.tx_type == UN_AUTHORIZE_FOR_PEER) {
+        pairs[nbPairs].item = ACCOUNT;
+        pairs[nbPairs].value = G_context.display_data.content;
+        nbPairs++;
+    }
+    if (G_context.tx_type == REGISTER_CANDIDATE ||
+        G_context.tx_type == ADD_INIT_POS ||
+        G_context.tx_type == REDUCE_INIT_POS ||
+        G_context.tx_type == CHANGE_MAX_AUTHORIZATION ||
+        G_context.tx_type == SET_FEE_PERCENTAGE ||
+        G_context.tx_type == WITHDRAW ||
+        G_context.tx_type == AUTHORIZE_FOR_PEER ||
+        G_context.tx_type == UN_AUTHORIZE_FOR_PEER) {
+        if (G_context.tx_type == CHANGE_MAX_AUTHORIZATION) {
+            pairs[nbPairs].item = MAX_AUTHORIZE;
+        } else if( G_context.tx_type == SET_FEE_PERCENTAGE){
+            pairs[nbPairs].item = PEER_COST;
+        } else if (G_context.tx_type == WITHDRAW) {
+            if (G_context.tx_info.withdraw_tx_info.withdraw_number ==1) {
+                pairs[nbPairs].item = AMOUNT;
+            } else {
+                pairs[nbPairs].item = TOTAL_WITHDRAW;
+            }
+        } else {
+           pairs[nbPairs].item = POS;
         }
-    pairs[nbPairs].item = ACCOUNT;
-    pairs[nbPairs].value = g_address;
-    nbPairs++;
-
-    memset(g_content_two,0,sizeof(g_content_two));
-    if (!format_u64(g_content_two,sizeof(g_content_two),G_context.tx_info.register_candidate_tx_info.init_pos)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+        pairs[nbPairs].value = G_context.display_data.amount;
+        nbPairs++;
     }
-    strcat(g_content_two,ONT_VIEW);
-    pairs[nbPairs].item = POS;
-    pairs[nbPairs].value = g_content_two;
-    nbPairs++;
+    if( G_context.tx_type == SET_FEE_PERCENTAGE) {
+        pairs[nbPairs].item = STAKE_COST;
+        pairs[nbPairs].value = G_context.display_data.content_two;
+        nbPairs++;
+    }
+    if (G_context.tx_type == REGISTER_CANDIDATE) {
+        pairs[nbPairs].item = STAKE_FEE;
+        pairs[nbPairs].value = STAKE_FEE_ONG;
+        nbPairs++;
+    }
 
-    pairs[nbPairs].item = STAKE_FEE;
-    pairs[nbPairs].value = STAKE_FEE_ONG;
-    nbPairs++;
-
+    if (G_context.tx_type == WITHDRAW) {
+         //peer pubkey
+         for(uint8_t i=0;i<G_context.tx_info.withdraw_tx_info.peer_pubkey_number;i++) {
+            if(i>2) {
+                break;
+            }
+            if (i==0) {
+                memset(g_content, 0, sizeof(g_content));
+                memcpy(g_content, G_context.tx_info.withdraw_tx_info.peer_pubkey[i], 66);
+                pairs[nbPairs].item = PEER_PUBKEY;
+                pairs[nbPairs].value = g_content;
+                nbPairs++;
+            }
+            if (i==1) {
+                memset(g_content_two, 0, sizeof(g_content_two));
+                memcpy(g_content_two, G_context.tx_info.withdraw_tx_info.peer_pubkey[i], 66);
+                pairs[nbPairs].item = PEER_PUBKEY;
+                pairs[nbPairs].value = g_content_two;
+                nbPairs++;
+            }
+            if (i==2) {
+                 memset(g_content_three, 0, sizeof(g_content_three));
+                memcpy(g_content_three, G_context.tx_info.withdraw_tx_info.peer_pubkey[i], 66);
+                pairs[nbPairs].item = PEER_PUBKEY;
+                pairs[nbPairs].value = g_content_three;
+                nbPairs++;
+            }
+        }
+        if (G_context.tx_info.withdraw_tx_info.peer_pubkey_number >1) {
+            memset(g_content_five,0,sizeof(g_content_five));
+            if (!format_u64(g_content_five, sizeof(g_content_five), G_context.tx_info.withdraw_tx_info.peer_pubkey_number)) {
+                 return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
+            }
+            pairs[nbPairs].item = NODE_AMOUNT;
+            pairs[nbPairs].value = g_content_five;
+            nbPairs++;
+        }
+    }
+    if (G_context.tx_type == AUTHORIZE_FOR_PEER) {
+        for(uint8_t i=0;i<G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey_number;i++) {
+            if(i>2) {
+                    break;
+                }
+            if (i==0) {
+                memset(g_content, 0, sizeof(g_content));
+                memcpy(g_content, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey[i], 66);
+                memset(g_title,0,sizeof(g_title));
+                memcpy(g_title,NBGL_PEER_PUBKEY,sizeof(NBGL_PEER_PUBKEY));
+                strcat(g_title,ONE);
+                pairs[nbPairs].item = g_title;
+                pairs[nbPairs].value = g_content;
+                nbPairs++;
+                }
+            if (i==1) {
+                memset(g_content_two, 0, sizeof(g_content_two));
+                memcpy(g_content_two, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey[i], 66);
+                memset(g_title_two,0,sizeof(g_title_two));
+                memcpy(g_title_two,NBGL_PEER_PUBKEY,sizeof(NBGL_PEER_PUBKEY));
+                strcat(g_title,TWO);
+                pairs[nbPairs].item = g_title_two;
+                pairs[nbPairs].value = g_content_two;
+                nbPairs++;
+            }
+            if (i==2) {
+                memset(g_content_three, 0, sizeof(g_content_three));
+                memcpy(g_content_three, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey[i], 66);
+                memset(g_title_three,0,sizeof(g_title_three));
+                memcpy(g_title_three,NBGL_PEER_PUBKEY,sizeof(NBGL_PEER_PUBKEY));
+                strcat(g_title,THREE);
+                pairs[nbPairs].item = g_title_three;
+                pairs[nbPairs].value = g_content_three;
+                nbPairs++;
+            }
+        }
+    }
+    if(G_context.tx_type == UN_AUTHORIZE_FOR_PEER) {
+        for(uint8_t i=0;i<G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey_number;i++) {
+            if(i>2) {
+                break;
+            }
+            if (i==0) {
+                memset(g_content, 0, sizeof(g_content));
+                memcpy(g_content, G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey[i], 66);
+                pairs[nbPairs].item = PEER_PUBKEY;
+                pairs[nbPairs].value = g_content;
+                nbPairs++;
+            }
+            if (i==1) {
+                memset(g_content_two, 0, sizeof(g_content_two));
+                memcpy(g_content_two, G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey[i], 66);
+                pairs[nbPairs].item = PEER_PUBKEY;
+                pairs[nbPairs].value = g_content_two;
+                nbPairs++;
+            }
+            if (i==2) {
+                memset(g_content_three, 0, sizeof(g_content_three));
+                memcpy(g_content_three, G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey[i], 66);
+                pairs[nbPairs].item = PEER_PUBKEY;
+                pairs[nbPairs].value = g_content_three;
+                nbPairs++;
+            }
+        }
+    }
     //fee
-    memset(g_fee, 0, sizeof(g_fee));
-    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.register_candidate_tx_info.header.gas_price*G_context.tx_info.register_candidate_tx_info.header.gas_limit,9);
-    strcat(g_fee,ONG_VIEW);
     pairs[nbPairs].item = FEE_ONG;
-    pairs[nbPairs].value = g_fee;
+    pairs[nbPairs].value = G_context.display_data.fee;
     nbPairs++;
 
-    memset(g_signer, 0, sizeof(g_signer));
-    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
-        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
-    }
     pairs[nbPairs].item = SIGNER;
-    pairs[nbPairs].value = g_signer;
+    pairs[nbPairs].value = G_context.display_data.signer;
     nbPairs++;
 
     return nbPairs;
@@ -131,7 +253,7 @@ int ui_display_register_candidate_tx_choice() {
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
-    pairsList.nbPairs = registerCandidateTagValuePairs();
+    pairsList.nbPairs = governTxTagValuePairs();
     pairsList.pairs = pairs;
 
     nbgl_useCaseReview(TYPE_TRANSACTION,
@@ -140,7 +262,7 @@ int ui_display_register_candidate_tx_choice() {
                            "Review registerCandidate transaction",
                            NULL,
                            "Sign registerCandidate transaction",
-                           register_candidate_tx_review_choice);
+                           govern_tx_review_choice);
     return 0;
 }
 
@@ -148,103 +270,6 @@ int ui_display_register_candidate_tx_choice() {
 int ui_display_register_candidate_tx() {
     return ui_display_register_candidate_tx_choice();
 }
-
-//withdraw
-// called when long press button on 3rd page is long-touched or when reject footer is touched
-static void withdraw_tx_review_choice(bool confirm) {
-    // Answer, display a status page and go back to main
-    validate_withdraw_transaction(confirm);
-    if (confirm) {
-        nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_SIGNED, ui_menu_main);
-    } else {
-        nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_REJECTED, ui_menu_main);
-    }
-}
-
-static uint8_t withdrawTagValuePairs(void) {
-    uint8_t nbPairs = 0;
-    explicit_bzero(pairs, sizeof(pairs));
-    //account
-    memset(g_address, 0, sizeof(g_address));
-    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.withdraw_tx_info.account) ==
-        -1) {
-           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
-        }
-    pairs[nbPairs].item = ACCOUNT;
-    pairs[nbPairs].value = g_address;
-    nbPairs++;
-    //peer pubkey
-    for(uint8_t i=0;i<G_context.tx_info.withdraw_tx_info.peer_pubkey_number;i++) {
-        if(i>2) {
-            break;
-        }
-        if (i==0) {
-            memset(g_content, 0, sizeof(g_content));
-            memcpy(g_content, G_context.tx_info.withdraw_tx_info.peer_pubkey[i], 66);
-            pairs[nbPairs].item = PEER_PUBKEY;
-            pairs[nbPairs].value = g_content;
-            nbPairs++;
-        }
-        if (i==1) {
-           memset(g_content_two, 0, sizeof(g_content_two));
-            memcpy(g_content_two, G_context.tx_info.withdraw_tx_info.peer_pubkey[i], 66);
-            pairs[nbPairs].item = PEER_PUBKEY;
-            pairs[nbPairs].value = g_content_two;
-            nbPairs++;
-        }
-        if (i==2) {
-            memset(g_content_three, 0, sizeof(g_content_three));
-            memcpy(g_content_three, G_context.tx_info.withdraw_tx_info.peer_pubkey[i], 66);
-            pairs[nbPairs].item = PEER_PUBKEY;
-            pairs[nbPairs].value = g_content_three;
-            nbPairs++;
-        }
-    }
-
-
-
-    memset(g_content_four,0,sizeof(g_content_four));
-     if (!format_u64(g_content_four, sizeof(g_content_four), G_context.tx_info.withdraw_tx_info.withdraw_value)) {
-            return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-        }
-
-    strcat(g_content_four,ONT_VIEW);
-    if (G_context.tx_info.withdraw_tx_info.withdraw_number ==1) {
-        pairs[nbPairs].item = AMOUNT;
-        pairs[nbPairs].value = g_content_four;
-        nbPairs++;
-    } else {
-        pairs[nbPairs].item = TOTAL_WITHDRAW;
-        pairs[nbPairs].value = g_content_four;
-        nbPairs++;
-
-        memset(g_content_five,0,sizeof(g_content_five));
-       if (!format_u64(g_content_five, sizeof(g_content_five), G_context.tx_info.withdraw_tx_info.peer_pubkey_number)) {
-            return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-        }
-        pairs[nbPairs].item = NODE_AMOUNT;
-        pairs[nbPairs].value = g_content_five;
-        nbPairs++;
-    }
-     //fee
-    memset(g_fee, 0, sizeof(g_fee));
-    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.withdraw_tx_info.header.gas_price*G_context.tx_info.withdraw_tx_info.header.gas_limit,9);
-    strcat(g_fee,ONG_VIEW);
-    pairs[nbPairs].item = FEE_ONG;
-    pairs[nbPairs].value = g_fee;
-    nbPairs++;
-
-    memset(g_signer, 0, sizeof(g_signer));
-    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
-        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
-    }
-    pairs[nbPairs].item = SIGNER;
-    pairs[nbPairs].value = g_signer;
-    nbPairs++;
-
-    return nbPairs;
-}
-
 
 // Public function to start the transaction review
 // - Check if the app is in the right state for transaction review
@@ -257,7 +282,7 @@ int ui_display_withdraw_tx_choice() {
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
-    pairsList.nbPairs = withdrawTagValuePairs();
+    pairsList.nbPairs = governTxTagValuePairs();
     pairsList.pairs = pairs;
 
     nbgl_useCaseReview(TYPE_TRANSACTION,
@@ -266,7 +291,7 @@ int ui_display_withdraw_tx_choice() {
                            "Review withdraw transaction",
                            NULL,
                            "Sign withdraw transaction",
-                           withdraw_tx_review_choice);
+                           govern_tx_review_choice);
 
     return 0;
 }
@@ -274,58 +299,6 @@ int ui_display_withdraw_tx_choice() {
 // Flow used to display a clear-signed transaction
 int ui_display_withdraw_tx() {
     return ui_display_withdraw_tx_choice();
-}
-
-
-//quitNode
-// called when long press button on 3rd page is long-touched or when reject footer is touched
-static void quit_node_tx_review_choice(bool confirm) {
-    // Answer, display a status page and go back to main
-    validate_quit_node_transaction(confirm);
-    if (confirm) {
-        nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_SIGNED, ui_menu_main);
-    } else {
-        nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_REJECTED, ui_menu_main);
-    }
-}
-
-static uint8_t quitNodeTagValuePairs(void) {
-    uint8_t nbPairs = 0;
-    explicit_bzero(pairs, sizeof(pairs));
-
-    memset(g_address, 0, sizeof(g_address));
-    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.quit_node_tx_info.account) ==
-        -1) {
-           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
-        }
-    pairs[nbPairs].item = ACCOUNT;
-    pairs[nbPairs].value = g_address;
-    nbPairs++;
-
-    memset(g_content, 0, sizeof(g_content));
-    memcpy(g_content, G_context.tx_info.quit_node_tx_info.peer_pubkey,66);
-    pairs[nbPairs].item = NBGL_PEER_PUBKEY;
-    pairs[nbPairs].value = g_content;
-    nbPairs++;
-
-    //fee
-    memset(g_fee, 0, sizeof(g_fee));
-    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.quit_node_tx_info.header.gas_price*G_context.tx_info.oep4_from_tx_info.header.gas_limit,9);
-    strcat(g_fee,ONG_VIEW);
-    pairs[nbPairs].item = FEE_ONG;
-    pairs[nbPairs].value = g_fee;
-    nbPairs++;
-
-
-    memset(g_signer, 0, sizeof(g_signer));
-    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
-        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
-    }
-    pairs[nbPairs].item = SIGNER;
-    pairs[nbPairs].value = g_signer;
-    nbPairs++;
-
-    return nbPairs;
 }
 
 // Public function to start the transaction review
@@ -339,7 +312,7 @@ int ui_display_quit_node_tx_choice() {
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
-    pairsList.nbPairs = quitNodeTagValuePairs();
+    pairsList.nbPairs = governTxTagValuePairs();
     pairsList.pairs = pairs;
 
     nbgl_useCaseReview(TYPE_TRANSACTION,
@@ -348,7 +321,7 @@ int ui_display_quit_node_tx_choice() {
                            "Review quitNode transaction",
                            NULL,
                            "Sign quitNode transaction",
-                           quit_node_tx_review_choice);
+                           govern_tx_review_choice);
 
     return 0;
 }
@@ -356,65 +329,6 @@ int ui_display_quit_node_tx_choice() {
 // Flow used to display a clear-signed transaction
 int ui_display_quit_node_tx() {
     return ui_display_quit_node_tx_choice();
-}
-
-//addInitPos
-// called when long press button on 3rd page is long-touched or when reject footer is touched
-static void add_init_pos_tx_review_choice(bool confirm) {
-    // Answer, display a status page and go back to main
-    validate_add_init_pos_transaction(confirm);
-    if (confirm) {
-        nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_SIGNED, ui_menu_main);
-    } else {
-        nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_REJECTED, ui_menu_main);
-    }
-}
-
-static uint8_t addInitPosTagValuePairs(void) {
-    uint8_t nbPairs = 0;
-    explicit_bzero(pairs, sizeof(pairs));
-
-    memset(g_address, 0, sizeof(g_address));
-    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.add_init_pos_tx_info.account) ==
-        -1) {
-           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
-        }
-    pairs[nbPairs].item = ACCOUNT;
-    pairs[nbPairs].value = g_address;
-    nbPairs++;
-
-    memset(g_content, 0, sizeof(g_content));
-    memcpy(g_content, G_context.tx_info.add_init_pos_tx_info.peer_pubkey,66);
-    pairs[nbPairs].item = NBGL_PEER_PUBKEY;
-    pairs[nbPairs].value = g_content;
-    nbPairs++;
-
-    memset(g_content_two,0,sizeof(g_content_two));
-    if (!format_u64(g_content_two,sizeof(g_content_two),G_context.tx_info.add_init_pos_tx_info.pos)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
-    strcat(g_content_two,ONT_VIEW);
-    pairs[nbPairs].item = POS;
-    pairs[nbPairs].value = g_content_two;
-    nbPairs++;
-
-    //fee
-    memset(g_fee, 0, sizeof(g_fee));
-    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.add_init_pos_tx_info.header.gas_price*G_context.tx_info.add_init_pos_tx_info.header.gas_limit,9);
-    strcat(g_fee,ONG_VIEW);
-    pairs[nbPairs].item = FEE_ONG;
-    pairs[nbPairs].value = g_fee;
-    nbPairs++;
-
-    memset(g_signer, 0, sizeof(g_signer));
-    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
-        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
-    }
-    pairs[nbPairs].item = SIGNER;
-    pairs[nbPairs].value = g_signer;
-    nbPairs++;
-
-    return nbPairs;
 }
 
 // Public function to start the transaction review
@@ -428,7 +342,7 @@ int ui_display_add_init_pos_tx_choice() {
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
-    pairsList.nbPairs = addInitPosTagValuePairs();
+    pairsList.nbPairs = governTxTagValuePairs();
     pairsList.pairs = pairs;
 
     nbgl_useCaseReview(TYPE_TRANSACTION,
@@ -437,7 +351,7 @@ int ui_display_add_init_pos_tx_choice() {
                            "Review addInitPos transaction",
                            NULL,
                            "Sign addInitPos transaction",
-                           add_init_pos_tx_review_choice);
+                           govern_tx_review_choice);
     return 0;
 }
 
@@ -445,66 +359,6 @@ int ui_display_add_init_pos_tx_choice() {
 int ui_display_add_init_pos_tx() {
     return ui_display_add_init_pos_tx_choice();
 }
-
-//reduceInitPos
-// called when long press button on 3rd page is long-touched or when reject footer is touched
-static void reduce_init_pos_tx_review_choice(bool confirm) {
-    // Answer, display a status page and go back to main
-    validate_reduce_init_pos_transaction(confirm);
-    if (confirm) {
-        nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_SIGNED, ui_menu_main);
-    } else {
-        nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_REJECTED, ui_menu_main);
-    }
-}
-
-static uint8_t reduceInitPosTagValuePairs(void) {
-    uint8_t nbPairs = 0;
-    explicit_bzero(pairs, sizeof(pairs));
-
-    memset(g_content, 0, sizeof(g_content));
-    memcpy(g_content, G_context.tx_info.reduce_init_pos_tx_info.peer_pubkey,66);
-    pairs[nbPairs].item = PEER_PUBKEY;
-    pairs[nbPairs].value = g_content;
-    nbPairs++;
-
-    memset(g_address, 0, sizeof(g_address));
-    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.reduce_init_pos_tx_info.account) ==
-        -1) {
-           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
-        }
-    pairs[nbPairs].item = ACCOUNT;
-    pairs[nbPairs].value = g_address;
-    nbPairs++;
-
-    memset(g_content_two,0,sizeof(g_content_two));
-    if (!format_u64(g_content_two,sizeof(g_content_two),G_context.tx_info.reduce_init_pos_tx_info.pos)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
-    strcat(g_content_two,ONT_VIEW);
-    pairs[nbPairs].item = POS;
-    pairs[nbPairs].value = g_content_two;
-    nbPairs++;
-
-    //fee
-    memset(g_fee, 0, sizeof(g_fee));
-    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.reduce_init_pos_tx_info.header.gas_price*G_context.tx_info.reduce_init_pos_tx_info.header.gas_limit,9);
-    strcat(g_fee,ONG_VIEW);
-    pairs[nbPairs].item = FEE_ONG;
-    pairs[nbPairs].value = g_fee;
-    nbPairs++;
-
-    memset(g_signer, 0, sizeof(g_signer));
-    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
-        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
-    }
-    pairs[nbPairs].item = SIGNER;
-    pairs[nbPairs].value = g_signer;
-    nbPairs++;
-
-    return nbPairs;
-}
-
 // Public function to start the transaction review
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
@@ -516,7 +370,7 @@ int ui_display_reduce_init_pos_tx_choice() {
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
-    pairsList.nbPairs = reduceInitPosTagValuePairs();
+    pairsList.nbPairs = governTxTagValuePairs();
     pairsList.pairs = pairs;
     nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairsList,
@@ -524,73 +378,13 @@ int ui_display_reduce_init_pos_tx_choice() {
                            "Review reduceInitPos transaction",
                            NULL,
                            "Sign reduceInitPos transaction",
-                           reduce_init_pos_tx_review_choice);
+                           govern_tx_review_choice);
     return 0;
 }
 
 // Flow used to display a clear-signed transaction
 int ui_display_reduce_init_pos_tx() {
     return ui_display_reduce_init_pos_tx_choice();
-}
-
-//changeMaxAuthorization
-// called when long press button on 3rd page is long-touched or when reject footer is touched
-static void change_max_authorization_tx_review_choice(bool confirm) {
-    // Answer, display a status page and go back to main
-    validate_change_max_authorization_transaction(confirm);
-    if (confirm) {
-        nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_SIGNED, ui_menu_main);
-    } else {
-        nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_REJECTED, ui_menu_main);
-    }
-}
-
-static uint8_t changeMaxAuthorizationTagValuePairs(void) {
-    uint8_t nbPairs = 0;
-    explicit_bzero(pairs, sizeof(pairs));
-
-    memset(g_address, 0, sizeof(g_address));
-    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.change_max_authorization_tx_info.account) ==
-        -1) {
-           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
-        }
-    pairs[nbPairs].item = ACCOUNT;
-    pairs[nbPairs].value = g_address;
-    nbPairs++;
-
-    memset(g_content, 0, sizeof(g_content));
-    memcpy(g_content, G_context.tx_info.change_max_authorization_tx_info.peer_pubkey,66);
-    pairs[nbPairs].item = NBGL_PEER_PUBKEY;
-    pairs[nbPairs].value = g_content;
-    nbPairs++;
-
-
-    memset(g_content_two,0,sizeof(g_content_two));
-    if (!format_u64(g_content_two,sizeof(g_content_two),G_context.tx_info.change_max_authorization_tx_info.max_authorize)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
-    strcat(g_content_two,ONT_VIEW);
-    pairs[nbPairs].item = MAX_AUTHORIZE;
-    pairs[nbPairs].value = g_content_two;
-    nbPairs++;
-
-     //fee
-    memset(g_fee, 0, sizeof(g_fee));
-    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.change_max_authorization_tx_info.header.gas_price*G_context.tx_info.change_max_authorization_tx_info.header.gas_limit,9);
-    strcat(g_fee,ONG_VIEW);
-    pairs[nbPairs].item = FEE_ONG;
-    pairs[nbPairs].value = g_fee;
-    nbPairs++;
-
-    memset(g_signer, 0, sizeof(g_signer));
-    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
-        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
-    }
-    pairs[nbPairs].item = SIGNER;
-    pairs[nbPairs].value = g_signer;
-    nbPairs++;
-
-    return nbPairs;
 }
 
 // Public function to start the transaction review
@@ -604,7 +398,7 @@ int ui_display_change_max_authorization_tx_choice() {
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
-    pairsList.nbPairs = changeMaxAuthorizationTagValuePairs();
+    pairsList.nbPairs = governTxTagValuePairs();
     pairsList.pairs = pairs;
     nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairsList,
@@ -612,7 +406,7 @@ int ui_display_change_max_authorization_tx_choice() {
                            "Review changeMaxAuthorization transaction",
                            NULL,
                            "Sign changeMaxAuthorization transaction",
-                           change_max_authorization_tx_review_choice);
+                           govern_tx_review_choice);
 
     return 0;
 }
@@ -621,74 +415,6 @@ int ui_display_change_max_authorization_tx_choice() {
 int ui_display_change_max_authorization_tx() {
     return ui_display_change_max_authorization_tx_choice();
 }
-
-
-//setFeePercentage
-// called when long press button on 3rd page is long-touched or when reject footer is touched
-static void set_fee_percentage_tx_review_choice(bool confirm) {
-    // Answer, display a status page and go back to main
-    validate_set_fee_percentage_transaction(confirm);
-    if (confirm) {
-        nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_SIGNED, ui_menu_main);
-    } else {
-        nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_REJECTED, ui_menu_main);
-    }
-}
-
-static uint8_t setFeePercentageTagValuePairs(void) {
-    uint8_t nbPairs = 0;
-    explicit_bzero(pairs, sizeof(pairs));
-    //account
-    memset(g_address, 0, sizeof(g_address));
-    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.set_fee_percentage_tx_info.account) ==
-        -1) {
-           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
-        }
-    pairs[nbPairs].item = ACCOUNT;
-    pairs[nbPairs].value = g_address;
-    nbPairs++;
-
-    memset(g_content, 0, sizeof(g_content));
-    memcpy(g_content, G_context.tx_info.set_fee_percentage_tx_info.peer_pubkey,66);
-    pairs[nbPairs].item = PEER_PUBKEY;
-    pairs[nbPairs].value = g_content;
-    nbPairs++;
-
-    memset(g_content_two,0,sizeof(g_content_two));
-    if (!format_u64(g_content_two,sizeof(g_content_two),G_context.tx_info.set_fee_percentage_tx_info.peer_cost)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
-    pairs[nbPairs].item = PEER_COST;
-    pairs[nbPairs].value = g_content_two;
-    nbPairs++;
-
-    memset(g_content_three,0,sizeof(g_content_three));
-    if (!format_u64(g_content_three,sizeof(g_content_three),G_context.tx_info.set_fee_percentage_tx_info.stake_cost)) {
-        return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-    }
-    pairs[nbPairs].item = STAKE_COST;
-    pairs[nbPairs].value = g_content_three;
-    nbPairs++;
-
-    //fee
-    memset(g_fee, 0, sizeof(g_fee));
-    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.set_fee_percentage_tx_info.header.gas_price*G_context.tx_info.set_fee_percentage_tx_info.header.gas_limit,9);
-    strcat(g_fee,ONG_VIEW);
-    pairs[nbPairs].item = FEE_ONG;
-    pairs[nbPairs].value = g_fee;
-    nbPairs++;
-
-    memset(g_signer, 0, sizeof(g_signer));
-    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
-        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
-    }
-    pairs[nbPairs].item = SIGNER;
-    pairs[nbPairs].value = g_signer;
-    nbPairs++;
-
-    return nbPairs;
-}
-
 // Public function to start the transaction review
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
@@ -700,7 +426,7 @@ int ui_display_set_fee_percentage_tx_choice() {
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
-    pairsList.nbPairs = setFeePercentageTagValuePairs();
+    pairsList.nbPairs = governTxTagValuePairs();
     pairsList.pairs = pairs;
 
     nbgl_useCaseReview(TYPE_TRANSACTION,
@@ -709,7 +435,7 @@ int ui_display_set_fee_percentage_tx_choice() {
                            "Review setFeePercentage transaction",
                            NULL,
                            "Sign setFeePercentage transaction",
-                           set_fee_percentage_tx_review_choice);
+                           govern_tx_review_choice);
 
     return 0;
 }
@@ -718,97 +444,6 @@ int ui_display_set_fee_percentage_tx_choice() {
 int ui_display_set_fee_percentage_tx() {
     return ui_display_set_fee_percentage_tx_choice();
 }
-
-
-//authorizeForPeer
-// called when long press button on 3rd page is long-touched or when reject footer is touched
-static void authorize_for_peer_tx_review_choice(bool confirm) {
-    // Answer, display a status page and go back to main
-    validate_authorize_for_peer_transaction(confirm);
-    if (confirm) {
-        nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_SIGNED, ui_menu_main);
-    } else {
-        nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_REJECTED, ui_menu_main);
-    }
-}
-
-static uint8_t setAuthorizeForPeerTagValuePairs(void) {
-    uint8_t nbPairs = 0;
-    explicit_bzero(pairs, sizeof(pairs));
-    //account
-    memset(g_address, 0, sizeof(g_address));
-    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.authorize_for_peer_tx_info.account) ==
-        -1) {
-           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
-        }
-    pairs[nbPairs].item = ACCOUNT;
-    pairs[nbPairs].value = g_address;
-    nbPairs++;
-
-    for(uint8_t i=0;i<G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey_number;i++) {
-        if(i>2) {
-            break;
-        }
-        if (i==0) {
-            memset(g_content, 0, sizeof(g_content));
-            memcpy(g_content, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey[i], 66);
-            memset(g_title,0,sizeof(g_title));
-            memcpy(g_title,NBGL_PEER_PUBKEY,sizeof(NBGL_PEER_PUBKEY));
-            strcat(g_title,ONE);
-            pairs[nbPairs].item = g_title;
-            pairs[nbPairs].value = g_content;
-            nbPairs++;
-        }
-        if (i==1) {
-           memset(g_content_two, 0, sizeof(g_content_two));
-            memcpy(g_content_two, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey[i], 66);
-            memset(g_title_two,0,sizeof(g_title_two));
-            memcpy(g_title_two,NBGL_PEER_PUBKEY,sizeof(NBGL_PEER_PUBKEY));
-            strcat(g_title,TWO);
-            pairs[nbPairs].item = g_title_two;
-            pairs[nbPairs].value = g_content_two;
-            nbPairs++;
-        }
-        if (i==2) {
-            memset(g_content_three, 0, sizeof(g_content_three));
-            memcpy(g_content_three, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey[i], 66);
-            memset(g_title_three,0,sizeof(g_title_three));
-            memcpy(g_title_three,NBGL_PEER_PUBKEY,sizeof(NBGL_PEER_PUBKEY));
-            strcat(g_title,THREE);
-            pairs[nbPairs].item = g_title_three;
-            pairs[nbPairs].value = g_content_three;
-            nbPairs++;
-        }
-    }
-
-    memset(g_content_four,0,sizeof(g_content_four));
-     if (!format_u64(g_content_four, sizeof(g_content_four), G_context.tx_info.authorize_for_peer_tx_info.pos_list_value)) {
-            return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-     }
-    strcat(g_content_four,ONT_VIEW);
-    pairs[nbPairs].item = POS;
-    pairs[nbPairs].value = g_content_four;
-    nbPairs++;
-
-    //fee
-    memset(g_fee, 0, sizeof(g_fee));
-    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.tx_info.header.gas_price*G_context.tx_info.tx_info.header.gas_limit,9);
-     strcat(g_fee,ONG_VIEW);
-    pairs[nbPairs].item = FEE_ONG;
-    pairs[nbPairs].value = g_fee;
-    nbPairs++;
-
-    memset(g_signer, 0, sizeof(g_signer));
-    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
-        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
-    }
-    pairs[nbPairs].item = SIGNER;
-    pairs[nbPairs].value = g_signer;
-    nbPairs++;
-
-    return nbPairs;
-}
-
 
 // Public function to start the transaction review
 // - Check if the app is in the right state for transaction review
@@ -821,7 +456,7 @@ int ui_display_authorize_for_peer_tx_choice() {
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
-    pairsList.nbPairs = setAuthorizeForPeerTagValuePairs();
+    pairsList.nbPairs = governTxTagValuePairs();
     pairsList.pairs = pairs;
     nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairsList,
@@ -829,7 +464,7 @@ int ui_display_authorize_for_peer_tx_choice() {
                            "Review AuthorizeForPeer transaction",
                            NULL,
                            "Sign AuthorizeForPeer transaction",
-                           authorize_for_peer_tx_review_choice);
+                           govern_tx_review_choice);
 
     return 0;
 }
@@ -838,86 +473,6 @@ int ui_display_authorize_for_peer_tx_choice() {
 int ui_display_authorize_for_peer_tx() {
     return ui_display_authorize_for_peer_tx_choice();
 }
-
-//unAuthorizeForPeer
-// called when long press button on 3rd page is long-touched or when reject footer is touched
-static void un_authorize_for_peer_tx_review_choice(bool confirm) {
-    // Answer, display a status page and go back to main
-    validate_un_authorize_for_peer_transaction(confirm);
-    if (confirm) {
-        nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_SIGNED, ui_menu_main);
-    } else {
-        nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_REJECTED, ui_menu_main);
-    }
-}
-
-static uint8_t setunAuthorizeForPeerTagValuePairs(void) {
-    uint8_t nbPairs = 0;
-    explicit_bzero(pairs, sizeof(pairs));
-    //account
-    memset(g_address, 0, sizeof(g_address));
-    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.un_authorize_for_peer_tx_info.account) ==
-        -1) {
-           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
-        }
-    pairs[nbPairs].item = ACCOUNT;
-    pairs[nbPairs].value = g_address;
-    nbPairs++;
-
-    for(uint8_t i=0;i<G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey_number;i++) {
-        if(i>2) {
-            break;
-        }
-        if (i==0) {
-            memset(g_content, 0, sizeof(g_content));
-            memcpy(g_content, G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey[i], 66);
-            pairs[nbPairs].item = PEER_PUBKEY;
-            pairs[nbPairs].value = g_content;
-            nbPairs++;
-        }
-        if (i==1) {
-           memset(g_content_two, 0, sizeof(g_content_two));
-            memcpy(g_content_two, G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey[i], 66);
-            pairs[nbPairs].item = PEER_PUBKEY;
-            pairs[nbPairs].value = g_content_two;
-            nbPairs++;
-        }
-        if (i==2) {
-            memset(g_content_three, 0, sizeof(g_content_three));
-            memcpy(g_content_three, G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey[i], 66);
-            pairs[nbPairs].item = PEER_PUBKEY;
-            pairs[nbPairs].value = g_content_three;
-            nbPairs++;
-        }
-    }
-
-    memset(g_content_four,0,sizeof(g_content_four));
-     if (!format_u64(g_content_four, sizeof(g_content_four), G_context.tx_info.un_authorize_for_peer_tx_info.pos_list_value)) {
-            return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-        }
-    pairs[nbPairs].item = TOTAL_POS;
-    pairs[nbPairs].value = g_content_four;
-    nbPairs++;
-
-    //fee
-    memset(g_fee, 0, sizeof(g_fee));
-    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.tx_info.header.gas_price*G_context.tx_info.tx_info.header.gas_limit,9);
-     strcat(g_fee,ONG_VIEW);
-    pairs[nbPairs].item = FEE_ONG;
-    pairs[nbPairs].value = g_fee;
-    nbPairs++;
-
-    memset(g_signer, 0, sizeof(g_signer));
-    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
-        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
-    }
-    pairs[nbPairs].item = SIGNER;
-    pairs[nbPairs].value = g_signer;
-    nbPairs++;
-
-    return nbPairs;
-}
-
 // Public function to start the transaction review
 // - Check if the app is in the right state for transaction review
 // - Format the amount and address strings in g_amount and g_address buffers
@@ -929,7 +484,7 @@ int ui_display_un_authorize_for_peer_tx_choice() {
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
-    pairsList.nbPairs = setunAuthorizeForPeerTagValuePairs();
+    pairsList.nbPairs = governTxTagValuePairs();
     pairsList.pairs = pairs;
     nbgl_useCaseReview(TYPE_TRANSACTION,
                            &pairsList,
@@ -937,7 +492,7 @@ int ui_display_un_authorize_for_peer_tx_choice() {
                            "Review unAuthorizeForPeer transaction",
                            NULL,
                            "Sign unAuthorizeForPeer transaction",
-                           un_authorize_for_peer_tx_review_choice);
+                           govern_tx_review_choice);
 
     return 0;
 }
@@ -945,50 +500,6 @@ int ui_display_un_authorize_for_peer_tx_choice() {
 // Flow used to display a clear-signed transaction
 int ui_display_un_authorize_for_peer_tx() {
     return ui_display_un_authorize_for_peer_tx_choice();
-}
-
-//withdrawFee
-// called when long press button on 3rd page is long-touched or when reject footer is touched
-static void withdraw_fee_tx_review_choice(bool confirm) {
-    // Answer, display a status page and go back to main
-    validate_withdraw_fee_transaction(confirm);
-    if (confirm) {
-        nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_SIGNED, ui_menu_main);
-    } else {
-        nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_REJECTED, ui_menu_main);
-    }
-}
-
-static uint8_t setwithdrawFeeTagValuePairs(void) {
-    uint8_t nbPairs = 0;
-    explicit_bzero(pairs, sizeof(pairs));
-    //account
-    memset(g_address, 0, sizeof(g_address));
-    if (script_hash_to_address(g_address,sizeof(g_address),G_context.tx_info.withdraw_fee_tx_info.account) ==
-        -1) {
-           return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
-        }
-    pairs[nbPairs].item = ACCOUNT;
-    pairs[nbPairs].value = g_address;
-    nbPairs++;
-
-    //fee
-    memset(g_fee, 0, sizeof(g_fee));
-    format_fpu64_trimmed(g_fee,sizeof(g_fee),G_context.tx_info.tx_info.header.gas_price*G_context.tx_info.tx_info.header.gas_limit,9);
-    strcat(g_fee,ONG_VIEW);
-    pairs[nbPairs].item = FEE_ONG;
-    pairs[nbPairs].value = g_fee;
-    nbPairs++;
-
-    memset(g_signer, 0, sizeof(g_signer));
-    if (!ont_address_from_pubkey(g_signer,sizeof(g_signer))) {
-        return io_send_sw(SW_DISPLAY_SIGNER_FAIL);
-    }
-    pairs[nbPairs].item = SIGNER;
-    pairs[nbPairs].value = g_signer;
-    nbPairs++;
-
-    return nbPairs;
 }
 // Public function to start the transaction review
 // - Check if the app is in the right state for transaction review
@@ -1001,7 +512,7 @@ int ui_display_withdraw_fee_tx_choice() {
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
-    pairsList.nbPairs = setwithdrawFeeTagValuePairs();
+    pairsList.nbPairs = governTxTagValuePairs();
     pairsList.pairs = pairs;
 
     nbgl_useCaseReview(TYPE_TRANSACTION,
@@ -1010,7 +521,7 @@ int ui_display_withdraw_fee_tx_choice() {
                            "Review withdrawFee transaction",
                            NULL,
                            "Sign withdrawFee transaction",
-                           withdraw_fee_tx_review_choice);
+                           govern_tx_review_choice);
     return 0;
 }
 

@@ -20,6 +20,8 @@
 #include "utils.h"
 #include "types.h"
 #include "constants.h"
+#include "../ui/utils.h"
+#include "../globals.h"
 
 #if defined(TEST) || defined(FUZZ)
 #include "assert.h"
@@ -109,6 +111,21 @@ parser_status_e oep4_neo_vm_transaction_deserialize(buffer_t *buf, ont_transacti
     if (!buffer_seek_cur(buf,sizeof (end_data))) {
         return DATA_END_PARSING_ERROR;
     }
+    if (script_hash_to_address(G_context.display_data.from,
+                               sizeof(G_context.display_data.from),
+                               tx->payload.from) == -1) {
+        return DATA_PARSING_ERROR;
+    }
+    if (script_hash_to_address(G_context.display_data.to,
+                               sizeof(G_context.display_data.to),
+                               tx->payload.to) == -1) {
+        return DATA_PARSING_ERROR;
+    }
+    if(!get_oep4_token_amount(tx->payload.value_len,tx->payload.value,
+                               G_context.display_data.amount,
+                               sizeof (G_context.display_data.amount))) {
+        return DATA_PARSING_ERROR;
+    }
     return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
 }
 
@@ -174,6 +191,21 @@ parser_status_e oep4_wasm_vm_transaction_deserialize(buffer_t *buf, ont_transact
     }
     if (!buffer_seek_cur(buf,sizeof (end_data))) {
         return DATA_END_PARSING_ERROR;
+    }
+    if (script_hash_to_address(G_context.display_data.from,
+                               sizeof(G_context.display_data.from),
+                               tx->payload.from) == -1) {
+        return DATA_PARSING_ERROR;
+    }
+    if (script_hash_to_address(G_context.display_data.to,
+                               sizeof(G_context.display_data.to),
+                               tx->payload.to) == -1) {
+        return DATA_PARSING_ERROR;
+    }
+    if(!get_oep4_token_amount(tx->payload.value_len,tx->payload.value,
+                              G_context.display_data.amount,
+                               sizeof (G_context.display_data.amount))) {
+        return DATA_PARSING_ERROR;
     }
     return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
 }
@@ -260,6 +292,21 @@ parser_status_e oep4_neo_vm_approve_transaction_deserialize(buffer_t *buf, ont_t
     if (!buffer_seek_cur(buf,sizeof (end_data))) {
         return DATA_END_PARSING_ERROR;
     }
+    if (script_hash_to_address(G_context.display_data.from,
+                               sizeof(G_context.display_data.from),
+                               tx->payload.from) == -1) {
+        return DATA_PARSING_ERROR;
+    }
+    if (script_hash_to_address(G_context.display_data.to,
+                               sizeof(G_context.display_data.to),
+                               tx->payload.to) == -1) {
+        return DATA_PARSING_ERROR;
+    }
+    if(!get_oep4_token_amount(tx->payload.value_len,tx->payload.value,
+                              G_context.display_data.amount,
+                               sizeof (G_context.display_data.amount))) {
+        return DATA_PARSING_ERROR;
+    }
     return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
 }
 
@@ -328,6 +375,21 @@ parser_status_e oep4_wasm_vm_approve_transaction_deserialize(buffer_t *buf, ont_
     }
     if (!buffer_seek_cur(buf,sizeof (end_data))) {
         return DATA_END_PARSING_ERROR;
+    }
+    if (script_hash_to_address(G_context.display_data.from,
+                               sizeof(G_context.display_data.from),
+                               tx->payload.from) == -1) {
+        return DATA_PARSING_ERROR;
+    }
+    if (script_hash_to_address(G_context.display_data.to,
+                               sizeof(G_context.display_data.to),
+                               tx->payload.to) == -1) {
+        return DATA_PARSING_ERROR;
+    }
+    if(!get_oep4_token_amount(tx->payload.value_len,tx->payload.value,
+                              G_context.display_data.amount,
+                               sizeof (G_context.display_data.amount))) {
+        return DATA_PARSING_ERROR;
     }
     return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
 }
@@ -426,6 +488,26 @@ parser_status_e oep4_neo_vm_transfer_from_transaction_deserialize(buffer_t *buf,
     if (!buffer_seek_cur(buf,sizeof (end_data))) {
         return DATA_END_PARSING_ERROR;
     }
+    if (script_hash_to_address(G_context.display_data.content,
+                               sizeof(G_context.display_data.content),
+                               tx->payload.sender) == -1) {
+        return DATA_PARSING_ERROR;
+    }
+    if (script_hash_to_address(G_context.display_data.from,
+                               sizeof(G_context.display_data.from),
+                               tx->payload.from) == -1) {
+        return DATA_PARSING_ERROR;
+    }
+    if (script_hash_to_address(G_context.display_data.to,
+                               sizeof(G_context.display_data.to),
+                               tx->payload.to) == -1) {
+        return DATA_PARSING_ERROR;
+    }
+    if(!get_oep4_token_amount(tx->payload.value_len,tx->payload.value,
+                              G_context.display_data.amount,
+                               sizeof (G_context.display_data.amount))) {
+        return DATA_PARSING_ERROR;
+    }
     return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
 }
 
@@ -498,6 +580,26 @@ parser_status_e oep4_wasm_vm_transfer_from_transaction_deserialize(buffer_t *buf
     }
     if (!buffer_seek_cur(buf,sizeof (end_data))) {
         return DATA_END_PARSING_ERROR;
+    }
+    if (script_hash_to_address(G_context.display_data.content,
+                               sizeof(G_context.display_data.content),
+                               tx->payload.sender) == -1) {
+        return DATA_PARSING_ERROR;
+    }
+    if (script_hash_to_address(G_context.display_data.from,
+                               sizeof(G_context.display_data.from),
+                               tx->payload.from) == -1) {
+        return DATA_PARSING_ERROR;
+    }
+    if (script_hash_to_address(G_context.display_data.to,
+                               sizeof(G_context.display_data.to),
+                               tx->payload.to) == -1) {
+        return DATA_PARSING_ERROR;
+    }
+    if(!get_oep4_token_amount(tx->payload.value_len,tx->payload.value,
+                              G_context.display_data.amount,
+                               sizeof (G_context.display_data.amount))) {
+        return DATA_PARSING_ERROR;
     }
     return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
 }
