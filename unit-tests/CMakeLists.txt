@@ -52,6 +52,7 @@ add_library(getValueByLen ../src/transaction/utils.c)
 add_library(transaction_deserialize_header ../src/transaction/utils.c)
 add_library(transaction_native_transfer_deserialize ../src/transaction/deserialize.c)
 add_library(oep4_neo_vm_transaction_deserialize ../src/transaction/oep4_deserialize.c)
+add_library(parse_tx ../src/transaction/parse.c)
 
 target_link_libraries(test_tx_parser PUBLIC
                       transaction_native_transfer_deserialize
@@ -59,6 +60,7 @@ target_link_libraries(test_tx_parser PUBLIC
 	      	      getValueByLen
 		      transaction_deserialize_header
                       oep4_neo_vm_transaction_deserialize
+		parse_tx,
                       buffer
 		              base58
                       bip32
