@@ -50,6 +50,15 @@ uint64_t getValueByLen(uint8_t *value,uint8_t len) {
     return pre_value;
 }
 
+uint64_t getValue(uint8_t *value,uint8_t begin_len,uint8_t end_len) {
+    uint64_t pre_value =0;
+    for (int i = begin_len; i < end_len; i++) {
+        pre_value |= ((int64_t)value[i] << (8 * i));
+    }
+    return pre_value;
+}
+
+
 parser_status_e transaction_deserialize_header(buffer_t *buf,transaction_header_t *tx) {
     if (buf->size > MAX_TRANSACTION_LEN) {
         return WRONG_LENGTH_ERROR;
@@ -74,6 +83,22 @@ parser_status_e transaction_deserialize_header(buffer_t *buf,transaction_header_
     tx->payer = (uint8_t *) (buf->ptr + buf->offset);
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return PAYER_PARSING_ERROR;
+    }
+    uint8_t  payload_size;
+    if(!buffer_read_u8(buf,&payload_size)) {
+        return OPCODE_PARSING_ERROR;
+    }
+    if(!buffer_can_read(buf,payload_size)) {
+        return OPCODE_PARSING_ERROR;
+    }
+    if (payload_size >= 253) {//fd
+        uint16_t code_size;
+        if (!buffer_read_u16(buf, &code_size,LE)) {
+            return OPCODE_PARSING_ERROR;
+        }
+        if (!buffer_can_read(buf, code_size)) {
+            return DATA_END_PARSING_ERROR;
+        }
     }
     return PARSING_OK;
 }

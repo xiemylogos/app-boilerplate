@@ -34,7 +34,7 @@
 
 #define UINT160_LEN 20
 
-int script_hash_to_address(char* out, size_t out_len, const unsigned char* script_hash) {
+void script_hash_to_address(char* out, size_t out_len, const unsigned char* script_hash) {
 
     static cx_sha256_t data_hash;
     unsigned char data_hash_1[SHA256_HASH_LEN];
@@ -51,7 +51,7 @@ int script_hash_to_address(char* out, size_t out_len, const unsigned char* scrip
 
     memcpy(&address[1 + SCRIPT_HASH_LEN], data_hash_2, SCRIPT_HASH_CHECKSUM_LEN);
 
-    return base58_encode(address, sizeof(address), out, out_len);
+    base58_encode(address, sizeof(address), out, out_len);
 }
 
 
@@ -229,9 +229,9 @@ bool get_native_token_amount(uint8_t *contract_addr,const uint8_t value_len,cons
     return true;
 }
 
-bool get_oep4_token_amount(const uint8_t value_len,const uint64_t value[2],char* out, size_t out_len) {
+bool get_oep4_token_amount(uint8_t *contract_addr,const uint8_t value_len,const uint64_t value[2],char* out, size_t out_len) {
     uint8_t decimals = 0;
-    decimals = get_oep4_token_decimals(G_context.tx_info.oep4_tx_info.payload.contract_addr);
+    decimals = get_oep4_token_decimals(contract_addr);
     if(!get_token_amount(value_len,value,decimals,out,out_len)) {
         return false;
     }

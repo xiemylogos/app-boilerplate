@@ -144,3 +144,5 @@ int ui_display_oep4_approve_tx(void);
  *
  */
 int ui_display_oep4_transfer_from_tx(void);
+
+int  ui_display_tx(void);

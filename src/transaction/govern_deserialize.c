@@ -24,6 +24,7 @@
 #include "format.h"
 #include "../ui/utils.h"
 #include "../globals.h"
+#include "parse.h"
 
 #if defined(TEST) || defined(FUZZ)
 #include "assert.h"
@@ -81,6 +82,74 @@ parser_status_e register_candidate_tx_deserialize(buffer_t *buf, register_candid
     if (status != PARSING_OK) {
         return status;
     }
+     cfg_t RegisterCandidateTx[] = {
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x00,0xc6,0x6b,0x42},
+            .data_len = 4
+        },
+        {
+            .data_type = PUBKEY_DATA_TYPE,
+            .data = NULL,
+        },
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8},
+            .data_len = 3
+        },
+        {
+            .data_type = ADDRESS_DATA_TYPE,
+            .data = NULL,
+        },
+
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8},
+            .data_len = 3
+        },
+        {
+            .data_type = AMOUNT_DATA_TYPE,
+            .values = {},
+        },
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8,0x00,0x6a,0x7c,0xc8},
+            .data_len = 7
+        },
+        {
+            .data_type = AMOUNT_DATA_TYPE,
+            .values = {},
+        },
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8,0x6c,0x11,0x72,0x65,0x67,0x69,0x73,0x74,0x65,
+                                 0x72,0x43,0x61,0x6e,0x64,0x69,0x64,0x61,0x74,0x65,
+                                  0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x68, 0x16,
+                                  0x4F, 0x6E, 0x74, 0x6F, 0x6C, 0x6F, 0x67, 0x79, 0x2E, 0x4E, 0x61, 0x74,
+                                  0x69, 0x76, 0x65, 0x2E, 0x49, 0x6E, 0x76, 0x6F, 0x6B, 0x65, 0x00},
+            .data_len = 69
+        },
+    };
+    size_t numElements = sizeof(RegisterCandidateTx) / sizeof(RegisterCandidateTx[0]);
+    parser_status_e status_tx = parse_tx(buf,RegisterCandidateTx,numElements,NATIVE_VM_OPERATOR);
+    if (status_tx != PARSING_OK) {
+        return status_tx;
+    }
+
+    memcpy(G_context.display_data.peer_pubkey, RegisterCandidateTx[1].data, 66);
+    script_hash_to_address(G_context.display_data.content,
+                           sizeof(G_context.display_data.content),
+                           RegisterCandidateTx[3].data);
+
+    if(!convert_uint64_to_char(G_context.display_data.amount,
+                               sizeof (G_context.display_data.amount),
+                               RegisterCandidateTx[5].values[0])) {
+        return DATA_PARSING_ERROR;
+    }
+    return PARSING_OK;
+
+/*
     uint8_t op_code_size;
     if (!buffer_read_u8(buf, &op_code_size)) {
         return OPCODE_PARSING_ERROR;
@@ -147,11 +216,10 @@ parser_status_e register_candidate_tx_deserialize(buffer_t *buf, register_candid
         tx->key_no = getBytesValueByLen(buf,tx->key_no_len);
     }
     memcpy(G_context.display_data.peer_pubkey, tx->peer_pubkey, 66);
-    if (script_hash_to_address(G_context.display_data.content,
+    script_hash_to_address(G_context.display_data.content,
                                sizeof(G_context.display_data.content),
-                               tx->account) == -1) {
-        return DATA_PARSING_ERROR;
-    }
+                               tx->account);
+
     if(!convert_uint64_to_char(G_context.display_data.amount,
                                sizeof (G_context.display_data.amount),
                                tx->init_pos)) {
@@ -161,6 +229,7 @@ parser_status_e register_candidate_tx_deserialize(buffer_t *buf, register_candid
 
 
     return check_govern_end_data(buf,RegisterCandidate);
+    */
 }
 
 parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
@@ -171,6 +240,59 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
     if (status != PARSING_OK) {
         return status;
     }
+
+    cfg_t WithDrawTx[] = {
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x00,0xc6,0x6b},
+            .data_len = 3
+        },
+        {
+            .data_type = ADDRESS_DATA_TYPE,
+            .data = NULL,
+        },
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8},
+            .data_len = 3
+        },
+        {
+            .data_type = MULTIPLE_PUBKEY_DATA_TYPE,
+            .peer_pubkeys = {}
+        },
+        {
+            .data_type = MULTIPLE_AMOUNT_DATA_TYPE,
+            .values = {}
+        },
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8,0x6c,
+                                  0x08,0x77,0x69,0x74,0x68,0x64,0x72,0x61,0x77,
+                                  0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x68, 0x16,
+                                  0x4F, 0x6E, 0x74, 0x6F, 0x6C, 0x6F, 0x67, 0x79, 0x2E, 0x4E, 0x61, 0x74,
+                                  0x69, 0x76, 0x65, 0x2E, 0x49, 0x6E, 0x76, 0x6F, 0x6B, 0x65, 0x00},
+            .data_len = 60
+        },
+    };
+    size_t numElements = sizeof(WithDrawTx) / sizeof(WithDrawTx[0]);
+    parser_status_e status_tx = parse_tx(buf,WithDrawTx,numElements,NATIVE_VM_OPERATOR);
+    if (status_tx != PARSING_OK) {
+        return status_tx;
+    }
+
+    memcpy(G_context.display_data.peer_pubkey, WithDrawTx[3].peer_pubkeys[0], PEER_PUBKEY_LEN);
+    script_hash_to_address(G_context.display_data.content,
+                           sizeof(G_context.display_data.content),
+                           WithDrawTx[1].data);
+    if(!convert_uint64_to_char(G_context.display_data.amount,
+                               sizeof (G_context.display_data.amount),
+                               WithDrawTx[4].values[0])) {
+        return DATA_PARSING_ERROR;
+    }
+    return PARSING_OK;
+
+/*
     uint8_t op_code_size;
     if (!buffer_read_u8(buf, &op_code_size)) {
         return OPCODE_PARSING_ERROR;
@@ -187,6 +309,8 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
             return DATA_END_PARSING_ERROR;
         }
     }
+    */
+    /*
     if(getBytesValueByLen(buf,3) != 7063040) { //00c66b
         return VALUE_PARSING_ERROR;
     }
@@ -261,17 +385,16 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf, withdraw_t *tx) {
     if (tx->peer_pubkey_number>0) {
         memcpy(G_context.display_data.peer_pubkey, tx->peer_pubkey[0], 66);
     }
-    if (script_hash_to_address(G_context.display_data.content,
+    script_hash_to_address(G_context.display_data.content,
                                sizeof(G_context.display_data.content),
-                               tx->account) == -1) {
-        return DATA_PARSING_ERROR;
-    }
+                               tx->account);
     if(!convert_uint64_to_char(G_context.display_data.amount,
                                sizeof (G_context.display_data.amount),
                                tx->withdraw_value)) {
         return DATA_PARSING_ERROR;
     }
     return check_govern_end_data(buf,Withdraw);
+*/
 }
 
 
@@ -283,6 +406,49 @@ parser_status_e quit_node_tx_deserialize(buffer_t *buf, quit_node_t *tx) {
     if (status != PARSING_OK) {
         return status;
     }
+    cfg_t QuitNodeTx[] = {
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x00,0xc6,0x6b,0x42},
+            .data_len = 4
+        },
+        {
+            .data_type = PUBKEY_DATA_TYPE,
+            .data = NULL,
+        },
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8},
+            .data_len = 3
+        },
+        {
+            .data_type = ADDRESS_DATA_TYPE,
+            .data = NULL,
+        },
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8,0x6c,
+                                  0x08,0x71,0x75,0x69,0x74,0x4e,0x6f,0x64,0x65,
+                                  0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x68, 0x16,
+                                  0x4F, 0x6E, 0x74, 0x6F, 0x6C, 0x6F, 0x67, 0x79, 0x2E, 0x4E, 0x61, 0x74,
+                                  0x69, 0x76, 0x65, 0x2E, 0x49, 0x6E, 0x76, 0x6F, 0x6B, 0x65, 0x00},
+            .data_len = 60
+        },
+    };
+    size_t numElements = sizeof(QuitNodeTx) / sizeof(QuitNodeTx[0]);
+    parser_status_e status_tx = parse_tx(buf,QuitNodeTx,numElements,NATIVE_VM_OPERATOR);
+    if (status_tx != PARSING_OK) {
+        return status_tx;
+    }
+
+    memcpy(G_context.display_data.peer_pubkey, QuitNodeTx[1].data, 66);
+    script_hash_to_address(G_context.display_data.content,
+                           sizeof(G_context.display_data.content),
+                           QuitNodeTx[3].data);
+
+    return PARSING_OK;
+    /*
     uint8_t op_code_size;
     if (!buffer_read_u8(buf, &op_code_size)) {
         return OPCODE_PARSING_ERROR;
@@ -316,12 +482,11 @@ parser_status_e quit_node_tx_deserialize(buffer_t *buf, quit_node_t *tx) {
         return ACCOUNT_PARSING_ERROR;
     }
     memcpy(G_context.display_data.peer_pubkey, tx->peer_pubkey, 66);
-    if (script_hash_to_address(G_context.display_data.content,
+    script_hash_to_address(G_context.display_data.content,
                                sizeof(G_context.display_data.content),
-                               tx->account) == -1) {
-        return DATA_PARSING_ERROR;
-    }
+                               tx->account);
     return check_govern_end_data(buf,QuitNode);
+     */
 }
 
 
@@ -333,6 +498,64 @@ parser_status_e add_init_pos_tx_deserialize(buffer_t *buf, add_init_pos_t *tx) {
     if (status != PARSING_OK) {
         return status;
     }
+    cfg_t AddInitPosTx[] = {
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x00,0xc6,0x6b,0x42},
+            .data_len = 4
+        },
+        {
+            .data_type = PUBKEY_DATA_TYPE,
+            .data = NULL,
+        },
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8},
+            .data_len = 3
+        },
+        {
+            .data_type = ADDRESS_DATA_TYPE,
+            .data = NULL,
+        },
+
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8},
+            .data_len = 3
+        },
+        {
+            .data_type = AMOUNT_DATA_TYPE,
+            .values = {},
+        },
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8,0x6c,
+                                  0x0a,0x61,0x64,0x64,0x49,0x6e,0x69,0x74,0x50,0x6f,0x73,
+                                  0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x68, 0x16,
+                                  0x4F, 0x6E, 0x74, 0x6F, 0x6C, 0x6F, 0x67, 0x79, 0x2E, 0x4E, 0x61, 0x74,
+                                  0x69, 0x76, 0x65, 0x2E, 0x49, 0x6E, 0x76, 0x6F, 0x6B, 0x65, 0x00},
+            .data_len = 62
+        },
+    };
+    size_t numElements = sizeof(AddInitPosTx) / sizeof(AddInitPosTx[0]);
+    parser_status_e status_tx = parse_tx(buf,AddInitPosTx,numElements,NATIVE_VM_OPERATOR);
+    if (status_tx != PARSING_OK) {
+        return status_tx;
+    }
+
+    memcpy(G_context.display_data.peer_pubkey, AddInitPosTx[1].data, 66);
+    script_hash_to_address(G_context.display_data.content,
+                           sizeof(G_context.display_data.content),
+                           AddInitPosTx[3].data);
+
+    if(!convert_uint64_to_char(G_context.display_data.amount,
+                               sizeof (G_context.display_data.amount),
+                               AddInitPosTx[5].values[0])) {
+        return DATA_PARSING_ERROR;
+    }
+    return PARSING_OK;
+/*
     uint8_t op_code_size;
     if (!buffer_read_u8(buf, &op_code_size)) {
         return OPCODE_PARSING_ERROR;
@@ -378,17 +601,16 @@ parser_status_e add_init_pos_tx_deserialize(buffer_t *buf, add_init_pos_t *tx) {
         tx->pos = getBytesValueByLen(buf, pos_len);
     }
     memcpy(G_context.display_data.peer_pubkey, tx->peer_pubkey, 66);
-    if (script_hash_to_address(G_context.display_data.content,
+    script_hash_to_address(G_context.display_data.content,
                                sizeof(G_context.display_data.content),
-                               tx->account) == -1) {
-        return DATA_PARSING_ERROR;
-    }
+                               tx->account);
     if(!convert_uint64_to_char(G_context.display_data.amount,
                                sizeof (G_context.display_data.amount),
                                tx->pos)) {
         return DATA_PARSING_ERROR;
     }
     return check_govern_end_data(buf,AddInitPos);
+    */
 }
 
 parser_status_e reduce_init_pos_tx_deserialize(buffer_t *buf, reduce_init_pos_t *tx) {
@@ -399,6 +621,64 @@ parser_status_e reduce_init_pos_tx_deserialize(buffer_t *buf, reduce_init_pos_t 
     if (status != PARSING_OK) {
         return status;
     }
+    cfg_t ReduceInitPosTx[] = {
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x00,0xc6,0x6b,0x42},
+            .data_len = 4
+        },
+        {
+            .data_type = PUBKEY_DATA_TYPE,
+            .data = NULL,
+        },
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8},
+            .data_len = 3
+        },
+        {
+            .data_type = ADDRESS_DATA_TYPE,
+            .data = NULL,
+        },
+
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8},
+            .data_len = 3
+        },
+        {
+            .data_type = AMOUNT_DATA_TYPE,
+            .values = {},
+        },
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8,0x6c,
+                                  0x0d,0x72,0x65,0x64,0x75,0x63,0x65,0x49,0x6e,0x69,0x74,0x50,0x6f,0x73,
+                                  0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x68, 0x16,
+                                  0x4F, 0x6E, 0x74, 0x6F, 0x6C, 0x6F, 0x67, 0x79, 0x2E, 0x4E, 0x61, 0x74,
+                                  0x69, 0x76, 0x65, 0x2E, 0x49, 0x6E, 0x76, 0x6F, 0x6B, 0x65, 0x00},
+            .data_len = 65
+        },
+    };
+    size_t numElements = sizeof(ReduceInitPosTx) / sizeof(ReduceInitPosTx[0]);
+    parser_status_e status_tx = parse_tx(buf,ReduceInitPosTx,numElements,NATIVE_VM_OPERATOR);
+    if (status_tx != PARSING_OK) {
+        return status_tx;
+    }
+
+    memcpy(G_context.display_data.peer_pubkey, ReduceInitPosTx[1].data, 66);
+    script_hash_to_address(G_context.display_data.content,
+                           sizeof(G_context.display_data.content),
+                           ReduceInitPosTx[3].data);
+
+    if(!convert_uint64_to_char(G_context.display_data.amount,
+                               sizeof (G_context.display_data.amount),
+                               ReduceInitPosTx[5].values[0])) {
+        return DATA_PARSING_ERROR;
+    }
+    return PARSING_OK;
+    /*
     uint8_t  op_code_size;
     if(!buffer_read_u8(buf,&op_code_size)) {
         return OPCODE_PARSING_ERROR;
@@ -444,17 +724,16 @@ parser_status_e reduce_init_pos_tx_deserialize(buffer_t *buf, reduce_init_pos_t 
         tx->pos = getBytesValueByLen(buf, pos_len);
     }
     memcpy(G_context.display_data.peer_pubkey, tx->peer_pubkey, 66);
-    if (script_hash_to_address(G_context.display_data.content,
+    script_hash_to_address(G_context.display_data.content,
                                sizeof(G_context.display_data.content),
-                               tx->account) == -1) {
-        return DATA_PARSING_ERROR;
-    }
+                               tx->account);
     if(!convert_uint64_to_char(G_context.display_data.amount,
                                sizeof (G_context.display_data.amount),
                                tx->pos)) {
         return DATA_PARSING_ERROR;
     }
     return check_govern_end_data(buf,ReduceInitPos);
+     */
 }
 
 
@@ -466,6 +745,65 @@ parser_status_e  change_max_authorization_tx_deserialize(buffer_t *buf, change_m
     if (status != PARSING_OK) {
         return status;
     }
+    cfg_t ChangeMaxAuthorizationTx[] = {
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x00,0xc6,0x6b,0x42},
+            .data_len = 4
+        },
+        {
+            .data_type = PUBKEY_DATA_TYPE,
+            .data = NULL,
+        },
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8},
+            .data_len = 3
+        },
+        {
+            .data_type = ADDRESS_DATA_TYPE,
+            .data = NULL,
+        },
+
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8},
+            .data_len = 3
+        },
+        {
+            .data_type = AMOUNT_DATA_TYPE,
+            .values = {},
+        },
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8,0x6c,
+                                  0x16,0x63,0x68,0x61,0x6e,0x67,0x65,0x4d,0x61,0x78,0x41,0x75,0x74,
+                                  0x68,0x6f,0x72,0x69,0x7a,0x61,0x74,0x69,0x6f,0x6e,
+                                  0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x68, 0x16,
+                                  0x4F, 0x6E, 0x74, 0x6F, 0x6C, 0x6F, 0x67, 0x79, 0x2E, 0x4E, 0x61, 0x74,
+                                  0x69, 0x76, 0x65, 0x2E, 0x49, 0x6E, 0x76, 0x6F, 0x6B, 0x65, 0x00},
+            .data_len = 74
+        },
+    };
+    size_t numElements = sizeof(ChangeMaxAuthorizationTx) / sizeof(ChangeMaxAuthorizationTx[0]);
+    parser_status_e status_tx = parse_tx(buf,ChangeMaxAuthorizationTx,numElements,NATIVE_VM_OPERATOR);
+    if (status_tx != PARSING_OK) {
+        return status_tx;
+    }
+
+    memcpy(G_context.display_data.peer_pubkey, ChangeMaxAuthorizationTx[1].data, 66);
+    script_hash_to_address(G_context.display_data.content,
+                           sizeof(G_context.display_data.content),
+                           ChangeMaxAuthorizationTx[3].data);
+
+    if(!convert_uint64_to_char(G_context.display_data.amount,
+                               sizeof (G_context.display_data.amount),
+                               ChangeMaxAuthorizationTx[5].values[0])) {
+        return DATA_PARSING_ERROR;
+    }
+    return PARSING_OK;
+/*
     uint8_t  op_code_size;
     if(!buffer_read_u8(buf,&op_code_size)) {
         return OPCODE_PARSING_ERROR;
@@ -511,17 +849,16 @@ parser_status_e  change_max_authorization_tx_deserialize(buffer_t *buf, change_m
     }
     tx->max_authorize = value;
     memcpy(G_context.display_data.peer_pubkey, tx->peer_pubkey, 66);
-    if (script_hash_to_address(G_context.display_data.content,
+    script_hash_to_address(G_context.display_data.content,
                                sizeof(G_context.display_data.content),
-                               tx->account) == -1) {
-        return DATA_PARSING_ERROR;
-    }
+                               tx->account);
     if(!convert_uint64_to_char(G_context.display_data.amount,
                                sizeof (G_context.display_data.amount),
                                tx->max_authorize)) {
         return DATA_PARSING_ERROR;
     }
     return check_govern_end_data(buf,ChangeMaxAuthorization);
+    */
 }
 
 
@@ -533,6 +870,81 @@ parser_status_e  set_fee_percentage_tx_deserialize(buffer_t *buf, set_fee_percen
     if (status != PARSING_OK) {
         return status;
     }
+    cfg_t SetFeePercentageTx[] = {
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x00,0xc6,0x6b,0x42},
+            .data_len = 4
+        },
+        {
+            .data_type = PUBKEY_DATA_TYPE,
+            .data = NULL,
+        },
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8},
+            .data_len = 3
+        },
+        {
+            .data_type = ADDRESS_DATA_TYPE,
+            .data = NULL,
+        },
+
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8},
+            .data_len = 3
+        },
+        {
+            .data_type = AMOUNT_DATA_TYPE,
+            .values = {},
+        },
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8},
+            .data_len = 3
+        },
+        {
+            .data_type = AMOUNT_DATA_TYPE,
+            .values = {},
+        },
+
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8,0x6c,
+                                  0x10,0x73,0x65,0x74,0x46,0x65,0x65,0x50,0x65,0x72,0x63,0x65,0x6e,0x74,0x61,0x67,0x65,
+                                  0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x68, 0x16,
+                                  0x4F, 0x6E, 0x74, 0x6F, 0x6C, 0x6F, 0x67, 0x79, 0x2E, 0x4E, 0x61, 0x74,
+                                  0x69, 0x76, 0x65, 0x2E, 0x49, 0x6E, 0x76, 0x6F, 0x6B, 0x65, 0x00},
+            .data_len = 68
+        },
+    };
+    size_t numElements = sizeof(SetFeePercentageTx) / sizeof(SetFeePercentageTx[0]);
+    parser_status_e status_tx = parse_tx(buf,SetFeePercentageTx,numElements,NATIVE_VM_OPERATOR);
+    if (status_tx != PARSING_OK) {
+        return status_tx;
+    }
+
+    memcpy(G_context.display_data.peer_pubkey, SetFeePercentageTx[1].data, 66);
+    script_hash_to_address(G_context.display_data.content,
+                           sizeof(G_context.display_data.content),
+                           SetFeePercentageTx[3].data);
+
+    if(!convert_uint64_to_char(G_context.display_data.amount,
+                               sizeof (G_context.display_data.amount),
+                               SetFeePercentageTx[5].values[0])) {
+        return DATA_PARSING_ERROR;
+    }
+    if(!convert_uint64_to_char(G_context.display_data.content_two,
+                               sizeof (G_context.display_data.content_two),
+                               SetFeePercentageTx[7].values[0])) {
+        return DATA_PARSING_ERROR;
+    }
+    return PARSING_OK;
+
+/*
+
     uint8_t  op_code_size;
     if(!buffer_read_u8(buf,&op_code_size)) {
         return OPCODE_PARSING_ERROR;
@@ -583,11 +995,9 @@ parser_status_e  set_fee_percentage_tx_deserialize(buffer_t *buf, set_fee_percen
     }
     tx->stake_cost = getBytesValueByLen(buf,stake_cost_len);
     memcpy(G_context.display_data.peer_pubkey, tx->peer_pubkey, 66);
-    if (script_hash_to_address(G_context.display_data.content,
+    script_hash_to_address(G_context.display_data.content,
                                sizeof(G_context.display_data.content),
-                               tx->account) == -1) {
-        return DATA_PARSING_ERROR;
-    }
+                               tx->account);
     if(!convert_uint64_to_char(G_context.display_data.amount,
                                sizeof (G_context.display_data.amount),
                                tx->peer_cost)) {
@@ -599,6 +1009,7 @@ parser_status_e  set_fee_percentage_tx_deserialize(buffer_t *buf, set_fee_percen
         return DATA_PARSING_ERROR;
     }
     return check_govern_end_data(buf,SetFeePercentage);
+    */
 }
 
 
@@ -610,6 +1021,59 @@ parser_status_e authorize_for_peer_tx_deserialize(buffer_t *buf, authorize_for_p
     if (status != PARSING_OK) {
         return status;
     }
+    cfg_t WithDrawTx[] = {
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x00,0xc6,0x6b},
+            .data_len = 3
+        },
+        {
+            .data_type = ADDRESS_DATA_TYPE,
+            .data = NULL,
+        },
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8},
+            .data_len = 3
+        },
+        {
+            .data_type = MULTIPLE_PUBKEY_DATA_TYPE,
+            .peer_pubkeys = {}
+        },
+        {
+            .data_type = MULTIPLE_AMOUNT_DATA_TYPE,
+            .values = {}
+        },
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8,0x6c,
+                                  0x10,0x61,0x75,0x74,0x68,0x6f,0x72,0x69,0x7a,0x65,0x46,0x6f,0x72,0x50,0x65,0x65,0x72,
+                                  0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x68, 0x16,
+                                  0x4F, 0x6E, 0x74, 0x6F, 0x6C, 0x6F, 0x67, 0x79, 0x2E, 0x4E, 0x61, 0x74,
+                                  0x69, 0x76, 0x65, 0x2E, 0x49, 0x6E, 0x76, 0x6F, 0x6B, 0x65, 0x00},
+            .data_len = 68
+        },
+    };
+    size_t numElements = sizeof(WithDrawTx) / sizeof(WithDrawTx[0]);
+    parser_status_e status_tx = parse_tx(buf,WithDrawTx,numElements,NATIVE_VM_OPERATOR);
+    if (status_tx != PARSING_OK) {
+        return status_tx;
+    }
+
+    memcpy(G_context.display_data.peer_pubkey, WithDrawTx[3].peer_pubkeys[0], PEER_PUBKEY_LEN);
+    script_hash_to_address(G_context.display_data.content,
+                           sizeof(G_context.display_data.content),
+                           WithDrawTx[1].data);
+
+    if(!convert_uint64_to_char(G_context.display_data.amount,
+                               sizeof (G_context.display_data.amount),
+                               WithDrawTx[4].values[0])) {
+        return DATA_PARSING_ERROR;
+    }
+    return PARSING_OK;
+/*
+
     uint8_t  op_code_size;
     if(!buffer_read_u8(buf,&op_code_size)) {
         return OPCODE_PARSING_ERROR;
@@ -702,17 +1166,16 @@ parser_status_e authorize_for_peer_tx_deserialize(buffer_t *buf, authorize_for_p
     if(tx->peer_pubkey_number >0) {
         memcpy(G_context.display_data.peer_pubkey, tx->peer_pubkey, 66);
     }
-    if (script_hash_to_address(G_context.display_data.content,
+    script_hash_to_address(G_context.display_data.content,
                                sizeof(G_context.display_data.content),
-                               tx->account) == -1) {
-        return DATA_PARSING_ERROR;
-    }
+                               tx->account);
     if(!convert_uint64_to_char(G_context.display_data.amount,
                                sizeof (G_context.display_data.amount),
                                tx->pos_list_value)) {
         return DATA_PARSING_ERROR;
     }
-    return check_govern_end_data(buf,AuthorizeForPeer);  
+    return check_govern_end_data(buf,AuthorizeForPeer);
+    */
 }
 
 
@@ -724,6 +1187,59 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf, un_authorize
     if (status != PARSING_OK) {
         return status;
     }
+    cfg_t WithDrawTx[] = {
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x00,0xc6,0x6b},
+            .data_len = 3
+        },
+        {
+            .data_type = ADDRESS_DATA_TYPE,
+            .data = NULL,
+        },
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8},
+            .data_len = 3
+        },
+        {
+            .data_type = MULTIPLE_PUBKEY_DATA_TYPE,
+            .peer_pubkeys = {}
+        },
+        {
+            .data_type = MULTIPLE_AMOUNT_DATA_TYPE,
+            .values = {}
+        },
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8,0x6c,
+                                  0x12,0x75,0x6e,0x41,0x75,0x74,0x68,0x6f,0x72,0x69,0x7a,0x65,0x46,
+                                  0x6f,0x72,0x50,0x65,0x65,0x72,
+                                  0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x68, 0x16,
+                                  0x4F, 0x6E, 0x74, 0x6F, 0x6C, 0x6F, 0x67, 0x79, 0x2E, 0x4E, 0x61, 0x74,
+                                  0x69, 0x76, 0x65, 0x2E, 0x49, 0x6E, 0x76, 0x6F, 0x6B, 0x65, 0x00},
+            .data_len = 70
+        },
+    };
+    size_t numElements = sizeof(WithDrawTx) / sizeof(WithDrawTx[0]);
+    parser_status_e status_tx = parse_tx(buf,WithDrawTx,numElements,NATIVE_VM_OPERATOR);
+    if (status_tx != PARSING_OK) {
+        return status_tx;
+    }
+
+    memcpy(G_context.display_data.peer_pubkey, WithDrawTx[3].peer_pubkeys[0], PEER_PUBKEY_LEN);
+    script_hash_to_address(G_context.display_data.content,
+                           sizeof(G_context.display_data.content),
+                           WithDrawTx[1].data);
+
+    if(!convert_uint64_to_char(G_context.display_data.amount,
+                               sizeof (G_context.display_data.amount),
+                               WithDrawTx[4].values[0])) {
+        return DATA_PARSING_ERROR;
+    }
+    return PARSING_OK;
+/*
     uint8_t  op_code_size;
     if(!buffer_read_u8(buf,&op_code_size)) {
         return OPCODE_PARSING_ERROR;
@@ -816,17 +1332,16 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf, un_authorize
     if(tx->peer_pubkey_number >0) {
         memcpy(G_context.display_data.peer_pubkey, tx->peer_pubkey, 66);
     }
-    if (script_hash_to_address(G_context.display_data.content,
+    script_hash_to_address(G_context.display_data.content,
                                sizeof(G_context.display_data.content),
-                               tx->account) == -1) {
-        return DATA_PARSING_ERROR;
-    }
+                               tx->account);
     if(!convert_uint64_to_char(G_context.display_data.amount,
                                sizeof (G_context.display_data.amount),
                                tx->pos_list_value)) {
         return DATA_PARSING_ERROR;
     }
-    return check_govern_end_data(buf,UnAuthorizeForPeer);  
+    return check_govern_end_data(buf,UnAuthorizeForPeer);
+    */
 }
 
 
@@ -838,6 +1353,39 @@ parser_status_e withdraw_fee_tx_deserialize(buffer_t *buf, withdraw_fee_t *tx) {
     if (status != PARSING_OK) {
         return status;
     }
+    cfg_t WithdrawFeeTx[] = {
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x00,0xc6,0x6b},
+            .data_len = 3
+        },
+        {
+            .data_type = ADDRESS_DATA_TYPE,
+            .data = NULL,
+        },
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8,0x6c,
+                                  0x0b,0x77,0x69,0x74,0x68,0x64,0x72,0x61,0x77,0x46,0x65,0x65,
+                                  0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x68, 0x16,
+                                  0x4F, 0x6E, 0x74, 0x6F, 0x6C, 0x6F, 0x67, 0x79, 0x2E, 0x4E, 0x61, 0x74,
+                                  0x69, 0x76, 0x65, 0x2E, 0x49, 0x6E, 0x76, 0x6F, 0x6B, 0x65, 0x00},
+            .data_len = 63
+        },
+    };
+    size_t numElements = sizeof(WithdrawFeeTx) / sizeof(WithdrawFeeTx[0]);
+    parser_status_e status_tx = parse_tx(buf,WithdrawFeeTx,numElements,NATIVE_VM_OPERATOR);
+    if (status_tx != PARSING_OK) {
+        return status_tx;
+    }
+
+    script_hash_to_address(G_context.display_data.content,
+                           sizeof(G_context.display_data.content),
+                           WithdrawFeeTx[1].data);
+
+    return PARSING_OK;
+/*
     uint8_t  op_code_size;
     if(!buffer_read_u8(buf,&op_code_size)) {
         return OPCODE_PARSING_ERROR;
@@ -859,10 +1407,9 @@ parser_status_e withdraw_fee_tx_deserialize(buffer_t *buf, withdraw_fee_t *tx) {
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
         return ACCOUNT_PARSING_ERROR;
     }
-    if (script_hash_to_address(G_context.display_data.content,
+    script_hash_to_address(G_context.display_data.content,
                                sizeof(G_context.display_data.content),
-                               tx->account) == -1) {
-        return DATA_PARSING_ERROR;
-    }
-    return check_govern_end_data(buf,WithdrawFee);  
+                               tx->account);
+    return check_govern_end_data(buf,WithdrawFee);
+    */
 }

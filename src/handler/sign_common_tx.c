@@ -229,9 +229,11 @@ int handler_hash_tx_and_display_tx(int status) {
             return ui_display_blind_signing_transaction();
         }
     } else {
+        return ui_display_tx();
         if (G_context.tx_type == TRANSFER_V2_TRANSACTION ||
             G_context.tx_type == TRANSFER_TRANSACTION) {
-            return ui_display_transaction();
+           //return ui_display_transaction();
+           return ui_display_tx();
         } else if (G_context.tx_type == OEP4_TRANSACTION) {
             return ui_display_oep4_transaction();
         } else if (G_context.tx_type == REGISTER_CANDIDATE) {

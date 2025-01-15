@@ -75,6 +75,22 @@ void validate_transaction(bool choice) {
     }
 }
 
+void validate_transaction_new(bool choice) {
+    if (choice) {
+        G_context.state = STATE_APPROVED;
+
+        if (crypto_sign_tx() != 0) {
+            G_context.state = STATE_NONE;
+            io_send_sw(SW_SIGNATURE_FAIL);
+        } else {
+            helper_tx_send_response_sig();
+        }
+    } else {
+        G_context.state = STATE_NONE;
+        io_send_sw(SW_DENY);
+    }
+    ui_menu_main();
+}
 
 static int crypto_sign_personal_message(void) {
     uint32_t info = 0;

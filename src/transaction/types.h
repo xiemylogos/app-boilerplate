@@ -4,6 +4,7 @@
 #include <stdint.h>  // uint*_t
 
 #define ADDRESS_LEN  20
+#define PEER_PUBKEY_LEN   66
 #define PAYLOAD_MIN_LENGTH_LIMIT 44
 #define PAYLOAD_TRANSFER_LEN  54
 #define PAYLOAD_TRANSFER_FROM_LEN  58
