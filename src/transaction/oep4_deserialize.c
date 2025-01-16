@@ -64,9 +64,8 @@ parser_status_e oep4_neo_vm_transaction_deserialize(buffer_t *buf) {
     };
     uint8_t *resultArray[MAX_RESULT_SIZE] = {0};
     uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
-    size_t resultLength = 0;
     size_t numElements = sizeof(NeoVmTransferTx) / sizeof(NeoVmTransferTx[0]);
-    parser_status_e status_tx = parse_tx(buf,NeoVmTransferTx,numElements,OEP4_NEO_VM_OPERATOR,resultArray, &resultLength,storage);
+    parser_status_e status_tx = parse_tx(buf,NeoVmTransferTx,numElements,OEP4_NEO_VM_OPERATOR,resultArray, storage);
     if (status_tx != PARSING_OK) {
         return status_tx;
     }
@@ -121,9 +120,8 @@ parser_status_e oep4_wasm_vm_transaction_deserialize(buffer_t *buf) {
     };
     uint8_t *resultArray[MAX_RESULT_SIZE] = {0};
     uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
-    size_t resultLength = 0;
     size_t numElements = sizeof(WasmVmTransferTx) / sizeof(WasmVmTransferTx[0]);
-    parser_status_e status_tx = parse_tx(buf,WasmVmTransferTx,numElements,OEP4_WSAM_VM_OPERATOR,resultArray, &resultLength,storage);
+    parser_status_e status_tx = parse_tx(buf,WasmVmTransferTx,numElements,OEP4_WSAM_VM_OPERATOR,resultArray, storage);
     if (status_tx != PARSING_OK) {
         return status_tx;
     }
@@ -182,9 +180,8 @@ parser_status_e oep4_neo_vm_approve_transaction_deserialize(buffer_t *buf) {
     };
     uint8_t *resultArray[MAX_RESULT_SIZE] = {0};
     uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
-    size_t resultLength = 0;
     size_t numElements = sizeof(NeoVmApproveTx) / sizeof(NeoVmApproveTx[0]);
-    parser_status_e status_tx = parse_tx(buf,NeoVmApproveTx,numElements,OEP4_NEO_VM_OPERATOR,resultArray, &resultLength,storage);
+    parser_status_e status_tx = parse_tx(buf,NeoVmApproveTx,numElements,OEP4_NEO_VM_OPERATOR,resultArray, storage);
     if (status_tx != PARSING_OK) {
         return status_tx;
     }
@@ -208,6 +205,7 @@ parser_status_e oep4_neo_vm_approve_transaction_deserialize(buffer_t *buf) {
 }
 
 parser_status_e oep4_wasm_vm_approve_transaction_deserialize(buffer_t *buf) {
+
     cfg_t WasmApproveTx[] = {
         {
             .data_type = CONTRACT_ADDRESS_DATA_TYPE,
@@ -237,11 +235,11 @@ parser_status_e oep4_wasm_vm_approve_transaction_deserialize(buffer_t *buf) {
             .data_len = 1
         },
     };
+
     uint8_t *resultArray[MAX_RESULT_SIZE] = {0};
     uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
-    size_t resultLength = 0;
     size_t numElements = sizeof(WasmApproveTx) / sizeof(WasmApproveTx[0]);
-    parser_status_e status_tx = parse_tx(buf,WasmApproveTx,numElements,OEP4_WSAM_VM_OPERATOR,resultArray, &resultLength,storage);
+    parser_status_e status_tx = parse_tx(buf,WasmApproveTx,numElements,OEP4_WSAM_VM_OPERATOR,resultArray, storage);
     if (status_tx != PARSING_OK) {
         return status_tx;
     }
@@ -301,9 +299,8 @@ parser_status_e oep4_neo_vm_transfer_from_transaction_deserialize(buffer_t *buf)
     };
     uint8_t *resultArray[MAX_RESULT_SIZE] = {0};
     uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
-    size_t resultLength = 0;
     size_t numElements = sizeof(NeoVmTransferFromTx) / sizeof(NeoVmTransferFromTx[0]);
-    parser_status_e status_tx = parse_tx(buf,NeoVmTransferFromTx,numElements,OEP4_NEO_VM_OPERATOR,resultArray, &resultLength,storage);
+    parser_status_e status_tx = parse_tx(buf,NeoVmTransferFromTx,numElements,OEP4_NEO_VM_OPERATOR,resultArray, storage);
     if (status_tx != PARSING_OK) {
         return status_tx;
     }
@@ -368,9 +365,8 @@ parser_status_e oep4_wasm_vm_transfer_from_transaction_deserialize(buffer_t *buf
     };
     uint8_t *resultArray[MAX_RESULT_SIZE] = {0};
     uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
-    size_t resultLength = 0;
     size_t numElements = sizeof(WasmVmTransferFromTx) / sizeof(WasmVmTransferFromTx[0]);
-    parser_status_e status_tx = parse_tx(buf,WasmVmTransferFromTx,numElements,OEP4_WSAM_VM_OPERATOR,resultArray, &resultLength,storage);
+    parser_status_e status_tx = parse_tx(buf,WasmVmTransferFromTx,numElements,OEP4_WSAM_VM_OPERATOR,resultArray, storage);
     if (status_tx != PARSING_OK) {
         return status_tx;
     }

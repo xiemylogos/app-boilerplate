@@ -97,7 +97,7 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                 }
             }
             parser_status_e status = PARSING_OK;
-            //parse transaction
+            //parse transaction payload
             if (tx_type == 0xd1) { //InvokeNeo
                 if (memcmp(buf.ptr + buf.size - 22 - 1, OntologyNativeInvoke, 22) == 0) {
                     if(memcmp(buf.ptr + buf.size - 46 - 10 - 1, TransferV2, 10) == 0) {

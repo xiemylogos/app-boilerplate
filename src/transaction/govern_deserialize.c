@@ -86,9 +86,8 @@ parser_status_e register_candidate_tx_deserialize(buffer_t *buf) {
     };
     uint8_t *resultArray[MAX_RESULT_SIZE] = {0};
     uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
-    size_t resultLength = 0;
     size_t numElements = sizeof(RegisterCandidateTx) / sizeof(RegisterCandidateTx[0]);
-    parser_status_e status_tx = parse_tx(buf,RegisterCandidateTx,numElements,NATIVE_VM_OPERATOR,resultArray, &resultLength,storage);
+    parser_status_e status_tx = parse_tx(buf,RegisterCandidateTx,numElements,NATIVE_VM_OPERATOR,resultArray, storage);
     if (status_tx != PARSING_OK) {
         return status_tx;
     }
@@ -123,10 +122,13 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf) {
             .data_len = 3
         },
         {
-            .data_type = MULTIPLE_PUBKEY_DATA_TYPE
+            .data_type = MULTIPLE_PUBKEY_DATA_TYPE,
+            .data_info = {}
+
         },
         {
-            .data_type = MULTIPLE_AMOUNT_DATA_TYPE
+            .data_type = MULTIPLE_AMOUNT_DATA_TYPE,
+            .data_info = {}
         },
         {
             .data_type = OP_CODE_DATA_TYPE,
@@ -141,18 +143,19 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf) {
     };
     uint8_t *resultArray[MAX_RESULT_SIZE] = {0};
     uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
-    size_t resultLength = 0;
     size_t numElements = sizeof(WithDrawTx) / sizeof(WithDrawTx[0]);
-    parser_status_e status_tx = parse_tx(buf,WithDrawTx,numElements,NATIVE_VM_OPERATOR,resultArray, &resultLength,storage);
+    parser_status_e status_tx = parse_tx(buf,WithDrawTx,numElements,NATIVE_VM_OPERATOR,resultArray,storage);
     if (status_tx != PARSING_OK) {
         return status_tx;
     }
     uint64_t  total_value = 0;
-    for(size_t j=resultLength/2;j<resultLength;j++) {
-        total_value += getValueByLen(resultArray[j], 8);
+    for(size_t j =0;j<WithDrawTx[4].data_info.data_number;j++) {
+        uint64_t  pos = WithDrawTx[4].data_info.pos_start+j;
+        total_value += getValueByLen(resultArray[pos], 8);
     }
-    if(resultLength >0) {
-        memcpy(G_context.display_data.peer_pubkey, resultArray[0], PEER_PUBKEY_LEN);
+    if(WithDrawTx[3].data_info.data_number > 0) {
+        uint64_t  pos = WithDrawTx[3].data_info.pos_start;
+        memcpy(G_context.display_data.peer_pubkey, resultArray[pos], PEER_PUBKEY_LEN);
     }
     script_hash_to_address(G_context.display_data.content,
                            sizeof(G_context.display_data.content),
@@ -164,12 +167,14 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf) {
     }
 //For other devices, only 3 pubkeys are displayed at most.
 #if !defined(TARGET_NANOS)
-    G_context.display_data.pubkey_number = resultLength/2;
-    if(resultLength == 4) {
-        memcpy(G_context.display_data.content_three, resultArray[1], PEER_PUBKEY_LEN);
+    G_context.display_data.pubkey_number = WithDrawTx[3].data_info.data_number;
+    if(G_context.display_data.pubkey_number >1) {
+        uint64_t  pos = WithDrawTx[3].data_info.pos_start+1;
+        memcpy(G_context.display_data.content_three, resultArray[pos], PEER_PUBKEY_LEN);
     }
-    if(resultLength == 6) {
-        memcpy(G_context.display_data.content_four, resultArray[2], PEER_PUBKEY_LEN);
+    if(G_context.display_data.pubkey_number >2) {
+        uint64_t  pos = WithDrawTx[3].data_info.pos_start+2;
+        memcpy(G_context.display_data.content_three, resultArray[pos], PEER_PUBKEY_LEN);
     }
 #endif
     return PARSING_OK;
@@ -209,9 +214,8 @@ parser_status_e quit_node_tx_deserialize(buffer_t *buf) {
     };
     uint8_t *resultArray[MAX_RESULT_SIZE] = {0};
     uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
-    size_t resultLength = 0;
     size_t numElements = sizeof(QuitNodeTx) / sizeof(QuitNodeTx[0]);
-    parser_status_e status_tx = parse_tx(buf,QuitNodeTx,numElements,NATIVE_VM_OPERATOR,resultArray, &resultLength,storage);
+    parser_status_e status_tx = parse_tx(buf,QuitNodeTx,numElements,NATIVE_VM_OPERATOR,resultArray, storage);
     if (status_tx != PARSING_OK) {
         return status_tx;
     }
@@ -268,9 +272,8 @@ parser_status_e add_init_pos_tx_deserialize(buffer_t *buf) {
     };
     uint8_t *resultArray[MAX_RESULT_SIZE] = {0};
     uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
-    size_t resultLength = 0;
     size_t numElements = sizeof(AddInitPosTx) / sizeof(AddInitPosTx[0]);
-    parser_status_e status_tx = parse_tx(buf,AddInitPosTx,numElements,NATIVE_VM_OPERATOR,resultArray, &resultLength,storage);
+    parser_status_e status_tx = parse_tx(buf,AddInitPosTx,numElements,NATIVE_VM_OPERATOR,resultArray, storage);
     if (status_tx != PARSING_OK) {
         return status_tx;
     }
@@ -331,9 +334,8 @@ parser_status_e reduce_init_pos_tx_deserialize(buffer_t *buf) {
     };
     uint8_t *resultArray[MAX_RESULT_SIZE] = {0};
     uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
-    size_t resultLength = 0;
     size_t numElements = sizeof(ReduceInitPosTx) / sizeof(ReduceInitPosTx[0]);
-    parser_status_e status_tx = parse_tx(buf,ReduceInitPosTx,numElements,NATIVE_VM_OPERATOR,resultArray, &resultLength,storage);
+    parser_status_e status_tx = parse_tx(buf,ReduceInitPosTx,numElements,NATIVE_VM_OPERATOR,resultArray, storage);
     if (status_tx != PARSING_OK) {
         return status_tx;
     }
@@ -396,9 +398,8 @@ parser_status_e  change_max_authorization_tx_deserialize(buffer_t *buf) {
     };
     uint8_t *resultArray[MAX_RESULT_SIZE] = {0};
     uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
-    size_t resultLength = 0;
     size_t numElements = sizeof(ChangeMaxAuthorizationTx) / sizeof(ChangeMaxAuthorizationTx[0]);
-    parser_status_e status_tx = parse_tx(buf,ChangeMaxAuthorizationTx,numElements,NATIVE_VM_OPERATOR,resultArray, &resultLength,storage);
+    parser_status_e status_tx = parse_tx(buf,ChangeMaxAuthorizationTx,numElements,NATIVE_VM_OPERATOR,resultArray, storage);
     if (status_tx != PARSING_OK) {
         return status_tx;
     }
@@ -470,9 +471,8 @@ parser_status_e  set_fee_percentage_tx_deserialize(buffer_t *buf) {
     };
     uint8_t *resultArray[MAX_RESULT_SIZE] = {0};
     uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
-    size_t resultLength = 0;
     size_t numElements = sizeof(SetFeePercentageTx) / sizeof(SetFeePercentageTx[0]);
-    parser_status_e status_tx = parse_tx(buf,SetFeePercentageTx,numElements,NATIVE_VM_OPERATOR,resultArray, &resultLength,storage);
+    parser_status_e status_tx = parse_tx(buf,SetFeePercentageTx,numElements,NATIVE_VM_OPERATOR,resultArray, storage);
     if (status_tx != PARSING_OK) {
         return status_tx;
     }
@@ -513,11 +513,12 @@ parser_status_e authorize_for_peer_tx_deserialize(buffer_t *buf) {
             .data_len = 3
         },
         {
-            .data_type = MULTIPLE_PUBKEY_DATA_TYPE
+            .data_type = MULTIPLE_PUBKEY_DATA_TYPE,
+            .data_info = {}
         },
         {
             .data_type = MULTIPLE_AMOUNT_DATA_TYPE,
-
+            .data_info = {}
         },
         {
             .data_type = OP_CODE_DATA_TYPE,
@@ -532,18 +533,19 @@ parser_status_e authorize_for_peer_tx_deserialize(buffer_t *buf) {
     };
     uint8_t *resultArray[MAX_RESULT_SIZE] = {0};
     uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
-    size_t resultLength = 0;
     size_t numElements = sizeof(AuthorizeForPeerTx) / sizeof(AuthorizeForPeerTx[0]);
-    parser_status_e status_tx = parse_tx(buf,AuthorizeForPeerTx,numElements,NATIVE_VM_OPERATOR,resultArray, &resultLength,storage);
+    parser_status_e status_tx = parse_tx(buf,AuthorizeForPeerTx,numElements,NATIVE_VM_OPERATOR,resultArray, storage);
     if (status_tx != PARSING_OK) {
         return status_tx;
     }
     uint64_t  total_value = 0;
-    for(size_t j=resultLength/2;j<resultLength;j++) {
-        total_value += getValueByLen(resultArray[j],8);
+    for(size_t j =0;j<AuthorizeForPeerTx[4].data_info.data_number;j++) {
+        uint64_t  pos = AuthorizeForPeerTx[4].data_info.pos_start+j;
+        total_value += getValueByLen(resultArray[pos], 8);
     }
-    if(resultLength >0) {
-        memcpy(G_context.display_data.peer_pubkey, &resultArray[0], PEER_PUBKEY_LEN);
+    if(AuthorizeForPeerTx[3].data_info.data_number > 0) {
+        uint64_t  pos = AuthorizeForPeerTx[3].data_info.pos_start;
+        memcpy(G_context.display_data.peer_pubkey, resultArray[pos], PEER_PUBKEY_LEN);
     }
     script_hash_to_address(G_context.display_data.content,
                            sizeof(G_context.display_data.content),
@@ -555,12 +557,14 @@ parser_status_e authorize_for_peer_tx_deserialize(buffer_t *buf) {
     }
 //For other devices, only 3 pubkeys are displayed at most.
 #if !defined(TARGET_NANOS)
-    G_context.display_data.pubkey_number = resultLength/2;
-    if(resultLength == 4) {
-        memcpy(G_context.display_data.content_three, resultArray[1], PEER_PUBKEY_LEN);
+    G_context.display_data.pubkey_number = AuthorizeForPeerTx[3].data_info.data_number;
+    if(G_context.display_data.pubkey_number >1) {
+        uint64_t  pos = AuthorizeForPeerTx[3].data_info.pos_start+1;
+        memcpy(G_context.display_data.content_three, resultArray[pos], PEER_PUBKEY_LEN);
     }
-    if(resultLength == 6) {
-        memcpy(G_context.display_data.content_four, resultArray[2], PEER_PUBKEY_LEN);
+    if(G_context.display_data.pubkey_number >2) {
+        uint64_t  pos = AuthorizeForPeerTx[3].data_info.pos_start+2;
+        memcpy(G_context.display_data.content_three, resultArray[pos], PEER_PUBKEY_LEN);
     }
 #endif
     return PARSING_OK;
@@ -584,10 +588,12 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf) {
             .data_len = 3
         },
         {
-            .data_type = MULTIPLE_PUBKEY_DATA_TYPE
+            .data_type = MULTIPLE_PUBKEY_DATA_TYPE,
+            .data_info = {}
         },
         {
-            .data_type = MULTIPLE_AMOUNT_DATA_TYPE
+            .data_type = MULTIPLE_AMOUNT_DATA_TYPE,
+            .data_info = {}
         },
         {
             .data_type = OP_CODE_DATA_TYPE,
@@ -603,18 +609,19 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf) {
     };
     uint8_t *resultArray[MAX_RESULT_SIZE] = {0};
     uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
-    size_t resultLength = 0;
     size_t numElements = sizeof(UnAuthorizeForPeerTx) / sizeof(UnAuthorizeForPeerTx[0]);
-    parser_status_e status_tx = parse_tx(buf,UnAuthorizeForPeerTx,numElements,NATIVE_VM_OPERATOR,resultArray, &resultLength,storage);
+    parser_status_e status_tx = parse_tx(buf,UnAuthorizeForPeerTx,numElements,NATIVE_VM_OPERATOR,resultArray, storage);
     if (status_tx != PARSING_OK) {
         return status_tx;
     }
     uint64_t  total_value = 0;
-    for(size_t j=resultLength/2;j<resultLength;j++) {
-        total_value += getValueByLen(resultArray[j],8);
+    for(size_t j =0;j<UnAuthorizeForPeerTx[4].data_info.data_number;j++) {
+        uint64_t  pos = UnAuthorizeForPeerTx[4].data_info.pos_start+j;
+        total_value += getValueByLen(resultArray[pos], 8);
     }
-    if(resultLength > 0) {
-        memcpy(G_context.display_data.peer_pubkey, resultArray[0], PEER_PUBKEY_LEN);
+    if(UnAuthorizeForPeerTx[3].data_info.data_number > 0) {
+        uint64_t  pos = UnAuthorizeForPeerTx[3].data_info.pos_start;
+        memcpy(G_context.display_data.peer_pubkey, resultArray[pos], PEER_PUBKEY_LEN);
     }
     script_hash_to_address(G_context.display_data.content,
                            sizeof(G_context.display_data.content),
@@ -627,12 +634,14 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf) {
     }
 //For other devices, only 3 pubkeys are displayed at most.
 #if !defined(TARGET_NANOS)
-    G_context.display_data.pubkey_number = resultLength/2;
-    if(resultLength == 4) {
-        memcpy(G_context.display_data.content_three, resultArray[1], PEER_PUBKEY_LEN);
+    G_context.display_data.pubkey_number = UnAuthorizeForPeerTx[3].data_info.data_number;
+    if(G_context.display_data.pubkey_number >1) {
+        uint64_t  pos = UnAuthorizeForPeerTx[3].data_info.pos_start+1;
+        memcpy(G_context.display_data.content_three, resultArray[pos], PEER_PUBKEY_LEN);
     }
-    if(resultLength == 6) {
-        memcpy(G_context.display_data.content_four, resultArray[2], PEER_PUBKEY_LEN);
+    if(G_context.display_data.pubkey_number >2) {
+        uint64_t  pos = UnAuthorizeForPeerTx[3].data_info.pos_start+2;
+        memcpy(G_context.display_data.content_three, resultArray[pos], PEER_PUBKEY_LEN);
     }
 #endif
     return PARSING_OK;
@@ -663,9 +672,8 @@ parser_status_e withdraw_fee_tx_deserialize(buffer_t *buf) {
     };
     uint8_t *resultArray[MAX_RESULT_SIZE] = {0};
     uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
-    size_t resultLength = 0;
     size_t numElements = sizeof(WithdrawFeeTx) / sizeof(WithdrawFeeTx[0]);
-    parser_status_e status_tx = parse_tx(buf,WithdrawFeeTx,numElements,NATIVE_VM_OPERATOR,resultArray, &resultLength,storage);
+    parser_status_e status_tx = parse_tx(buf,WithdrawFeeTx,numElements,NATIVE_VM_OPERATOR,resultArray, storage);
     if (status_tx != PARSING_OK) {
         return status_tx;
     }

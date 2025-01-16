@@ -57,7 +57,6 @@ static void ui_action_validate_pubkey(bool choice) {
 // Validate/Invalidate transaction and go back to home
 static void ui_action_validate_transaction(bool choice) {
     validate_transaction(choice);
-    ui_menu_main();
 }
 
 // Validate/Invalidate personal msg and go back to home
