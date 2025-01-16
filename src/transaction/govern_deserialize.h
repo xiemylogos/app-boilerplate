@@ -125,15 +125,3 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf);
  *
  */
 parser_status_e withdraw_fee_tx_deserialize(buffer_t *buf);
-/**
- * Deserialize  check govern tx end data opcode in raw transaction in structure.
- *
- * @param[in, out] buf
- *   Pointer to buffer with serialized transaction.
- * @param[out]     tx
- *   Pointer to transaction structure.
- *
- * @return PARSING_OK if success, error status otherwise.
- *
- */
-parser_status_e check_govern_end_data(buffer_t *buf,const char* param_name);
