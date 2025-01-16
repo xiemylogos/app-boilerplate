@@ -22,7 +22,7 @@ typedef enum {
 typedef enum {
     NATIVE_VM_OPERATOR = 0x01,
     OEP4_NEO_VM_OPERATOR = 0x02,
-    OEP4_WSAM_VM_OPERATOR = 0x03
+    OEP4_WASM_VM_OPERATOR = 0x03
 }vm_operator_t;
 
 typedef struct {

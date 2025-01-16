@@ -31,7 +31,7 @@ parser_status_e parse_tx(buffer_t *buf,cfg_t* tx,size_t array_length,vm_operator
             }
             buffer_seek_cur(buf, tx[i].data_len);
         } else if (tx[i].data_type== ADDRESS_DATA_TYPE) {
-            if(vm_type != OEP4_WSAM_VM_OPERATOR) {
+            if(vm_type != OEP4_WASM_VM_OPERATOR) {
                 uint8_t address_len;
                 if (!buffer_read_u8(buf, &address_len)) {
                     return OPCODE_PARSING_ERROR;
@@ -45,7 +45,7 @@ parser_status_e parse_tx(buffer_t *buf,cfg_t* tx,size_t array_length,vm_operator
                 return FROM_PARSING_ERROR;
             }
         } else if(tx[i].data_type== CONTRACT_ADDRESS_DATA_TYPE){
-            if(vm_type != OEP4_WSAM_VM_OPERATOR &&
+            if(vm_type != OEP4_WASM_VM_OPERATOR &&
                vm_type != OEP4_NEO_VM_OPERATOR) {
                 uint8_t address_len;
                 if (!buffer_read_u8(buf, &address_len)) {

@@ -121,7 +121,7 @@ parser_status_e oep4_wasm_vm_transaction_deserialize(buffer_t *buf) {
     uint8_t *resultArray[MAX_RESULT_SIZE] = {0};
     uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
     size_t numElements = sizeof(WasmVmTransferTx) / sizeof(WasmVmTransferTx[0]);
-    parser_status_e status_tx = parse_tx(buf,WasmVmTransferTx,numElements,OEP4_WSAM_VM_OPERATOR,resultArray, storage);
+    parser_status_e status_tx = parse_tx(buf,WasmVmTransferTx,numElements,OEP4_WASM_VM_OPERATOR,resultArray, storage);
     if (status_tx != PARSING_OK) {
         return status_tx;
     }
@@ -239,7 +239,7 @@ parser_status_e oep4_wasm_vm_approve_transaction_deserialize(buffer_t *buf) {
     uint8_t *resultArray[MAX_RESULT_SIZE] = {0};
     uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
     size_t numElements = sizeof(WasmApproveTx) / sizeof(WasmApproveTx[0]);
-    parser_status_e status_tx = parse_tx(buf,WasmApproveTx,numElements,OEP4_WSAM_VM_OPERATOR,resultArray, storage);
+    parser_status_e status_tx = parse_tx(buf,WasmApproveTx,numElements,OEP4_WASM_VM_OPERATOR,resultArray, storage);
     if (status_tx != PARSING_OK) {
         return status_tx;
     }
@@ -366,7 +366,7 @@ parser_status_e oep4_wasm_vm_transfer_from_transaction_deserialize(buffer_t *buf
     uint8_t *resultArray[MAX_RESULT_SIZE] = {0};
     uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
     size_t numElements = sizeof(WasmVmTransferFromTx) / sizeof(WasmVmTransferFromTx[0]);
-    parser_status_e status_tx = parse_tx(buf,WasmVmTransferFromTx,numElements,OEP4_WSAM_VM_OPERATOR,resultArray, storage);
+    parser_status_e status_tx = parse_tx(buf,WasmVmTransferFromTx,numElements,OEP4_WASM_VM_OPERATOR,resultArray, storage);
     if (status_tx != PARSING_OK) {
         return status_tx;
     }
