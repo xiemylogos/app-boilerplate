@@ -118,22 +118,6 @@ typedef struct {
 typedef struct {
     uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
     size_t raw_tx_len;                    /// length of raw transaction
-    union {
-        ont_transaction_t tx_info;        ///native transaction context
-        ont_transaction_from_t  from_tx_info; ///native transfer from transaction context
-        ont_transaction_t oep4_tx_info;  ///oep4 transaction context
-        ont_transaction_from_t  oep4_from_tx_info;  ///oep4 transfer from context
-        register_candidate_t register_candidate_tx_info; ///registerCandidate transaction context
-        withdraw_t  withdraw_tx_info;                    ///withdraw transaction context
-        quit_node_t  quit_node_tx_info;                  ///quitNode transaction context
-        add_init_pos_t  add_init_pos_tx_info;            ///addInitPos transaction context
-        reduce_init_pos_t reduce_init_pos_tx_info;       ///reduceInitPos transaction context
-        change_max_authorization_t change_max_authorization_tx_info; ///changeMaxAuthorization transaction context
-        set_fee_percentage_t  set_fee_percentage_tx_info;  ///setFeePercentage transaction context
-        authorize_for_peer_t authorize_for_peer_tx_info;   ///authorizeForPeer transaction context
-        un_authorize_for_peer_t un_authorize_for_peer_tx_info; ///unAuthorizeForPeer transaction context
-        withdraw_fee_t  withdraw_fee_tx_info;             //////withdrawFee transaction context
-    };
     uint8_t m_hash[32];                   /// message hash digest
     uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
     uint8_t signature_len;                /// length of transaction signature
@@ -150,116 +134,6 @@ typedef struct {
     uint8_t v;
 } personal_msg_ctx_t;
 
-typedef struct {
-    uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
-    size_t raw_tx_len;                    /// length of raw transaction
-    ont_transaction_t transaction;        /// structured transaction
-    uint8_t m_hash[32];                   /// message hash digest
-    uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
-    uint8_t signature_len;                /// length of transaction signature
-    uint8_t v;                            /// parity of y-coordinate of R in ECDSA signature
-} oep4_transaction_ctx_t;
-
-
-typedef  struct {
-    uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
-    size_t raw_tx_len;                    /// length of raw transaction
-    register_candidate_t transaction;        /// structured transaction
-    uint8_t m_hash[32];                   /// message hash digest
-    uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
-    uint8_t signature_len;                /// length of transaction signature
-    uint8_t v;
-}register_candidate_ctx_t;
-
-typedef  struct {
-    uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
-    size_t raw_tx_len;                    /// length of raw transaction
-    withdraw_t transaction;        /// structured transaction
-    uint8_t m_hash[32];                   /// message hash digest
-    uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
-    uint8_t signature_len;                /// length of transaction signature
-    uint8_t v;
-}withdraw_ctx_t;
-
-typedef struct {
-    uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
-    size_t raw_tx_len;                    /// length of raw transaction
-    quit_node_t transaction;        /// structured transaction
-    uint8_t m_hash[32];                   /// message hash digest
-    uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
-    uint8_t signature_len;                /// length of transaction signature
-    uint8_t v;
-}quit_node_ctx_t;
-
-typedef struct {
-    uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
-    size_t raw_tx_len;                    /// length of raw transaction
-    add_init_pos_t transaction;        /// structured transaction
-    uint8_t m_hash[32];                   /// message hash digest
-    uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
-    uint8_t signature_len;                /// length of transaction signature
-    uint8_t v;
-}add_init_pos_ctx_t;
-
-typedef struct {
-    uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
-    size_t raw_tx_len;                    /// length of raw transaction
-    reduce_init_pos_t transaction;        /// structured transaction
-    uint8_t m_hash[32];                   /// message hash digest
-    uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
-    uint8_t signature_len;                /// length of transaction signature
-    uint8_t v;
-}reduce_init_pos_ctx_t;
-
-typedef struct {
-    uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
-    size_t raw_tx_len;                    /// length of raw transaction
-    change_max_authorization_t transaction;        /// structured transaction
-    uint8_t m_hash[32];                   /// message hash digest
-    uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
-    uint8_t signature_len;                /// length of transaction signature
-    uint8_t v;
-}change_max_authorization_ctx_t;
-
-typedef struct {
-    uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
-    size_t raw_tx_len;                    /// length of raw transaction
-    set_fee_percentage_t transaction;        /// structured transaction
-    uint8_t m_hash[32];                   /// message hash digest
-    uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
-    uint8_t signature_len;                /// length of transaction signature
-    uint8_t v;
-}set_fee_percentage_ctx_t;
-
-typedef struct {
-    uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
-    size_t raw_tx_len;                    /// length of raw transaction
-    authorize_for_peer_t transaction;        /// structured transaction
-    uint8_t m_hash[32];                   /// message hash digest
-    uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
-    uint8_t signature_len;                /// length of transaction signature
-    uint8_t v;
-}authorize_for_peer_ctx_t;
-
-typedef struct {
-    uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
-    size_t raw_tx_len;                    /// length of raw transaction
-    un_authorize_for_peer_t transaction;        /// structured transaction
-    uint8_t m_hash[32];                   /// message hash digest
-    uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
-    uint8_t signature_len;                /// length of transaction signature
-    uint8_t v;
-}un_authorize_for_peer_ctx_t;
-
-typedef struct {
-    uint8_t raw_tx[MAX_TRANSACTION_LEN];  /// raw transaction serialized
-    size_t raw_tx_len;                    /// length of raw transaction
-    withdraw_fee_t transaction;        /// structured transaction
-    uint8_t m_hash[32];                   /// message hash digest
-    uint8_t signature[MAX_DER_SIG_LEN];   /// transaction signature encoded in DER
-    uint8_t signature_len;                /// length of transaction signature
-    uint8_t v;
-}withdraw_fee_ctx_t;
 /**
  * Structure for global context.
  */

@@ -32,14 +32,7 @@
 #include "ledger_assert.h"
 #endif
 
-parser_status_e oep4_neo_vm_transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
-    LEDGER_ASSERT(buf != NULL, "NULL buf");
-    LEDGER_ASSERT(tx != NULL, "NULL oep4 tx");
-
-    parser_status_e status = transaction_deserialize_header(buf,&tx->header);
-    if (status != PARSING_OK) {
-        return status;
-    }
+parser_status_e oep4_neo_vm_transaction_deserialize(buffer_t *buf) {
     cfg_t NeoVmTransferTx[] = {
         {
             .data_type = AMOUNT_DATA_TYPE,
@@ -185,11 +178,7 @@ parser_status_e oep4_neo_vm_transaction_deserialize(buffer_t *buf, ont_transacti
     */
 }
 
-parser_status_e oep4_wasm_vm_transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
-    parser_status_e status = transaction_deserialize_header(buf,&tx->header);
-    if (status != PARSING_OK) {
-        return status;
-    }
+parser_status_e oep4_wasm_vm_transaction_deserialize(buffer_t *buf) {
     cfg_t WasmVmTransferTx[] = {
         {
             .data_type = CONTRACT_ADDRESS_DATA_TYPE,
@@ -323,14 +312,7 @@ parser_status_e oep4_wasm_vm_transaction_deserialize(buffer_t *buf, ont_transact
     */
 }
 
-parser_status_e oep4_neo_vm_approve_transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
-    LEDGER_ASSERT(buf != NULL, "NULL buf");
-    LEDGER_ASSERT(tx != NULL, "NULL oep4 tx");
-
-    parser_status_e status = transaction_deserialize_header(buf,&tx->header);
-    if (status != PARSING_OK) {
-        return status;
-    }
+parser_status_e oep4_neo_vm_approve_transaction_deserialize(buffer_t *buf) {
     cfg_t NeoVmApproveTx[] = {
         {
             .data_type = AMOUNT_DATA_TYPE,
@@ -475,14 +457,7 @@ parser_status_e oep4_neo_vm_approve_transaction_deserialize(buffer_t *buf, ont_t
      */
 }
 
-parser_status_e oep4_wasm_vm_approve_transaction_deserialize(buffer_t *buf, ont_transaction_t *tx) {
-    LEDGER_ASSERT(buf != NULL, "NULL buf");
-    LEDGER_ASSERT(tx != NULL, "NULL oep4 tx");
-
-    parser_status_e status = transaction_deserialize_header(buf,&tx->header);
-    if (status != PARSING_OK) {
-        return status;
-    }
+parser_status_e oep4_wasm_vm_approve_transaction_deserialize(buffer_t *buf) {
     cfg_t WasmApproveTx[] = {
         {
             .data_type = CONTRACT_ADDRESS_DATA_TYPE,
@@ -612,14 +587,7 @@ parser_status_e oep4_wasm_vm_approve_transaction_deserialize(buffer_t *buf, ont_
     */
 }
 
-parser_status_e oep4_neo_vm_transfer_from_transaction_deserialize(buffer_t *buf, ont_transaction_from_t *tx) {
-    LEDGER_ASSERT(buf != NULL, "NULL buf");
-    LEDGER_ASSERT(tx != NULL, "NULL oep4 tx");
-
-    parser_status_e status = transaction_deserialize_header(buf,&tx->header);
-    if (status != PARSING_OK) {
-        return status;
-    }
+parser_status_e oep4_neo_vm_transfer_from_transaction_deserialize(buffer_t *buf) {
     cfg_t NeoVmTransferFromTx[] = {
         {
             .data_type = AMOUNT_DATA_TYPE,
@@ -791,15 +759,7 @@ parser_status_e oep4_neo_vm_transfer_from_transaction_deserialize(buffer_t *buf,
     */
 }
 
-parser_status_e oep4_wasm_vm_transfer_from_transaction_deserialize(buffer_t *buf, ont_transaction_from_t *tx) {
-    LEDGER_ASSERT(buf != NULL, "NULL buf");
-    LEDGER_ASSERT(tx != NULL, "NULL oep4 tx");
-
-    parser_status_e status = transaction_deserialize_header(buf,&tx->header);
-    if (status != PARSING_OK) {
-        return status;
-    }
-
+parser_status_e oep4_wasm_vm_transfer_from_transaction_deserialize(buffer_t *buf) {
     cfg_t WasmVmTransferFromTx[] = {
         {
             .data_type = CONTRACT_ADDRESS_DATA_TYPE,

@@ -31,40 +31,8 @@
 #include "ledger_assert.h"
 #endif
 
-parser_status_e check_native_end_data(buffer_t *buf) {
-    uint8_t end_data[] = {
-        0x00, 0x68, 0x16, 0x4F, 0x6E, 0x74, 0x6F, 0x6C,
-        0x6F, 0x67, 0x79, 0x2E, 0x4E, 0x61, 0x74, 0x69,
-        0x76, 0x65, 0x2E, 0x49, 0x6E, 0x76, 0x6F, 0x6B,
-        0x65, 0x00
-    };
-    if(!buffer_can_read(buf,sizeof(end_data))) {
-        return DATA_END_PARSING_ERROR;
-    }
-    if(memcmp(buf->ptr+buf->offset, end_data, sizeof(end_data)) != 0) {
-        return DATA_END_PARSING_ERROR;
-    }
-    if (!buffer_seek_cur(buf,sizeof(end_data))) {
-        return DATA_END_PARSING_ERROR;
-    }
-    return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
-}
 
-parser_status_e transaction_native_transfer_deserialize(buffer_t *buf, ont_transaction_t *tx) {
-    LEDGER_ASSERT(buf != NULL, "NULL buf");
-    LEDGER_ASSERT(tx != NULL, "NULL tx");
-    parser_status_e status = transaction_deserialize_header(buf,&tx->header);
-    if (status != PARSING_OK) {
-        return status;
-    }
-    uint8_t  payload_size;
-    if(!buffer_read_u8(buf,&payload_size)) {
-        return OPCODE_PARSING_ERROR;
-    }
-    if(!buffer_can_read(buf,payload_size)) {
-        return OPCODE_PARSING_ERROR;
-    }
-
+parser_status_e transaction_native_transfer_deserialize(buffer_t *buf) {
     cfg_t TransferTx[] = {
         {
             .data_type = OP_CODE_DATA_TYPE,
@@ -249,14 +217,7 @@ parser_status_e transaction_native_transfer_deserialize(buffer_t *buf, ont_trans
      */
 }
 
-parser_status_e transaction_native_transfer_v2_deserialize(buffer_t *buf, ont_transaction_t *tx) {
-    LEDGER_ASSERT(buf != NULL, "NULL buf");
-    LEDGER_ASSERT(tx != NULL, "NULL tx");
-
-    parser_status_e status = transaction_deserialize_header(buf,&tx->header);
-    if (status != PARSING_OK) {
-        return status;
-    }
+parser_status_e transaction_native_transfer_v2_deserialize(buffer_t *buf) {
     cfg_t TransferV2Tx[] = {
         {
             .data_type = OP_CODE_DATA_TYPE,
@@ -454,14 +415,7 @@ parser_status_e transaction_native_transfer_v2_deserialize(buffer_t *buf, ont_tr
 }
 
 
-parser_status_e transaction_native_transfer_from_deserialize(buffer_t *buf, ont_transaction_from_t *tx) {
-    LEDGER_ASSERT(buf != NULL, "NULL buf");
-    LEDGER_ASSERT(tx != NULL, "NULL tx");
-
-    parser_status_e status = transaction_deserialize_header(buf,&tx->header);
-    if (status != PARSING_OK) {
-        return status;
-    }
+parser_status_e transaction_native_transfer_from_deserialize(buffer_t *buf) {
     cfg_t TransferFromTx[] = {
         {
             .data_type = OP_CODE_DATA_TYPE,
@@ -684,14 +638,7 @@ parser_status_e transaction_native_transfer_from_deserialize(buffer_t *buf, ont_
     */
 }
 
-parser_status_e transaction_native_transfer_from_v2_deserialize(buffer_t *buf, ont_transaction_from_t *tx) {
-    LEDGER_ASSERT(buf != NULL, "NULL buf");
-    LEDGER_ASSERT(tx != NULL, "NULL tx");
-
-    parser_status_e status = transaction_deserialize_header(buf,&tx->header);
-    if (status != PARSING_OK) {
-        return status;
-    }
+parser_status_e transaction_native_transfer_from_v2_deserialize(buffer_t *buf) {
     cfg_t TransferFromV2Tx[] = {
         {
             .data_type = OP_CODE_DATA_TYPE,
@@ -926,14 +873,7 @@ parser_status_e transaction_native_transfer_from_v2_deserialize(buffer_t *buf, o
     */
 }
 
-parser_status_e transaction_approve_deserialize(buffer_t *buf, ont_transaction_t *tx) {
-    LEDGER_ASSERT(buf != NULL, "NULL buf");
-    LEDGER_ASSERT(tx != NULL, "NULL tx");
-    parser_status_e  status = transaction_deserialize_header(buf,&tx->header);
-    if (status != PARSING_OK) {
-        return status;
-    }
-
+parser_status_e transaction_approve_deserialize(buffer_t *buf) {
     cfg_t ApproveTx[] = {
         {
             .data_type = OP_CODE_DATA_TYPE,
@@ -1122,13 +1062,7 @@ parser_status_e transaction_approve_deserialize(buffer_t *buf, ont_transaction_t
 }
 
 
-parser_status_e transaction_approve_v2_deserialize(buffer_t *buf, ont_transaction_t *tx) {
-    LEDGER_ASSERT(buf != NULL, "NULL buf");
-    LEDGER_ASSERT(tx != NULL, "NULL tx");
-    parser_status_e status = transaction_deserialize_header(buf,&tx->header);
-    if (status != PARSING_OK) {
-        return status;
-    }
+parser_status_e transaction_approve_v2_deserialize(buffer_t *buf) {
     cfg_t ApproveV2Tx[] = {
         {
             .data_type = OP_CODE_DATA_TYPE,

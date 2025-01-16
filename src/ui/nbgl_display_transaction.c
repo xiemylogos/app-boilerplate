@@ -102,7 +102,7 @@ static uint8_t setTagValuePairs(void) {
         } else if( G_context.tx_type == SET_FEE_PERCENTAGE){
             pairs[nbPairs].item = PEER_COST;
         } else if (G_context.tx_type == WITHDRAW) {
-            if (G_context.tx_info.withdraw_tx_info.withdraw_number ==1) {
+            if (G_context.display_data.pubkey_number == 1) {
                 pairs[nbPairs].item = AMOUNT;
             } else {
                 pairs[nbPairs].item = TOTAL_WITHDRAW;
@@ -237,66 +237,28 @@ static uint8_t setTagValuePairs(void) {
     return nbPairs;
 }
 
-// Public function to start the transaction review
-// - Check if the app is in the right state for transaction review
-// - Format the amount and address strings in g_amount and g_address buffers
-// - Display the first screen of the transaction review
-int ui_display_transaction_choice() {
-    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
-        || (G_context.tx_type != TRANSFER_V2_TRANSACTION &&
-            G_context.tx_type != TRANSFER_TRANSACTION)) {
-        G_context.state = STATE_NONE;
-        return io_send_sw(SW_BAD_STATE);
-    }
-    explicit_bzero(&pairsList, sizeof(pairsList));
-    pairsList.nbPairs = setTagValuePairs();
-    pairsList.pairs = pairs;
-
-   if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONT_ADDR,20) == 0) {
-          nbgl_useCaseReview(TYPE_TRANSACTION,
-                              &pairsList,
-                              &C_icon_ont_64px,
-                              "Review transaction\nto send ONT",
-                              NULL,
-                              "Sign transaction\nto send ONT",
-                              tx_review_choice);
-   } else if (memcmp(G_context.tx_info.tx_info.payload.contract_addr,ONG_ADDR,20) == 0) {
-          nbgl_useCaseReview(TYPE_TRANSACTION,
-                              &pairsList,
-                              &C_icon_ont_64px,
-                              "Review transaction\nto send ONG",
-                              NULL,
-                              "Sign transaction\nto send ONG",
-                              tx_review_choice);
-   }
-    return 0;
-}
-
-// Flow used to display a clear-signed transaction
-int ui_display_transaction() {
-    return ui_display_transaction_choice();
-}
-
 int ui_display_blind_transaction_bs_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION) {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
     explicit_bzero(&pairsList, sizeof(pairsList));
-    pairs[0].item = "transaction";
-    pairs[0].value = "transaction blind signing";
+    pairs[0].item = BLIND_SIGN_TX;
+    pairs[0].value = BLIND_SIGNING;
 
     pairs[1].item = SIGNER;
     pairs[1].value = G_context.display_data.signer;
 
     pairsList.pairs = pairs;
     pairsList.nbPairs = 2;
+    review_title = BLIND_SIGNING_TITLE;
+    review_content = BLIND_SIGNING_CONTENT;
     nbgl_useCaseReviewBlindSigning(TYPE_TRANSACTION,
                               &pairsList,
                               &C_icon_ont_64px,
-                              "Review transaction",
+                              BLIND_SIGNING_TITLE,
                               NULL,
-                              "Accept risk and send transaction?",
+                              BLIND_SIGNING_CONTENT,
                                NULL,
                               tx_review_choice);
 
@@ -305,147 +267,6 @@ int ui_display_blind_transaction_bs_choice() {
 
 int ui_display_blind_signing_transaction() {
     return ui_display_blind_transaction_bs_choice();
-}
-
-int ui_display_approve_transaction_choice() {
-    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
-        || (G_context.tx_type != APPROVE &&
-            G_context.tx_type != APPROVE_V2)) {
-        G_context.state = STATE_NONE;
-        return io_send_sw(SW_BAD_STATE);
-    }
-    explicit_bzero(&pairsList, sizeof(pairsList));
-    pairsList.nbPairs = setTagValuePairs();
-    pairsList.pairs = pairs;
-
-    if (memcmp(G_context.tx_info.from_tx_info.payload.contract_addr,ONT_ADDR,20) == 0) {
-          nbgl_useCaseReview(TYPE_TRANSACTION,
-                              &pairsList,
-                              &C_icon_ont_64px,
-                              "Review transaction Approve ONT",
-                              NULL,
-                              "Sign transaction Aprove ONT",
-                              tx_review_choice);
-   } else if (memcmp(G_context.tx_info.from_tx_info.payload.contract_addr,ONG_ADDR,20) == 0) {
-          nbgl_useCaseReview(TYPE_TRANSACTION,
-                              &pairsList,
-                              &C_icon_ont_64px,
-                              "Review transaction Approve ONG",
-                              NULL,
-                               "Sign transaction Aprove ONG",
-                              tx_review_choice);
-   }
-    return 0;
-}
-
-int ui_display_approve_tx() {
-    return ui_display_approve_transaction_choice();
-}
-
-int ui_display_transaction_from_choice() {
-    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
-        || (G_context.tx_type != TRANSFER_FROM_V2_TRANSACTION &&
-            G_context.tx_type != TRANSFER_FROM_TRANSACTION)) {
-        G_context.state = STATE_NONE;
-        return io_send_sw(SW_BAD_STATE);
-    }
-    explicit_bzero(&pairsList, sizeof(pairsList));
-    pairsList.nbPairs = setTagValuePairs();
-    pairsList.pairs = pairs;
-
-   if (memcmp(G_context.tx_info.from_tx_info.payload.contract_addr,ONT_ADDR,20) == 0) {
-          nbgl_useCaseReview(TYPE_TRANSACTION,
-                              &pairsList,
-                              &C_icon_ont_64px,
-                              "Review transaction from\nto send ONT",
-                              NULL,
-                              "Sign transaction from\nto send ONT",
-                              tx_review_choice);
-   } else if (memcmp(G_context.tx_info.from_tx_info.payload.contract_addr,ONG_ADDR,20) == 0) {
-          nbgl_useCaseReview(TYPE_TRANSACTION,
-                              &pairsList,
-                              &C_icon_ont_64px,
-                              "Review transaction from\nto send ONG",
-                              NULL,
-                              "Sign transaction from\nto send ONG",
-                              tx_review_choice);
-   }
-    return 0;
-}
-
-int ui_display_transaction_from() {
-    return ui_display_transaction_from_choice();
-}
-
-int ui_display_oep4_transaction_choice() {
-    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
-        || G_context.tx_type != OEP4_TRANSACTION) {
-        G_context.state = STATE_NONE;
-        return io_send_sw(SW_BAD_STATE);
-    }
-
-    explicit_bzero(&pairsList, sizeof(pairsList));
-    pairsList.nbPairs = setTagValuePairs();
-    pairsList.pairs = pairs;
-    nbgl_useCaseReview(TYPE_TRANSACTION,
-                           &pairsList,
-                           &C_icon_ont_64px,
-                           "Review transaction\nto send token",
-                           NULL,
-                           "Sign transaction\nto send token",
-                           tx_review_choice);
-    return 0;
-}
-
-// Flow used to display a clear-signed transaction
-int ui_display_oep4_transaction() {
-    return ui_display_oep4_transaction_choice();
-}
-
-int ui_display_oep4_approve_transaction_choice() {
-    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
-        || (G_context.tx_type != NEO_VM_OEP4_APPROVE &&
-            G_context.tx_type != WASM_VM_OEP4_APPROVE)) {
-        G_context.state = STATE_NONE;
-        return io_send_sw(SW_BAD_STATE);
-    }
-    explicit_bzero(&pairsList, sizeof(pairsList));
-    pairsList.nbPairs = setTagValuePairs();
-    pairsList.pairs = pairs;
-
-    nbgl_useCaseReview(TYPE_TRANSACTION,
-                           &pairsList,
-                           &C_icon_ont_64px,
-                           "Review approve transaction",
-                           NULL,
-                           "Sign approve transaction",
-                           tx_review_choice);
-    return 0;
-}
-
-int ui_display_oep4_approve_tx() {
-    return ui_display_oep4_approve_transaction_choice();
-}
-
-int ui_display_oep4_transfer_from_transaction_choice() {
-    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED
-        || (G_context.tx_type != NEO_VM_OEP4_TRANSFER_FROM &&
-            G_context.tx_type != WASM_VM_OEP4_TRANSFER_FROM)) {
-        G_context.state = STATE_NONE;
-        return io_send_sw(SW_BAD_STATE);
-    }
-
-    explicit_bzero(&pairsList, sizeof(pairsList));
-    pairsList.nbPairs = setTagValuePairs();
-    pairsList.pairs = pairs;
-    nbgl_useCaseReview(TYPE_TRANSACTION,
-                           &pairsList,
-                           &C_icon_ont_64px,
-                           "Review transaction from\nto send token",
-                           NULL,
-                           "Sign transaction from \nto send token",
-                           tx_review_choice);
-    return 0;
 }
 
 static void set_display_title_content(void) {
@@ -509,9 +330,6 @@ static void set_display_title_content(void) {
     }
 }
 
-int ui_display_oep4_transfer_from_tx() {
-    return ui_display_oep4_transfer_from_transaction_choice();
-}
 int ui_display_tx_transaction_choice() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED) {
         G_context.state = STATE_NONE;
@@ -531,7 +349,7 @@ int ui_display_tx_transaction_choice() {
     return 0;
 }
 
-int  ui_display_tx() {
+int  ui_display_transaction() {
     return ui_display_tx_transaction_choice();
 }
 #endif

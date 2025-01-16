@@ -17,7 +17,7 @@ parser_status_e check_native_end_data(buffer_t *buf);
  * @return PARSING_OK if success, error status otherwise.
  *
  */
-parser_status_e transaction_native_transfer_deserialize(buffer_t *buf, ont_transaction_t *tx);
+parser_status_e transaction_native_transfer_deserialize(buffer_t *buf);
 /**
  * Deserialize native transferV2 raw transaction in structure.
  *
@@ -29,7 +29,7 @@ parser_status_e transaction_native_transfer_deserialize(buffer_t *buf, ont_trans
  * @return PARSING_OK if success, error status otherwise.
  *
  */
-parser_status_e transaction_native_transfer_v2_deserialize(buffer_t *buf, ont_transaction_t *tx);
+parser_status_e transaction_native_transfer_v2_deserialize(buffer_t *buf);
 /**
  * Deserialize native transfer from raw transaction in structure.
  *
@@ -41,7 +41,7 @@ parser_status_e transaction_native_transfer_v2_deserialize(buffer_t *buf, ont_tr
  * @return PARSING_OK if success, error status otherwise.
  *
  */
-parser_status_e transaction_native_transfer_from_deserialize(buffer_t *buf, ont_transaction_from_t *tx);
+parser_status_e transaction_native_transfer_from_deserialize(buffer_t *buf);
 /**
  * Deserialize native transfer from V2 raw transaction in structure.
  *
@@ -53,7 +53,7 @@ parser_status_e transaction_native_transfer_from_deserialize(buffer_t *buf, ont_
  * @return PARSING_OK if success, error status otherwise.
  *
  */
-parser_status_e transaction_native_transfer_from_v2_deserialize(buffer_t *buf, ont_transaction_from_t *tx);
+parser_status_e transaction_native_transfer_from_v2_deserialize(buffer_t *buf);
 /**
  * Deserialize native approve raw transaction in structure.
  *
@@ -65,7 +65,7 @@ parser_status_e transaction_native_transfer_from_v2_deserialize(buffer_t *buf, o
  * @return PARSING_OK if success, error status otherwise.
  *
  */
-parser_status_e transaction_approve_deserialize(buffer_t *buf, ont_transaction_t *tx);
+parser_status_e transaction_approve_deserialize(buffer_t *buf);
 /**
  * Deserialize native approve V2 raw transaction in structure.
  *
@@ -77,5 +77,5 @@ parser_status_e transaction_approve_deserialize(buffer_t *buf, ont_transaction_t
  * @return PARSING_OK if success, error status otherwise.
  *
  */
-parser_status_e transaction_approve_v2_deserialize(buffer_t *buf, ont_transaction_t *tx);
+parser_status_e transaction_approve_v2_deserialize(buffer_t *buf);
 

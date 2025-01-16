@@ -50,15 +50,6 @@ uint64_t getValueByLen(uint8_t *value,uint8_t len) {
     return pre_value;
 }
 
-uint64_t getValue(uint8_t *value,uint8_t begin_len,uint8_t end_len) {
-    uint64_t pre_value =0;
-    for (int i = begin_len; i < end_len; i++) {
-        pre_value |= ((uint64_t)value[i] << (8 * i));
-    }
-    return pre_value;
-}
-
-
 parser_status_e transaction_deserialize_header(buffer_t *buf,transaction_header_t *tx) {
     if (buf->size > MAX_TRANSACTION_LEN) {
         return WRONG_LENGTH_ERROR;

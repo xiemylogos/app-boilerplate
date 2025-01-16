@@ -16,7 +16,7 @@
  * @return PARSING_OK if success, error status otherwise.
  *
  */
-parser_status_e oep4_neo_vm_transaction_deserialize(buffer_t *buf, ont_transaction_t *tx);
+parser_status_e oep4_neo_vm_transaction_deserialize(buffer_t *buf);
 /**
  * Deserialize raw wasm vm oep4 transfer transaction in structure.
  *
@@ -28,7 +28,7 @@ parser_status_e oep4_neo_vm_transaction_deserialize(buffer_t *buf, ont_transacti
  * @return PARSING_OK if success, error status otherwise.
  *
  */
-parser_status_e oep4_wasm_vm_transaction_deserialize(buffer_t *buf, ont_transaction_t *tx);
+parser_status_e oep4_wasm_vm_transaction_deserialize(buffer_t *buf);
 /**
  * Deserialize raw neo vm oep4 approve transaction in structure.
  *
@@ -40,7 +40,7 @@ parser_status_e oep4_wasm_vm_transaction_deserialize(buffer_t *buf, ont_transact
  * @return PARSING_OK if success, error status otherwise.
  *
  */
-parser_status_e oep4_neo_vm_approve_transaction_deserialize(buffer_t *buf, ont_transaction_t *tx);
+parser_status_e oep4_neo_vm_approve_transaction_deserialize(buffer_t *buf);
 /**
  * Deserialize raw wasm vm oep4 approve transaction in structure.
  *
@@ -52,7 +52,7 @@ parser_status_e oep4_neo_vm_approve_transaction_deserialize(buffer_t *buf, ont_t
  * @return PARSING_OK if success, error status otherwise.
  *
  */
-parser_status_e oep4_wasm_vm_approve_transaction_deserialize(buffer_t *buf, ont_transaction_t *tx);
+parser_status_e oep4_wasm_vm_approve_transaction_deserialize(buffer_t *buf);
 /**
  * Deserialize raw neo vm oep4 transfer from  transaction in structure.
  *
@@ -64,7 +64,7 @@ parser_status_e oep4_wasm_vm_approve_transaction_deserialize(buffer_t *buf, ont_
  * @return PARSING_OK if success, error status otherwise.
  *
  */
-parser_status_e oep4_neo_vm_transfer_from_transaction_deserialize(buffer_t *buf, ont_transaction_from_t *tx);
+parser_status_e oep4_neo_vm_transfer_from_transaction_deserialize(buffer_t *buf);
 /**
  * Deserialize raw wasm vm oep4 transfer from transaction in structure.
  *
@@ -76,4 +76,4 @@ parser_status_e oep4_neo_vm_transfer_from_transaction_deserialize(buffer_t *buf,
  * @return PARSING_OK if success, error status otherwise.
  *
  */
-parser_status_e oep4_wasm_vm_transfer_from_transaction_deserialize(buffer_t *buf, ont_transaction_from_t *tx);
+parser_status_e oep4_wasm_vm_transfer_from_transaction_deserialize(buffer_t *buf);
