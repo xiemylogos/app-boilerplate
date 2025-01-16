@@ -45,7 +45,7 @@ uint64_t getBytesValueByLen(buffer_t *buf,uint8_t len) {
 uint64_t getValueByLen(uint8_t *value,uint8_t len) {
     uint64_t pre_value =0;
     for (int i = 0; i < len; i++) {
-        pre_value |= ((int64_t)value[i] << (8 * i));
+        pre_value |= ((uint64_t)value[i] << (8 * i));
     }
     return pre_value;
 }
@@ -53,7 +53,7 @@ uint64_t getValueByLen(uint8_t *value,uint8_t len) {
 uint64_t getValue(uint8_t *value,uint8_t begin_len,uint8_t end_len) {
     uint64_t pre_value =0;
     for (int i = begin_len; i < end_len; i++) {
-        pre_value |= ((int64_t)value[i] << (8 * i));
+        pre_value |= ((uint64_t)value[i] << (8 * i));
     }
     return pre_value;
 }

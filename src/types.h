@@ -98,24 +98,12 @@ typedef struct {
     char content_two[40];
     char fee[20];
     char peer_pubkey[66];
+#if !defined(TARGET_NANOS)
+    char content_three[66];
+    char content_four[66];
+    uint8_t pubkey_number;
+#endif
 }display_data_t;
-/*
-typedef struct DisplayItem {
-    char key[40];
-    char value[40];
-} DisplayItem;
-
-typedef struct DisplayData {
-    DisplayItem items[40];
-    uint8_t  len;
-} DisplayData;
-
-void push_item(DisplayData* data, char key[], char value[]) {
-    data->items[data->len].key = key;
-    data->items[data->len].value = value;
-data->len += 1;
-}
- */
 /**
  * Structure for public key context information.
  */

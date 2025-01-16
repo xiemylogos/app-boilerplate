@@ -38,13 +38,10 @@
 #include "../utils.h"
 #include "types.h"
 
-static char g_content[66];
-static char g_content_two[66];
-static char g_content_three[66];
-static char g_content_five[20];
+static char g_pubkey_number[20];
 static char g_title[60];
-static char g_title_two[40];
-static char g_title_three[40];
+static char g_title_two[60];
+static char g_title_three[60];
 
 #define MAX_PAIRS        11
 
@@ -127,111 +124,48 @@ static uint8_t setTagValuePairs(void) {
         nbPairs++;
     }
 
-    if (G_context.tx_type == WITHDRAW) {
-         //peer pubkey
-         for(uint8_t i=0;i<G_context.tx_info.withdraw_tx_info.peer_pubkey_number;i++) {
+    if (G_context.tx_type == WITHDRAW  ||
+        G_context.tx_type == AUTHORIZE_FOR_PEER ||
+        G_context.tx_type == UN_AUTHORIZE_FOR_PEER) {
+         for(uint8_t i=0;i<G_context.display_data.pubkey_number;i++) {
             if(i>2) {
                 break;
             }
             if (i==0) {
-                memset(g_content, 0, sizeof(g_content));
-                memcpy(g_content, G_context.tx_info.withdraw_tx_info.peer_pubkey[i], 66);
-                pairs[nbPairs].item = PEER_PUBKEY;
-                pairs[nbPairs].value = g_content;
-                nbPairs++;
-            }
-            if (i==1) {
-                memset(g_content_two, 0, sizeof(g_content_two));
-                memcpy(g_content_two, G_context.tx_info.withdraw_tx_info.peer_pubkey[i], 66);
-                pairs[nbPairs].item = PEER_PUBKEY;
-                pairs[nbPairs].value = g_content_two;
-                nbPairs++;
-            }
-            if (i==2) {
-                 memset(g_content_three, 0, sizeof(g_content_three));
-                memcpy(g_content_three, G_context.tx_info.withdraw_tx_info.peer_pubkey[i], 66);
-                pairs[nbPairs].item = PEER_PUBKEY;
-                pairs[nbPairs].value = g_content_three;
-                nbPairs++;
-            }
-        }
-        if (G_context.tx_info.withdraw_tx_info.peer_pubkey_number >1) {
-            memset(g_content_five,0,sizeof(g_content_five));
-            if (!format_u64(g_content_five, sizeof(g_content_five), G_context.tx_info.withdraw_tx_info.peer_pubkey_number)) {
-                 return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
-            }
-            pairs[nbPairs].item = NODE_AMOUNT;
-            pairs[nbPairs].value = g_content_five;
-            nbPairs++;
-        }
-    }
-    if (G_context.tx_type == AUTHORIZE_FOR_PEER) {
-        for(uint8_t i=0;i<G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey_number;i++) {
-            if(i>2) {
-                    break;
-                }
-            if (i==0) {
-                memset(g_content, 0, sizeof(g_content));
-                memcpy(g_content, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey[i], 66);
                 memset(g_title,0,sizeof(g_title));
                 memcpy(g_title,NBGL_PEER_PUBKEY,sizeof(NBGL_PEER_PUBKEY));
                 strcat(g_title,ONE);
                 pairs[nbPairs].item = g_title;
-                pairs[nbPairs].value = g_content;
+                pairs[nbPairs].value = G_context.display_data.peer_pubkey;
                 nbPairs++;
-                }
+            }
             if (i==1) {
-                memset(g_content_two, 0, sizeof(g_content_two));
-                memcpy(g_content_two, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey[i], 66);
                 memset(g_title_two,0,sizeof(g_title_two));
                 memcpy(g_title_two,NBGL_PEER_PUBKEY,sizeof(NBGL_PEER_PUBKEY));
-                strcat(g_title,TWO);
+                strcat(g_title_two,TWO);
                 pairs[nbPairs].item = g_title_two;
-                pairs[nbPairs].value = g_content_two;
+                pairs[nbPairs].value = G_context.display_data.content_three;
                 nbPairs++;
             }
             if (i==2) {
-                memset(g_content_three, 0, sizeof(g_content_three));
-                memcpy(g_content_three, G_context.tx_info.authorize_for_peer_tx_info.peer_pubkey[i], 66);
                 memset(g_title_three,0,sizeof(g_title_three));
                 memcpy(g_title_three,NBGL_PEER_PUBKEY,sizeof(NBGL_PEER_PUBKEY));
-                strcat(g_title,THREE);
+                strcat(g_title_three,THREE);
                 pairs[nbPairs].item = g_title_three;
-                pairs[nbPairs].value = g_content_three;
+                pairs[nbPairs].value = G_context.display_data.content_four;
                 nbPairs++;
             }
         }
-    }
-    if(G_context.tx_type == UN_AUTHORIZE_FOR_PEER) {
-        for(uint8_t i=0;i<G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey_number;i++) {
-            if(i>2) {
-                break;
+        if (G_context.display_data.pubkey_number >1) {
+            memset(g_pubkey_number,0,sizeof(g_pubkey_number));
+            if (!format_u64(g_pubkey_number, sizeof(g_pubkey_number), G_context.display_data.pubkey_number)) {
+                 return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
             }
-            if (i==0) {
-                memset(g_content, 0, sizeof(g_content));
-                memcpy(g_content, G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey[i], 66);
-                pairs[nbPairs].item = PEER_PUBKEY;
-                pairs[nbPairs].value = g_content;
-                nbPairs++;
-            }
-            if (i==1) {
-                memset(g_content_two, 0, sizeof(g_content_two));
-                memcpy(g_content_two, G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey[i], 66);
-                pairs[nbPairs].item = PEER_PUBKEY;
-                pairs[nbPairs].value = g_content_two;
-                nbPairs++;
-            }
-            if (i==2) {
-                memset(g_content_three, 0, sizeof(g_content_three));
-                memcpy(g_content_three, G_context.tx_info.un_authorize_for_peer_tx_info.peer_pubkey[i], 66);
-                pairs[nbPairs].item = PEER_PUBKEY;
-                pairs[nbPairs].value = g_content_three;
-                nbPairs++;
-            }
+            pairs[nbPairs].item = NODE_AMOUNT;
+            pairs[nbPairs].value = g_pubkey_number;
+            nbPairs++;
         }
     }
-
-
     if(G_context.tx_type == OEP4_TRANSACTION ||
         G_context.tx_type == NEO_VM_OEP4_APPROVE ||
         G_context.tx_type == WASM_VM_OEP4_APPROVE ||

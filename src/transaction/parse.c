@@ -2,9 +2,10 @@
 #include "parse.h"
 #include "utils.h"
 #include <string.h>
-//add vm type check address
-//add char array return values
-parser_status_e parse_tx(buffer_t *buf,cfg_t* tx,size_t array_length,vm_operator_t vm_type) {
+#include "../ui/utils.h"
+
+parser_status_e parse_tx(buffer_t *buf,cfg_t* tx,size_t array_length,vm_operator_t vm_type,uint8_t *resultArray[MAX_RESULT_SIZE],size_t *result_length,uint8_t storage[][VALUE_SIZE]) {
+    *result_length = 0;
     for(size_t i=0;i<array_length;i++) {
         if (tx[i].data_type == OP_CODE_DATA_TYPE) {
             if (!buffer_can_read(buf, tx[i].data_len)) {
@@ -81,33 +82,28 @@ parser_status_e parse_tx(buffer_t *buf,cfg_t* tx,size_t array_length,vm_operator
                 return FROM_PARSING_ERROR;
             }
         } else if(tx[i].data_type == MULTIPLE_PUBKEY_DATA_TYPE) {
-            uint8_t op_code_value;
-            if (!buffer_read_u8(buf, &op_code_value)) {
+            uint8_t peer_pubkey_number;
+            if (!buffer_read_u8(buf, &peer_pubkey_number)) {
                 return VALUE_PARSING_ERROR;
             }
-            uint8_t  peer_pubkey_number = op_code_value;
-            if(op_code_value >=81) {
-                peer_pubkey_number = op_code_value -80;
+            if(peer_pubkey_number >= 81) {
+                peer_pubkey_number = peer_pubkey_number - 80;
             }
-            //tx[i].data_len = op_code_value - 80;
-            //todo
             if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
                 return VALUE_PARSING_ERROR;
             }
-            for(size_t len=0;len< peer_pubkey_number;i++) {
+            for(size_t len=0;len< peer_pubkey_number;len++) {
                 uint8_t peer_pubkey_length =0;
                 if (!buffer_read_u8(buf, &peer_pubkey_length)) {
                     return VALUE_PARSING_ERROR;
                 }
-                if(i<3) {
-                    tx[i].peer_pubkeys[len] = (uint8_t *) (buf->ptr + buf->offset);
+                if (*result_length < MAX_RESULT_SIZE) {
+                    resultArray[(*result_length)++] = (uint8_t *) (buf->ptr + buf->offset);
                     if (!buffer_seek_cur(buf, peer_pubkey_length)) {
                         return PEER_PUBKEY_PARSING_ERROR;
                     }
                 } else {
-                    if (!buffer_seek_cur(buf,peer_pubkey_length)) {
-                        return PEER_PUBKEY_PARSING_ERROR;
-                    }
+                    return PEER_PUBKEY_PARSING_ERROR;
                 }
                 if (getBytesValueByLen(buf, 3) != 13139050) {  // 6a7cc8
                     return VALUE_PARSING_ERROR;
@@ -129,11 +125,23 @@ parser_status_e parse_tx(buffer_t *buf,cfg_t* tx,size_t array_length,vm_operator
                 if (!buffer_read_u8(buf, &amount_len)) {
                     return VALUE_PARSING_ERROR;
                 }
+                uint64_t  value = 0;
                 if (amount_len >= 81) {
-                    tx[i].values[0] += amount_len - 80;
+                    value = amount_len - 80;
                 } else {
-                    tx[i].values[0] += getBytesValueByLen(buf, amount_len);
+                    value = getBytesValueByLen(buf, amount_len);
                 }
+
+                size_t byte_count = sizeof(value);
+                if (*result_length >= MAX_RESULT_SIZE) {
+                    return DATA_PARSING_ERROR;
+                }
+                uint8_t *current_storage = storage[*result_length];
+                for (size_t j = 0; j < byte_count; j++) {
+                    current_storage[j] = (value >> (j * 8)) & 0xFF;
+                }
+                resultArray[*result_length] = current_storage;
+                (*result_length)++;
                 if (num+1 < amount_number) {
                     if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
                         return VALUE_PARSING_ERROR;

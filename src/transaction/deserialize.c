@@ -113,8 +113,11 @@ parser_status_e transaction_native_transfer_deserialize(buffer_t *buf, ont_trans
             .data_len = 26
         }
     };
+    uint8_t *resultArray[MAX_RESULT_SIZE] = {0};
+    uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
+    size_t resultLength = 0;
     size_t numElements = sizeof(TransferTx) / sizeof(TransferTx[0]);
-    parser_status_e status_tx = parse_tx(buf,TransferTx,numElements,NATIVE_VM_OPERATOR);
+    parser_status_e status_tx = parse_tx(buf,TransferTx,numElements,NATIVE_VM_OPERATOR,resultArray, &resultLength,storage);
     if (status_tx != PARSING_OK) {
         return status_tx;
     }
@@ -302,8 +305,11 @@ parser_status_e transaction_native_transfer_v2_deserialize(buffer_t *buf, ont_tr
             .data_len = 26
         }
     };
+    uint8_t *resultArray[MAX_RESULT_SIZE] = {0};
+    uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
+    size_t resultLength = 0;
     size_t numElements = sizeof(TransferV2Tx) / sizeof(TransferV2Tx[0]);
-    parser_status_e status_tx = parse_tx(buf,TransferV2Tx,numElements,NATIVE_VM_OPERATOR);
+    parser_status_e status_tx = parse_tx(buf,TransferV2Tx,numElements,NATIVE_VM_OPERATOR,resultArray, &resultLength,storage);
      if (status_tx != PARSING_OK) {
         return status_tx;
     }
@@ -513,8 +519,11 @@ parser_status_e transaction_native_transfer_from_deserialize(buffer_t *buf, ont_
             .data_len = 26
         }
     };
+    uint8_t *resultArray[MAX_RESULT_SIZE] = {0};
+    uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
+    size_t resultLength = 0;
     size_t numElements = sizeof(TransferFromTx) / sizeof(TransferFromTx[0]);
-    parser_status_e status_tx = parse_tx(buf,TransferFromTx,numElements,NATIVE_VM_OPERATOR);
+    parser_status_e status_tx = parse_tx(buf,TransferFromTx,numElements,NATIVE_VM_OPERATOR,resultArray, &resultLength,storage);
     if (status_tx != PARSING_OK) {
         return status_tx;
     }
@@ -740,8 +749,11 @@ parser_status_e transaction_native_transfer_from_v2_deserialize(buffer_t *buf, o
             .data_len = 26
         }
     };
+    uint8_t *resultArray[MAX_RESULT_SIZE] = {0};
+    uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
+    size_t resultLength = 0;
     size_t numElements = sizeof(TransferFromV2Tx) / sizeof(TransferFromV2Tx[0]);
-    parser_status_e status_tx = parse_tx(buf,TransferFromV2Tx,numElements,NATIVE_VM_OPERATOR);
+    parser_status_e status_tx = parse_tx(buf,TransferFromV2Tx,numElements,NATIVE_VM_OPERATOR,resultArray, &resultLength,storage);
     if (status_tx != PARSING_OK) {
         return status_tx;
     }
@@ -969,8 +981,11 @@ parser_status_e transaction_approve_deserialize(buffer_t *buf, ont_transaction_t
             .data_len = 26
         }
     };
+    uint8_t *resultArray[MAX_RESULT_SIZE] = {0};
+    uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
+    size_t resultLength = 0;
     size_t numElements = sizeof(ApproveTx) / sizeof(ApproveTx[0]);
-    parser_status_e status_tx = parse_tx(buf,ApproveTx,numElements,NATIVE_VM_OPERATOR);
+    parser_status_e status_tx = parse_tx(buf,ApproveTx,numElements,NATIVE_VM_OPERATOR,resultArray, &resultLength,storage);
     if (status_tx != PARSING_OK) {
         return status_tx;
     }
@@ -1162,8 +1177,11 @@ parser_status_e transaction_approve_v2_deserialize(buffer_t *buf, ont_transactio
             .data_len = 26
         }
     };
+    uint8_t *resultArray[MAX_RESULT_SIZE] = {0};
+    uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
+    size_t resultLength = 0;
     size_t numElements = sizeof(ApproveV2Tx) / sizeof(ApproveV2Tx[0]);
-    parser_status_e status_tx = parse_tx(buf,ApproveV2Tx,numElements,NATIVE_VM_OPERATOR);
+    parser_status_e status_tx = parse_tx(buf,ApproveV2Tx,numElements,NATIVE_VM_OPERATOR,resultArray, &resultLength,storage);
     if (status_tx != PARSING_OK) {
         return status_tx;
     }
