@@ -105,13 +105,30 @@ UX_STEP_NOCB(ux_display_address_step,
 // Step with approve button
 UX_STEP_CB(ux_display_approve_step,
            pb,
-           validate_transaction(true),
+           (*g_validate_callback)(true),
            {
                &C_icon_validate_14,
                "Approve",
            });
 // Step with reject button
 UX_STEP_CB(ux_display_reject_step,
+           pb,
+           (*g_validate_callback)(false),
+           {
+               &C_icon_crossmark,
+               "Reject",
+           });
+
+// Step with approve tx button
+UX_STEP_CB(ux_display_tx_approve_step,
+           pb,
+           validate_transaction(true),
+           {
+               &C_icon_validate_14,
+               "Approve",
+           });
+// Step with reject tx button
+UX_STEP_CB(ux_display_tx_reject_step,
            pb,
            validate_transaction(false),
            {
@@ -424,8 +441,8 @@ static void create_transaction_flow(void) {
 
      ux_display_tx_flow[index++] = &ux_display_fee_step;
      ux_display_tx_flow[index++] = &ux_display_signer_address_step;
-     ux_display_tx_flow[index++] = &ux_display_approve_step;
-     ux_display_tx_flow[index++] = &ux_display_reject_step;
+     ux_display_tx_flow[index++] = &ux_display_tx_approve_step;
+     ux_display_tx_flow[index++] = &ux_display_tx_reject_step;
      ux_display_tx_flow[index++] = FLOW_END_STEP;
 }
 
