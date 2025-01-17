@@ -101,7 +101,9 @@ static uint8_t setTagValuePairs(void) {
             if (i==0) {
                 memset(g_title,0,sizeof(g_title));
                 memcpy(g_title,NBGL_PEER_PUBKEY,sizeof(NBGL_PEER_PUBKEY));
-                strcat(g_title,ONE);
+                if (G_context.display_data.pubkey_number >1) {
+                    strcat(g_title, ONE);
+                }
                 pairs[nbPairs].item = g_title;
                 pairs[nbPairs].value = G_context.display_data.peer_pubkey;
                 nbPairs++;
