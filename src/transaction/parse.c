@@ -2,7 +2,6 @@
 #include "parse.h"
 #include "utils.h"
 #include <string.h>
-#include "../ui/utils.h"
 
 uint64_t  GetBufferData(buffer_t *buf) {
     uint64_t  value = 0;

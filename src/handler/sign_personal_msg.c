@@ -22,14 +22,13 @@
 
 #include "os.h"
 #include "cx.h"
-#include "buffer.h"
 #include "../sw.h"
 #include "../globals.h"
 #include "../ui/display.h"
 #include "sign_personal_msg.h"
 #include "../personal-msg/deserialize.h"
 #include "../personal-msg/types.h"
-#include "../ui/utils.h"
+#include "../transaction/utils.h"
 
 
 #ifdef TARGET_NANOS

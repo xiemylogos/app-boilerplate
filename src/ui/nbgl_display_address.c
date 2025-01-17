@@ -34,7 +34,7 @@
 #include "action/validate.h"
 #include "../transaction/types.h"
 #include "../menu.h"
-#include "../utils.h"
+#include "../transaction/utils.h"
 
 static char g_address[40];
 

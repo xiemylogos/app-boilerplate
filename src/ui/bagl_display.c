@@ -34,7 +34,6 @@
 #include "action/validate.h"
 #include "../transaction/types.h"
 #include "../menu.h"
-#include "../utils.h"
 #include "../transaction/utils.h"
 #include "types.h"
 

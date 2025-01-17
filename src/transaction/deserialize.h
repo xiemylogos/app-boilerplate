@@ -2,7 +2,6 @@
 
 #include "buffer.h"
 
-#include "types.h"
 #include "../types.h"
 
 parser_status_e transaction_native_transfer_deserialize(buffer_t *buf);

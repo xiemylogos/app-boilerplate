@@ -20,7 +20,7 @@
 #include "constants.h"
 #include "types.h"
 #include "../globals.h"
-#include "../ui/utils.h"
+#include "../transaction/utils.h"
 
 #if defined(TEST) || defined(FUZZ)
 #include "assert.h"
