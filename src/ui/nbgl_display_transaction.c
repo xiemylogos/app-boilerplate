@@ -270,38 +270,38 @@ int ui_display_blind_signing_transaction() {
 }
 
 static void set_display_title_content(void) {
-    if (G_context.req_type == ADD_INIT_POS) {
+    if (G_context.tx_type == ADD_INIT_POS) {
         review_title = ADD_INIT_POS_TITLE;
         review_content = ADD_INIT_POS_CONTENT;
-    } else if (G_context.req_type == APPROVE ||
-               G_context.req_type == APPROVE_V2 ||
-               G_context.req_type == NEO_VM_OEP4_APPROVE ||
-               G_context.req_type == WASM_VM_OEP4_APPROVE) {
+    } else if (G_context.tx_type == APPROVE ||
+               G_context.tx_type == APPROVE_V2 ||
+               G_context.tx_type == NEO_VM_OEP4_APPROVE ||
+               G_context.tx_type == WASM_VM_OEP4_APPROVE) {
         review_title = SIGN_APPROVE_TX_TITLE;
         review_content = SIGN_APPROVE_TX_CONTENT;
-    } else if (G_context.req_type == AUTHORIZE_FOR_PEER) {
+    } else if (G_context.tx_type == AUTHORIZE_FOR_PEER) {
         review_title = AUTHORIZE_FOR_PEER_TITLE;
         review_content = AUTHORIZE_FOR_PEER_CONTENT;
-    } else if (G_context.req_type == CHANGE_MAX_AUTHORIZATION) {
+    } else if (G_context.tx_type == CHANGE_MAX_AUTHORIZATION) {
         review_title = CHANGE_MAX_AUTHORIZATION_TITLE;
         review_content = CHANGE_MAX_AUTHORIZATION_CONTENT;
-    } else if (G_context.req_type == OEP4_TRANSACTION) {
+    } else if (G_context.tx_type == OEP4_TRANSACTION) {
         review_title = OEP4_TX_TITLE;
         review_content = OEP4_TX_CONTENT;
-    } else if (G_context.req_type == QUIT_NODE) {
+    } else if (G_context.tx_type == QUIT_NODE) {
         review_title = QUIT_NODE_TITLE;
         review_content = QUIT_NODE_CONTENT;
-    } else if (G_context.req_type == REDUCE_INIT_POS) {
+    } else if (G_context.tx_type == REDUCE_INIT_POS) {
         review_title = REDUCE_INIT_POS_TITLE;
         review_content = REDUCE_INIT_POS_CONTENT;
-    } else if (G_context.req_type == REGISTER_CANDIDATE) {
+    } else if (G_context.tx_type == REGISTER_CANDIDATE) {
         review_title = REGISTER_CANDIDATE_TITLE;
         review_content = REGISTER_CANDIDATE_CONTENT;
-    } else if (G_context.req_type == SET_FEE_PERCENTAGE) {
+    } else if (G_context.tx_type == SET_FEE_PERCENTAGE) {
         review_title = SET_FEE_PERCENTAGE_TITLE;
         review_content = SET_FEE_PERCENTAGE_CONTENT;
-    } else if (G_context.req_type == TRANSFER_TRANSACTION ||
-               G_context.req_type == TRANSFER_V2_TRANSACTION) {
+    } else if (G_context.tx_type == TRANSFER_TRANSACTION ||
+               G_context.tx_type == TRANSFER_V2_TRANSACTION) {
         if (memcmp(G_context.display_data.content_two, ONT_ADDR, 20) == 0) {
             review_title = NATIVE_ONT_TRANSFER_TITLE;
             review_content = NATIVE_ONT_TRANSFER_CONTENT;
@@ -309,19 +309,19 @@ static void set_display_title_content(void) {
             review_title = NATIVE_ONG_TRANSFER_TITLE;
             review_content = NATIVE_ONG_TRANSFER_CONTENT;
         }
-    } else if (G_context.req_type == TRANSFER_FROM_TRANSACTION ||
-               G_context.req_type == TRANSFER_FROM_V2_TRANSACTION ||
-               G_context.req_type == NEO_VM_OEP4_TRANSFER_FROM ||
-               G_context.req_type == WASM_VM_OEP4_TRANSFER_FROM) {
+    } else if (G_context.tx_type == TRANSFER_FROM_TRANSACTION ||
+               G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION ||
+               G_context.tx_type == NEO_VM_OEP4_TRANSFER_FROM ||
+               G_context.tx_type == WASM_VM_OEP4_TRANSFER_FROM) {
         review_title = TRANSFER_FROM_TITLE;
         review_content = TRANSFER_FROM_CONTENT;
-    } else if (G_context.req_type == UN_AUTHORIZE_FOR_PEER) {
+    } else if (G_context.tx_type == UN_AUTHORIZE_FOR_PEER) {
         review_title = UN_AUTHORIZE_FOR_PEER_TITLE;
         review_content = UN_AUTHORIZE_FOR_PEER_CONTENT;
-    } else if (G_context.req_type == WITHDRAW_FEE) {
+    } else if (G_context.tx_type == WITHDRAW_FEE) {
         review_title = WITHDRAW_FEE_TITLE;
         review_content = WITHDRAW_FEE_CONTENT;
-    } else if (G_context.req_type == WITHDRAW) {
+    } else if (G_context.tx_type == WITHDRAW) {
         review_title = WITHDRAW_TITLE;
         review_content = WITHDRAW_CONTENT;
     } else {
