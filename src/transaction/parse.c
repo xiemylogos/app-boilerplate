@@ -103,19 +103,24 @@ parser_status_e parse_tx(buffer_t *buf,cfg_t* tx,size_t array_length,vm_operator
             }
             tx[i].data_info.pos_start = result_length;
             tx[i].data_info.data_number = peer_pubkey_number;
+
             if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
                 return VALUE_PARSING_ERROR;
             }
             for(size_t len=0;len< peer_pubkey_number;len++) {
-                uint8_t peer_pubkey_length =0;
+                uint8_t peer_pubkey_length  = 0;
                 if (!buffer_read_u8(buf, &peer_pubkey_length)) {
                     return VALUE_PARSING_ERROR;
                 }
+                if (peer_pubkey_length != PEER_PUBKEY_LEN) {
+                    return VALUE_PARSING_ERROR;
+                }
                 if (result_length < MAX_RESULT_SIZE) {
-                    resultArray[(result_length)++] = (uint8_t *) (buf->ptr + buf->offset);
-                    if (!buffer_seek_cur(buf, peer_pubkey_length)) {
+                    resultArray[result_length] = (uint8_t *) (buf->ptr + buf->offset);
+                    if (!buffer_seek_cur(buf, PEER_PUBKEY_LEN)) {
                         return PEER_PUBKEY_PARSING_ERROR;
                     }
+                    result_length ++;
                 } else {
                     return PEER_PUBKEY_PARSING_ERROR;
                 }

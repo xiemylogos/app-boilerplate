@@ -174,7 +174,7 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf) {
     }
     if(G_context.display_data.pubkey_number >2) {
         uint64_t  pos = WithDrawTx[3].data_info.pos_start+2;
-        memcpy(G_context.display_data.content_three, resultArray[pos], PEER_PUBKEY_LEN);
+        memcpy(G_context.display_data.content_four, resultArray[pos], PEER_PUBKEY_LEN);
     }
 #endif
     return PARSING_OK;
@@ -564,7 +564,7 @@ parser_status_e authorize_for_peer_tx_deserialize(buffer_t *buf) {
     }
     if(G_context.display_data.pubkey_number >2) {
         uint64_t  pos = AuthorizeForPeerTx[3].data_info.pos_start+2;
-        memcpy(G_context.display_data.content_three, resultArray[pos], PEER_PUBKEY_LEN);
+        memcpy(G_context.display_data.content_four, resultArray[pos], PEER_PUBKEY_LEN);
     }
 #endif
     return PARSING_OK;
@@ -641,7 +641,7 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf) {
     }
     if(G_context.display_data.pubkey_number >2) {
         uint64_t  pos = UnAuthorizeForPeerTx[3].data_info.pos_start+2;
-        memcpy(G_context.display_data.content_three, resultArray[pos], PEER_PUBKEY_LEN);
+        memcpy(G_context.display_data.content_four, resultArray[pos], PEER_PUBKEY_LEN);
     }
 #endif
     return PARSING_OK;
