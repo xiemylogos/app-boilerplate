@@ -66,16 +66,6 @@ static uint8_t setTagValuePairs(void) {
     explicit_bzero(pairs, sizeof(pairs));
 
     if (G_context.tx_type == REGISTER_CANDIDATE ||
-        G_context.tx_type == QUIT_NODE ||
-        G_context.tx_type == ADD_INIT_POS ||
-        G_context.tx_type == REDUCE_INIT_POS ||
-        G_context.tx_type == CHANGE_MAX_AUTHORIZATION ||
-        G_context.tx_type == SET_FEE_PERCENTAGE) {
-        pairs[nbPairs].item = NBGL_PEER_PUBKEY;
-        pairs[nbPairs].value = G_context.display_data.peer_pubkey;
-        nbPairs++;
-    }
-    if (G_context.tx_type == REGISTER_CANDIDATE ||
          G_context.tx_type == QUIT_NODE ||
         G_context.tx_type == ADD_INIT_POS ||
         G_context.tx_type == REDUCE_INIT_POS ||
@@ -89,38 +79,15 @@ static uint8_t setTagValuePairs(void) {
         pairs[nbPairs].value = G_context.display_data.content;
         nbPairs++;
     }
+
     if (G_context.tx_type == REGISTER_CANDIDATE ||
+        G_context.tx_type == QUIT_NODE ||
         G_context.tx_type == ADD_INIT_POS ||
         G_context.tx_type == REDUCE_INIT_POS ||
         G_context.tx_type == CHANGE_MAX_AUTHORIZATION ||
-        G_context.tx_type == SET_FEE_PERCENTAGE ||
-        G_context.tx_type == WITHDRAW ||
-        G_context.tx_type == AUTHORIZE_FOR_PEER ||
-        G_context.tx_type == UN_AUTHORIZE_FOR_PEER) {
-        if (G_context.tx_type == CHANGE_MAX_AUTHORIZATION) {
-            pairs[nbPairs].item = MAX_AUTHORIZE;
-        } else if( G_context.tx_type == SET_FEE_PERCENTAGE){
-            pairs[nbPairs].item = PEER_COST;
-        } else if (G_context.tx_type == WITHDRAW) {
-            if (G_context.display_data.pubkey_number == 1) {
-                pairs[nbPairs].item = AMOUNT;
-            } else {
-                pairs[nbPairs].item = TOTAL_WITHDRAW;
-            }
-        } else {
-           pairs[nbPairs].item = POS;
-        }
-        pairs[nbPairs].value = G_context.display_data.amount;
-        nbPairs++;
-    }
-    if( G_context.tx_type == SET_FEE_PERCENTAGE) {
-        pairs[nbPairs].item = STAKE_COST;
-        pairs[nbPairs].value = G_context.display_data.content_two;
-        nbPairs++;
-    }
-    if (G_context.tx_type == REGISTER_CANDIDATE) {
-        pairs[nbPairs].item = STAKE_FEE;
-        pairs[nbPairs].value = STAKE_FEE_ONG;
+        G_context.tx_type == SET_FEE_PERCENTAGE) {
+        pairs[nbPairs].item = NBGL_PEER_PUBKEY;
+        pairs[nbPairs].value = G_context.display_data.peer_pubkey;
         nbPairs++;
     }
 
@@ -166,6 +133,44 @@ static uint8_t setTagValuePairs(void) {
             nbPairs++;
         }
     }
+
+
+    if (G_context.tx_type == REGISTER_CANDIDATE ||
+        G_context.tx_type == ADD_INIT_POS ||
+        G_context.tx_type == REDUCE_INIT_POS ||
+        G_context.tx_type == CHANGE_MAX_AUTHORIZATION ||
+        G_context.tx_type == SET_FEE_PERCENTAGE ||
+        G_context.tx_type == WITHDRAW ||
+        G_context.tx_type == AUTHORIZE_FOR_PEER ||
+        G_context.tx_type == UN_AUTHORIZE_FOR_PEER) {
+        if (G_context.tx_type == CHANGE_MAX_AUTHORIZATION) {
+            pairs[nbPairs].item = MAX_AUTHORIZE;
+        } else if( G_context.tx_type == SET_FEE_PERCENTAGE){
+            pairs[nbPairs].item = PEER_COST;
+        } else if (G_context.tx_type == WITHDRAW) {
+            if (G_context.display_data.pubkey_number == 1) {
+                pairs[nbPairs].item = AMOUNT;
+            } else {
+                pairs[nbPairs].item = TOTAL_WITHDRAW;
+            }
+        } else {
+           pairs[nbPairs].item = POS;
+        }
+        pairs[nbPairs].value = G_context.display_data.amount;
+        nbPairs++;
+    }
+    if( G_context.tx_type == SET_FEE_PERCENTAGE) {
+        pairs[nbPairs].item = STAKE_COST;
+        pairs[nbPairs].value = G_context.display_data.content_two;
+        nbPairs++;
+    }
+    if (G_context.tx_type == REGISTER_CANDIDATE) {
+        pairs[nbPairs].item = STAKE_FEE;
+        pairs[nbPairs].value = STAKE_FEE_ONG;
+        nbPairs++;
+    }
+
+
     if(G_context.tx_type == OEP4_TRANSACTION ||
         G_context.tx_type == NEO_VM_OEP4_APPROVE ||
         G_context.tx_type == WASM_VM_OEP4_APPROVE ||
