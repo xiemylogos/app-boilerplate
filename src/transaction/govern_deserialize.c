@@ -92,7 +92,7 @@ parser_status_e register_candidate_tx_deserialize(buffer_t *buf) {
         return status_tx;
     }
 
-    memcpy(G_context.display_data.peer_pubkey, RegisterCandidateTx[1].data, 66);
+    memcpy(G_context.display_data.peer_pubkey, RegisterCandidateTx[1].data, PEER_PUBKEY_LEN);
     script_hash_to_address(G_context.display_data.content,
                            sizeof(G_context.display_data.content),
                            RegisterCandidateTx[3].data);
@@ -220,7 +220,7 @@ parser_status_e quit_node_tx_deserialize(buffer_t *buf) {
         return status_tx;
     }
 
-    memcpy(G_context.display_data.peer_pubkey, QuitNodeTx[1].data, 66);
+    memcpy(G_context.display_data.peer_pubkey, QuitNodeTx[1].data, PEER_PUBKEY_LEN);
     script_hash_to_address(G_context.display_data.content,
                            sizeof(G_context.display_data.content),
                            QuitNodeTx[3].data);
@@ -278,7 +278,7 @@ parser_status_e add_init_pos_tx_deserialize(buffer_t *buf) {
         return status_tx;
     }
 
-    memcpy(G_context.display_data.peer_pubkey, AddInitPosTx[1].data, 66);
+    memcpy(G_context.display_data.peer_pubkey, AddInitPosTx[1].data, PEER_PUBKEY_LEN);
     script_hash_to_address(G_context.display_data.content,
                            sizeof(G_context.display_data.content),
                            AddInitPosTx[3].data);
@@ -340,7 +340,7 @@ parser_status_e reduce_init_pos_tx_deserialize(buffer_t *buf) {
         return status_tx;
     }
 
-    memcpy(G_context.display_data.peer_pubkey, ReduceInitPosTx[1].data, 66);
+    memcpy(G_context.display_data.peer_pubkey, ReduceInitPosTx[1].data, PEER_PUBKEY_LEN);
     script_hash_to_address(G_context.display_data.content,
                            sizeof(G_context.display_data.content),
                            ReduceInitPosTx[3].data);
@@ -404,7 +404,7 @@ parser_status_e  change_max_authorization_tx_deserialize(buffer_t *buf) {
         return status_tx;
     }
 
-    memcpy(G_context.display_data.peer_pubkey, ChangeMaxAuthorizationTx[1].data, 66);
+    memcpy(G_context.display_data.peer_pubkey, ChangeMaxAuthorizationTx[1].data, PEER_PUBKEY_LEN);
     script_hash_to_address(G_context.display_data.content,
                            sizeof(G_context.display_data.content),
                            ChangeMaxAuthorizationTx[3].data);
@@ -477,7 +477,7 @@ parser_status_e  set_fee_percentage_tx_deserialize(buffer_t *buf) {
         return status_tx;
     }
 
-    memcpy(G_context.display_data.peer_pubkey, SetFeePercentageTx[1].data, 66);
+    memcpy(G_context.display_data.peer_pubkey, SetFeePercentageTx[1].data, PEER_PUBKEY_LEN);
     script_hash_to_address(G_context.display_data.content,
                            sizeof(G_context.display_data.content),
                            SetFeePercentageTx[3].data);

@@ -204,19 +204,14 @@ static uint8_t setTagValuePairs(void) {
             G_context.tx_type == NEO_VM_OEP4_APPROVE ||
             G_context.tx_type == WASM_VM_OEP4_APPROVE ||
             G_context.tx_type == NEO_VM_OEP4_TRANSFER_FROM ||
+            G_context.tx_type == WASM_VM_OEP4_TRANSFER_FROM ||
+            G_context.tx_type == OEP4_TRANSACTION ||
+            G_context.tx_type == NEO_VM_OEP4_APPROVE ||
+            G_context.tx_type == WASM_VM_OEP4_APPROVE ||
+            G_context.tx_type == NEO_VM_OEP4_TRANSFER_FROM ||
             G_context.tx_type == WASM_VM_OEP4_TRANSFER_FROM) {
-            if (memcmp(G_context.display_data.content_two,ONT_ADDR,20) == 0) {
-                pairs[nbPairs].item = ONT_AMOUNT;
-            } else if (memcmp(G_context.display_data.content_two,ONG_ADDR,20) == 0) {
-                pairs[nbPairs].item = ONG_AMOUNT;
-            }
-            if(G_context.tx_type == OEP4_TRANSACTION ||
-                G_context.tx_type == NEO_VM_OEP4_APPROVE ||
-                G_context.tx_type == WASM_VM_OEP4_APPROVE ||
-                G_context.tx_type == NEO_VM_OEP4_TRANSFER_FROM ||
-                G_context.tx_type == WASM_VM_OEP4_TRANSFER_FROM) {
-                pairs[nbPairs].item = AMOUNT;
-            }
+
+             pairs[nbPairs].item = AMOUNT;
              pairs[nbPairs].value = G_context.display_data.amount;
              nbPairs++;
 
@@ -307,13 +302,8 @@ static void set_display_title_content(void) {
         review_content = SET_FEE_PERCENTAGE_CONTENT;
     } else if (G_context.tx_type == TRANSFER_TRANSACTION ||
                G_context.tx_type == TRANSFER_V2_TRANSACTION) {
-        if (memcmp(G_context.display_data.content_two, ONT_ADDR, 20) == 0) {
-            review_title = NATIVE_ONT_TRANSFER_TITLE;
-            review_content = NATIVE_ONT_TRANSFER_CONTENT;
-        } else if (memcmp(G_context.display_data.content_two, ONG_ADDR, 20) == 0) {
-            review_title = NATIVE_ONG_TRANSFER_TITLE;
-            review_content = NATIVE_ONG_TRANSFER_CONTENT;
-        }
+            review_title = NATIVE_ONG_OR_ONT_TRANSFER_TITLE;
+            review_content = NATIVE_ONG_OR_ONT_TRANSFER_CONTENT;
     } else if (G_context.tx_type == TRANSFER_FROM_TRANSACTION ||
                G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION ||
                G_context.tx_type == NEO_VM_OEP4_TRANSFER_FROM ||
