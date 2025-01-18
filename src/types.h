@@ -97,10 +97,10 @@ typedef struct {
     char signer[40];
     char content_two[40];
     char fee[20];
-    char peer_pubkey[66];
+    char peer_pubkey[68];
 #if !defined(TARGET_NANOS)
-    char content_three[66];
-    char content_four[66];
+    char content_three[68];
+    char content_four[68];
     uint8_t pubkey_number;
 #endif
 }display_data_t;

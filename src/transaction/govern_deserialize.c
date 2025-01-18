@@ -145,35 +145,38 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf) {
     if (status_tx != PARSING_OK) {
         return status_tx;
     }
+
+    script_hash_to_address(G_context.display_data.content,
+                           sizeof(G_context.display_data.content),
+                           WithDrawTx[1].data);
+    
+    for(size_t i=0; i< WithDrawTx[3].data_info.data_number;i++) {
+        uint64_t pos = WithDrawTx[3].data_info.pos_start+i;
+        if(i==0) {
+            memcpy(G_context.display_data.peer_pubkey, resultArray[pos], PEER_PUBKEY_LEN);
+        }
+#if !defined(TARGET_NANOS) //For other devices, only three pubkey are displayed at most
+        G_context.display_data.pubkey_number = WithDrawTx[3].data_info.data_number;
+        if(i==1) {
+            memcpy(G_context.display_data.content_three, resultArray[pos], PEER_PUBKEY_LEN);
+        }
+        if (i==2) {
+            memcpy(G_context.display_data.content_four, resultArray[pos], PEER_PUBKEY_LEN);
+        }
+#endif
+    }
+
     uint64_t  total_value = 0;
     for(size_t j =0;j<WithDrawTx[4].data_info.data_number;j++) {
         uint64_t  pos = WithDrawTx[4].data_info.pos_start+j;
         total_value += getValueByLen(resultArray[pos], 8);
     }
-    if(WithDrawTx[3].data_info.data_number > 0) {
-        uint64_t  pos = WithDrawTx[3].data_info.pos_start;
-        memcpy(G_context.display_data.peer_pubkey, resultArray[pos], PEER_PUBKEY_LEN);
-    }
-    script_hash_to_address(G_context.display_data.content,
-                           sizeof(G_context.display_data.content),
-                           WithDrawTx[1].data);
+
     if(!convert_uint64_to_char(G_context.display_data.amount,
                                sizeof (G_context.display_data.amount),
                                total_value)) {
         return DATA_PARSING_ERROR;
     }
-//For other devices, only 3 pubkeys are displayed at most.
-#if !defined(TARGET_NANOS)
-    G_context.display_data.pubkey_number = WithDrawTx[3].data_info.data_number;
-    if(G_context.display_data.pubkey_number >1) {
-        uint64_t  pos = WithDrawTx[3].data_info.pos_start+1;
-        memcpy(G_context.display_data.content_three, resultArray[pos], PEER_PUBKEY_LEN);
-    }
-    if(G_context.display_data.pubkey_number >2) {
-        uint64_t  pos = WithDrawTx[3].data_info.pos_start+2;
-        memcpy(G_context.display_data.content_four, resultArray[pos], PEER_PUBKEY_LEN);
-    }
-#endif
     return PARSING_OK;
 }
 
@@ -535,35 +538,37 @@ parser_status_e authorize_for_peer_tx_deserialize(buffer_t *buf) {
     if (status_tx != PARSING_OK) {
         return status_tx;
     }
+    script_hash_to_address(G_context.display_data.content,
+                           sizeof(G_context.display_data.content),
+                           AuthorizeForPeerTx[1].data);
+
+    for(size_t i=0; i< AuthorizeForPeerTx[3].data_info.data_number;i++) {
+        uint64_t pos = AuthorizeForPeerTx[3].data_info.pos_start+i;
+        if(i==0) {
+            memcpy(G_context.display_data.peer_pubkey, resultArray[pos], PEER_PUBKEY_LEN);
+        }
+#if !defined(TARGET_NANOS) //For other devices, only three pubkey are displayed at most
+        G_context.display_data.pubkey_number = AuthorizeForPeerTx[3].data_info.data_number;
+        if(i==1) {
+            memcpy(G_context.display_data.content_three, resultArray[pos], PEER_PUBKEY_LEN);
+        }
+        if (i==2) {
+            memcpy(G_context.display_data.content_four, resultArray[pos], PEER_PUBKEY_LEN);
+        }
+#endif
+    }
+
     uint64_t  total_value = 0;
     for(size_t j =0;j<AuthorizeForPeerTx[4].data_info.data_number;j++) {
         uint64_t  pos = AuthorizeForPeerTx[4].data_info.pos_start+j;
         total_value += getValueByLen(resultArray[pos], 8);
     }
-    if(AuthorizeForPeerTx[3].data_info.data_number > 0) {
-        uint64_t  pos = AuthorizeForPeerTx[3].data_info.pos_start;
-        memcpy(G_context.display_data.peer_pubkey, resultArray[pos], PEER_PUBKEY_LEN);
-    }
-    script_hash_to_address(G_context.display_data.content,
-                           sizeof(G_context.display_data.content),
-                           AuthorizeForPeerTx[1].data);
+
     if(!convert_uint64_to_char(G_context.display_data.amount,
                                sizeof (G_context.display_data.amount),
                                total_value)) {
         return DATA_PARSING_ERROR;
     }
-//For other devices, only 3 pubkeys are displayed at most.
-#if !defined(TARGET_NANOS)
-    G_context.display_data.pubkey_number = AuthorizeForPeerTx[3].data_info.data_number;
-    if(G_context.display_data.pubkey_number >1) {
-        uint64_t  pos = AuthorizeForPeerTx[3].data_info.pos_start+1;
-        memcpy(G_context.display_data.content_three, resultArray[pos], PEER_PUBKEY_LEN);
-    }
-    if(G_context.display_data.pubkey_number >2) {
-        uint64_t  pos = AuthorizeForPeerTx[3].data_info.pos_start+2;
-        memcpy(G_context.display_data.content_four, resultArray[pos], PEER_PUBKEY_LEN);
-    }
-#endif
     return PARSING_OK;
 }
 
@@ -611,36 +616,37 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf) {
     if (status_tx != PARSING_OK) {
         return status_tx;
     }
+    script_hash_to_address(G_context.display_data.content,
+                           sizeof(G_context.display_data.content),
+                           UnAuthorizeForPeerTx[1].data);
+
+    for(size_t i=0; i< UnAuthorizeForPeerTx[3].data_info.data_number;i++) {
+        uint64_t pos = UnAuthorizeForPeerTx[3].data_info.pos_start+i;
+        if(i==0) {
+            memcpy(G_context.display_data.peer_pubkey, resultArray[pos], PEER_PUBKEY_LEN);
+        }
+#if !defined(TARGET_NANOS) //For other devices, only three pubkey are displayed at most
+        G_context.display_data.pubkey_number = UnAuthorizeForPeerTx[3].data_info.data_number;
+        if(i==1) {
+            memcpy(G_context.display_data.content_three, resultArray[pos], PEER_PUBKEY_LEN);
+        }
+        if (i==2) {
+            memcpy(G_context.display_data.content_four, resultArray[pos], PEER_PUBKEY_LEN);
+        }
+#endif
+    }
+
     uint64_t  total_value = 0;
     for(size_t j =0;j<UnAuthorizeForPeerTx[4].data_info.data_number;j++) {
         uint64_t  pos = UnAuthorizeForPeerTx[4].data_info.pos_start+j;
         total_value += getValueByLen(resultArray[pos], 8);
     }
-    if(UnAuthorizeForPeerTx[3].data_info.data_number > 0) {
-        uint64_t  pos = UnAuthorizeForPeerTx[3].data_info.pos_start;
-        memcpy(G_context.display_data.peer_pubkey, resultArray[pos], PEER_PUBKEY_LEN);
-    }
-    script_hash_to_address(G_context.display_data.content,
-                           sizeof(G_context.display_data.content),
-                           UnAuthorizeForPeerTx[1].data);
 
     if(!convert_uint64_to_char(G_context.display_data.amount,
                                sizeof (G_context.display_data.amount),
                                total_value)) {
         return DATA_PARSING_ERROR;
     }
-//For other devices, only 3 pubkeys are displayed at most.
-#if !defined(TARGET_NANOS)
-    G_context.display_data.pubkey_number = UnAuthorizeForPeerTx[3].data_info.data_number;
-    if(G_context.display_data.pubkey_number >1) {
-        uint64_t  pos = UnAuthorizeForPeerTx[3].data_info.pos_start+1;
-        memcpy(G_context.display_data.content_three, resultArray[pos], PEER_PUBKEY_LEN);
-    }
-    if(G_context.display_data.pubkey_number >2) {
-        uint64_t  pos = UnAuthorizeForPeerTx[3].data_info.pos_start+2;
-        memcpy(G_context.display_data.content_four, resultArray[pos], PEER_PUBKEY_LEN);
-    }
-#endif
     return PARSING_OK;
 }
 
