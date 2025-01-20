@@ -149,14 +149,14 @@ parser_status_e withdraw_tx_deserialize(buffer_t *buf) {
     script_hash_to_address(G_context.display_data.content,
                            sizeof(G_context.display_data.content),
                            WithDrawTx[1].data);
-    
+
+    G_context.display_data.pubkey_number = WithDrawTx[3].data_info.data_number;
     for(size_t i=0; i< WithDrawTx[3].data_info.data_number;i++) {
         uint64_t pos = WithDrawTx[3].data_info.pos_start+i;
         if(i==0) {
             memcpy(G_context.display_data.peer_pubkey, resultArray[pos], PEER_PUBKEY_LEN);
         }
 #if !defined(TARGET_NANOS) //For other devices, only three pubkey are displayed at most
-        G_context.display_data.pubkey_number = WithDrawTx[3].data_info.data_number;
         if(i==1) {
             memcpy(G_context.display_data.content_three, resultArray[pos], PEER_PUBKEY_LEN);
         }
@@ -541,14 +541,13 @@ parser_status_e authorize_for_peer_tx_deserialize(buffer_t *buf) {
     script_hash_to_address(G_context.display_data.content,
                            sizeof(G_context.display_data.content),
                            AuthorizeForPeerTx[1].data);
-
+    G_context.display_data.pubkey_number = AuthorizeForPeerTx[3].data_info.data_number;
     for(size_t i=0; i< AuthorizeForPeerTx[3].data_info.data_number;i++) {
         uint64_t pos = AuthorizeForPeerTx[3].data_info.pos_start+i;
         if(i==0) {
             memcpy(G_context.display_data.peer_pubkey, resultArray[pos], PEER_PUBKEY_LEN);
         }
 #if !defined(TARGET_NANOS) //For other devices, only three pubkey are displayed at most
-        G_context.display_data.pubkey_number = AuthorizeForPeerTx[3].data_info.data_number;
         if(i==1) {
             memcpy(G_context.display_data.content_three, resultArray[pos], PEER_PUBKEY_LEN);
         }
@@ -619,14 +618,13 @@ parser_status_e un_authorize_for_peer_tx_deserialize(buffer_t *buf) {
     script_hash_to_address(G_context.display_data.content,
                            sizeof(G_context.display_data.content),
                            UnAuthorizeForPeerTx[1].data);
-
+    G_context.display_data.pubkey_number = UnAuthorizeForPeerTx[3].data_info.data_number;
     for(size_t i=0; i< UnAuthorizeForPeerTx[3].data_info.data_number;i++) {
         uint64_t pos = UnAuthorizeForPeerTx[3].data_info.pos_start+i;
         if(i==0) {
             memcpy(G_context.display_data.peer_pubkey, resultArray[pos], PEER_PUBKEY_LEN);
         }
 #if !defined(TARGET_NANOS) //For other devices, only three pubkey are displayed at most
-        G_context.display_data.pubkey_number = UnAuthorizeForPeerTx[3].data_info.data_number;
         if(i==1) {
             memcpy(G_context.display_data.content_three, resultArray[pos], PEER_PUBKEY_LEN);
         }

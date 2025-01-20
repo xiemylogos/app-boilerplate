@@ -6,7 +6,9 @@
 #define TO                  "To"
 #define FEE_ONG             "Fee"
 #define GAS_FEE             "Gas fee"
-
+#define PERCENTAGE          "%"
+#define ONG_VIEW            " ONG"
+#define ONT_VIEW            " ONT"
 #define SIGNER              "Signer"
 #define SENDER              "Sender"
 #define DECIMALS            "Decimals"

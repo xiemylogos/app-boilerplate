@@ -8,8 +8,6 @@
 #include "buffer.h"
 #include "types.h"
 #include "../types.h"
-#define ONG_VIEW            " ONG"
-#define ONT_VIEW            " ONT"
 
 uint64_t getBytesValueByLen(buffer_t *buf,uint8_t len);
 

@@ -26,6 +26,7 @@
 #include "uint128.h"
 #include "format.h"
 #include "../globals.h"
+#include "../ui/types.h"
 
 #if defined(TEST) || defined(FUZZ)
 #include "assert.h"
@@ -326,6 +327,10 @@ bool convert_uint64_to_char(char* out, size_t out_len,uint64_t amount) {
     if(!format_u64(out,out_len,amount)) {
         return false;
     }
-    strcat(out,ONT_VIEW);
+    if (G_context.tx_type == SET_FEE_PERCENTAGE) {
+        strcat(out, PERCENTAGE);
+    } else {
+        strcat(out, ONT_VIEW);
+    }
     return true;
 }

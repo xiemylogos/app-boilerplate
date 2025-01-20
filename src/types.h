@@ -99,10 +99,10 @@ typedef struct {
     char fee[20];
     char peer_pubkey[68];
     uint8_t decimals;
+    uint8_t pubkey_number;
 #if !defined(TARGET_NANOS)
     char content_three[68];
     char content_four[68];
-    uint8_t pubkey_number;
 #endif
 }display_data_t;
 /**
