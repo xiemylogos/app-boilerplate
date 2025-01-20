@@ -72,8 +72,6 @@ parser_status_e oep4_neo_vm_transaction_deserialize(buffer_t *buf) {
     script_hash_to_address(G_context.display_data.to,
                            sizeof(G_context.display_data.to),
                            NeoVmTransferTx[1].data);
-    //oep4 contract addr
-    memcpy(G_context.display_data.content, NeoVmTransferTx[4].data,ADDRESS_LEN);
     if(!get_oep4_token_amount(NeoVmTransferTx[4].data,
                                 NeoVmTransferTx[0].data_len,
                                 NeoVmTransferTx[0].values,
@@ -131,8 +129,6 @@ parser_status_e oep4_wasm_vm_transaction_deserialize(buffer_t *buf) {
                            WasmVmTransferTx[3].data);
                            
                      
-    //oep4 contract addr
-    memcpy(G_context.display_data.content, WasmVmTransferTx[0].data,ADDRESS_LEN);
     if(!get_oep4_token_amount(WasmVmTransferTx[0].data,
                               WasmVmTransferTx[4].data_len,
                               WasmVmTransferTx[4].values,
@@ -246,8 +242,6 @@ parser_status_e oep4_wasm_vm_approve_transaction_deserialize(buffer_t *buf) {
     script_hash_to_address(G_context.display_data.to,
                            sizeof(G_context.display_data.to),
                            WasmApproveTx[3].data);
-    //oep4 contract addr
-    memcpy(G_context.display_data.content, WasmApproveTx[0].data,ADDRESS_LEN);
     if(!get_oep4_token_amount(WasmApproveTx[0].data,
                               WasmApproveTx[4].data_len,
                               WasmApproveTx[4].values,
@@ -312,8 +306,7 @@ parser_status_e oep4_neo_vm_transfer_from_transaction_deserialize(buffer_t *buf)
     script_hash_to_address(G_context.display_data.content,
                            sizeof(G_context.display_data.content),
                            NeoVmTransferFromTx[3].data);
-    //oep4 contract addr
-    memcpy(G_context.display_data.content, NeoVmTransferFromTx[5].data,ADDRESS_LEN);
+
     if(!get_oep4_token_amount(NeoVmTransferFromTx[5].data,
                               NeoVmTransferFromTx[0].data_len,
                               NeoVmTransferFromTx[0].values,
@@ -377,8 +370,7 @@ parser_status_e oep4_wasm_vm_transfer_from_transaction_deserialize(buffer_t *buf
     script_hash_to_address(G_context.display_data.to,
                            sizeof(G_context.display_data.to),
                            WasmVmTransferFromTx[4].data);
-    //oep4 contract addr
-    memcpy(G_context.display_data.content, WasmVmTransferFromTx[0].data,ADDRESS_LEN);
+
     if(!get_oep4_token_amount(WasmVmTransferFromTx[0].data,
                               WasmVmTransferFromTx[5].data_len,
                               WasmVmTransferFromTx[5].values,

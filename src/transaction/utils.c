@@ -315,6 +315,7 @@ bool get_native_token_amount(uint8_t *contract_addr,const uint8_t value_len,cons
 bool get_oep4_token_amount(uint8_t *contract_addr,const uint8_t value_len,const uint64_t value[2],char* out, size_t out_len) {
     uint8_t decimals = 0;
     decimals = get_oep4_token_decimals(contract_addr);
+    G_context.display_data.decimals = decimals;
     if(!get_token_amount(value_len,value,decimals,out,out_len)) {
         return false;
     }

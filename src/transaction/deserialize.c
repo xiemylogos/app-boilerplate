@@ -96,8 +96,6 @@ parser_status_e transaction_native_transfer_deserialize(buffer_t *buf) {
     script_hash_to_address(G_context.display_data.to,
                            sizeof(G_context.display_data.to),
                            TransferTx[3].data);
-    //contract addr
-    memcpy(G_context.display_data.content_two,TransferTx[7].data,ADDRESS_LEN);
 
     if(!get_native_token_amount(TransferTx[7].data,
                                 TransferTx[5].data_len,
@@ -176,8 +174,6 @@ parser_status_e transaction_native_transfer_v2_deserialize(buffer_t *buf) {
     script_hash_to_address(G_context.display_data.to,
                                sizeof(G_context.display_data.to),
                                TransferV2Tx[3].data);
-    //contract addr
-    memcpy(G_context.display_data.content_two,TransferV2Tx[7].data,ADDRESS_LEN);
 
     if(!get_native_token_amount(TransferV2Tx[7].data,
                                 TransferV2Tx[5].data_len,
@@ -272,8 +268,6 @@ parser_status_e transaction_native_transfer_from_deserialize(buffer_t *buf) {
     script_hash_to_address(G_context.display_data.to,
                            sizeof(G_context.display_data.to),
                            TransferFromTx[5].data);
-    //contract addr
-    memcpy(G_context.display_data.content_two,TransferFromTx[9].data,ADDRESS_LEN);
 
     if(!get_native_token_amount(TransferFromTx[9].data,
                                 TransferFromTx[7].data_len,
@@ -369,8 +363,6 @@ parser_status_e transaction_native_transfer_from_v2_deserialize(buffer_t *buf) {
                            sizeof(G_context.display_data.to),
                            TransferFromV2Tx[5].data);
 
-    //contract addr
-    memcpy(G_context.display_data.content_two,TransferFromV2Tx[9].data,ADDRESS_LEN);
 
     if(!get_native_token_amount(TransferFromV2Tx[9].data,
                                 TransferFromV2Tx[7].data_len,
@@ -451,8 +443,6 @@ parser_status_e transaction_approve_deserialize(buffer_t *buf) {
                            sizeof(G_context.display_data.to),
                            ApproveTx[3].data);
 
-    //contract addr
-    memcpy(G_context.display_data.content_two,ApproveTx[7].data,ADDRESS_LEN);
 
     if(!get_native_token_amount(ApproveTx[7].data,
                                 ApproveTx[5].data_len,
@@ -535,8 +525,6 @@ parser_status_e transaction_approve_v2_deserialize(buffer_t *buf) {
                            sizeof(G_context.display_data.to),
                            ApproveV2Tx[3].data);
 
-    //contract addr
-    memcpy(G_context.display_data.content_two,ApproveV2Tx[7].data,ADDRESS_LEN);
 
     if(!get_native_token_amount(ApproveV2Tx[7].data,
                                 ApproveV2Tx[5].data_len,

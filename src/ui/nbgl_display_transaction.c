@@ -155,7 +155,9 @@ static uint8_t setTagValuePairs(void) {
             } else {
                 pairs[nbPairs].item = TOTAL_WITHDRAW;
             }
-        } else {
+        } else if(G_context.tx_type == UN_AUTHORIZE_FOR_PEER){
+            pairs[nbPairs].item = AMOUNT;
+        }else {
            pairs[nbPairs].item = POS;
         }
         pairs[nbPairs].value = G_context.display_data.amount;
@@ -178,23 +180,14 @@ static uint8_t setTagValuePairs(void) {
         G_context.tx_type == WASM_VM_OEP4_APPROVE ||
         G_context.tx_type == NEO_VM_OEP4_TRANSFER_FROM ||
         G_context.tx_type == WASM_VM_OEP4_TRANSFER_FROM) {
-        uint8_t decimals = 0;
-        decimals = get_oep4_token_decimals((uint8_t *)G_context.display_data.content);
-        if (decimals == 0) {
+        if (G_context.display_data.decimals == 0) {
             pairs[nbPairs].item = DECIMALS;
             pairs[nbPairs].value = DECIMALS_UNKNOWN;
             nbPairs++;
         }
     }
 
-     if(G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION ||
-        G_context.tx_type == TRANSFER_FROM_TRANSACTION ||
-        G_context.tx_type == NEO_VM_OEP4_TRANSFER_FROM ||
-        G_context.tx_type == WASM_VM_OEP4_TRANSFER_FROM) {
-         pairs[nbPairs].item = SENDER;
-         pairs[nbPairs].value = G_context.display_data.content;
-         nbPairs++;
-    }
+     
 
     if(G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION ||
             G_context.tx_type == TRANSFER_FROM_TRANSACTION ||
@@ -217,6 +210,15 @@ static uint8_t setTagValuePairs(void) {
              pairs[nbPairs].value = G_context.display_data.amount;
              nbPairs++;
 
+        if(G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION ||
+            G_context.tx_type == TRANSFER_FROM_TRANSACTION ||
+            G_context.tx_type == NEO_VM_OEP4_TRANSFER_FROM ||
+            G_context.tx_type == WASM_VM_OEP4_TRANSFER_FROM) {
+                pairs[nbPairs].item = SENDER;
+                pairs[nbPairs].value = G_context.display_data.content;
+                nbPairs++;
+        }
+
              //fromAddr
              pairs[nbPairs].item = FROM;
              pairs[nbPairs].value = G_context.display_data.from;
@@ -228,7 +230,11 @@ static uint8_t setTagValuePairs(void) {
     }
 
    //fee
-    pairs[nbPairs].item = FEE_ONG;
+   if (G_context.tx_type == REGISTER_CANDIDATE) {
+         pairs[nbPairs].item = GAS_FEE;
+   } else { 
+         pairs[nbPairs].item = FEE_ONG;
+   }
     pairs[nbPairs].value = G_context.display_data.fee;
     nbPairs++;
     //

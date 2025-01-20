@@ -98,6 +98,7 @@ typedef struct {
     char content_two[40];
     char fee[20];
     char peer_pubkey[68];
+    uint8_t decimals;
 #if !defined(TARGET_NANOS)
     char content_three[68];
     char content_four[68];

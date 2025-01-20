@@ -5,6 +5,7 @@
 #define FROM                "From"
 #define TO                  "To"
 #define FEE_ONG             "Fee"
+#define GAS_FEE             "Gas fee"
 
 #define SIGNER              "Signer"
 #define SENDER              "Sender"
