@@ -42,8 +42,5 @@ parser_status_e personal_msg_deserialize(buffer_t *buf, personal_msg_info *info)
         return PERSONAL_MESSAGE_PARSING_ERROR;
     }
 
-    if (!ont_address_from_pubkey(G_context.display_data.signer,sizeof(G_context.display_data.signer))) {
-        return DATA_PARSING_ERROR;
-    }
     return (buf->offset == buf->size) ? PARSING_OK : WRONG_LENGTH_ERROR;
 }

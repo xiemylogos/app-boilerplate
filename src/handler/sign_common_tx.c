@@ -45,7 +45,9 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                                     (size_t) G_context.bip32_path_len)) {
             return io_send_sw(SW_WRONG_DATA_LENGTH);
         }
-
+        if (!ont_address_from_pubkey(G_context.display_data.signer,sizeof(G_context.display_data.signer))) {
+            return io_send_sw(SW_DISPLAY_ADDRESS_FAIL);
+        }
         return io_send_sw(SW_OK);
 
     } else {  // parse transaction

@@ -91,9 +91,6 @@ parser_status_e transaction_deserialize_header(buffer_t *buf,transaction_header_
         return GASLIMIT_PARSING_ERROR;
     }
     get_ong_fee(tx->gas_price,tx->gas_limit,G_context.display_data.fee,sizeof(G_context.display_data.fee));
-    if (!ont_address_from_pubkey(G_context.display_data.signer,sizeof(G_context.display_data.signer))) {
-        return DATA_PARSING_ERROR;
-    }
     //payer
     tx->payer = (uint8_t *) (buf->ptr + buf->offset);
     if (!buffer_seek_cur(buf, ADDRESS_LEN)) {

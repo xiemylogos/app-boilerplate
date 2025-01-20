@@ -147,7 +147,7 @@ typedef struct {
     };
     tx_type_e tx_type;
     request_type_e req_type;                  /// user request
-    display_data_t display_data;
     uint32_t bip32_path[MAX_BIP32_PATH];      /// BIP32 path
     uint8_t bip32_path_len;                   /// length of BIP32 path
+    display_data_t display_data;
 } global_ctx_t;
