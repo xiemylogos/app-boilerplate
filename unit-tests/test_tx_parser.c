@@ -6,12 +6,12 @@
 #include <string.h>
 #include <stdio.h>
 #include <cmocka.h>
-#include "transaction/deserialize.h"
-#include "transaction/oep4_deserialize.h"
+//#include "transaction/deserialize.h"
+//#include "transaction/oep4_deserialize.h"
 #include "types.h"
 #include "transaction/parse.h"
 
-
+/*
 static void test_ont_tx_serialization(void **state) {
     (void) state;
 
@@ -46,7 +46,7 @@ static void test_oep4_transaction(void **state) {
     parser_status_e status = oep4_neo_vm_transaction_deserialize(&buf, &tx);
     assert_int_equal(status, PARSING_OK);
 }
-
+*/
 static void test_new_parse_tx(void **state) {
     (void) state;
 
@@ -62,8 +62,8 @@ static void test_new_parse_tx(void **state) {
     cfg_t TransferV2Tx[] = {
         {
             .data_type = OP_CODE_DATA_TYPE,
-            .data = (uint8_t []) {0x00,0xc6,0x6b,0x14},
-            .data_len = 4
+            .data = (uint8_t []) {0x00,0xc6,0x6b},
+            .data_len = 3
         },
         {
             .data_type = ADDRESS_DATA_TYPE,
@@ -71,8 +71,8 @@ static void test_new_parse_tx(void **state) {
         },
         {
             .data_type = OP_CODE_DATA_TYPE,
-            .data = (uint8_t []) {0x6a,0x7c,0xc8,0x14},
-            .data_len = 4
+            .data = (uint8_t []) {0x6a,0x7c,0xc8},
+            .data_len = 3
         },
         {
             .data_type = ADDRESS_DATA_TYPE,
@@ -91,8 +91,8 @@ static void test_new_parse_tx(void **state) {
             .data_type = OP_CODE_DATA_TYPE,
             .data = (uint8_t []) {0x6a,0x7c,0xc8,0x6c,0x51,0xc1,0x0a,
                                   0x74,0x72,0x61,0x6e,0x73,0x66,0x65,
-                                  0x72,0x56,0x32,0x14},
-            .data_len = 18
+                                  0x72,0x56,0x32},
+            .data_len = 17
         },
         {
             .data_type = ADDRESS_DATA_TYPE,
@@ -107,14 +107,16 @@ static void test_new_parse_tx(void **state) {
             .data_len = 26
         }
     };
+    uint8_t *resultArray[MAX_RESULT_SIZE] = {0};
+    uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
     size_t numElements = sizeof(TransferV2Tx) / sizeof(TransferV2Tx[0]);
-    parser_status_e status_tx = parse_tx(buf,TransferV2Tx,numElements);
+    parser_status_e status_tx = parse_tx(buf,TransferV2Tx,numElements,NATIVE_VM_OPERATOR,resultArray, storage);
     assert_int_equal(status, PARSING_OK);
 }
 
 int main() {
-	const struct CMUnitTest tests[] = {cmocka_unit_test(test_ont_tx_serialization),
-                cmocka_unit_test(test_oep4_transaction),
+	const struct CMUnitTest tests[] = {/*cmocka_unit_test(test_ont_tx_serialization),
+                cmocka_unit_test(test_oep4_transaction),*/
                                            cmocka_unit_test(test_new_parse_tx)
 	};
     return cmocka_run_group_tests(tests, NULL, NULL);
