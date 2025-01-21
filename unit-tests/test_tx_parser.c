@@ -50,12 +50,11 @@ static void test_oep4_transaction(void **state) {
 static void test_new_parse_tx(void **state) {
     (void) state;
 
-    ont_transaction_t tx;
     const char *hex_str = "00c66b1405815d34e0e9ab73a175ec86ffb24aad5bee20f16a7cc8141451108489337c8055a9c1ed9158c947d22070d76a7cc808000064a7b3b6e00d6a7cc86c51c10a7472616e7366657256321400000000000000000000000000000000000000020068164f6e746f6c6f67792e4e61746976652e496e766f6b6500";
     size_t len = strlen(hex_str) / 2;
     uint8_t raw_tx[len];
     for (size_t i = 0; i < len; i++) {
-        sscanf(hex_str + 2 * i, "%2hhx", &oep4_tx[i]);
+        sscanf(hex_str + 2 * i, "%2hhx", &raw_tx[i]);
     }
     buffer_t buf = {.ptr = raw_tx, .size = sizeof(raw_tx), .offset = 0};
 
@@ -111,7 +110,7 @@ static void test_new_parse_tx(void **state) {
     uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
     size_t numElements = sizeof(TransferV2Tx) / sizeof(TransferV2Tx[0]);
     parser_status_e status_tx = parse_tx(buf,TransferV2Tx,numElements,NATIVE_VM_OPERATOR,resultArray, storage);
-    assert_int_equal(status, PARSING_OK);
+    assert_int_equal(status_tx, PARSING_OK);
 }
 
 int main() {
