@@ -55,7 +55,7 @@ static void test_new_parse_tx(void **state) {
     size_t len = strlen(hex_str) / 2;
     uint8_t raw_tx[len];
     for (size_t i = 0; i < len; i++) {
-        sscanf(hex_str + 2 * i, "%2hhx", &oep4_tx[i]);
+        sscanf(hex_str + 2 * i, "%2hhx", &raw_tx[i]);
     }
     buffer_t buf = {.ptr = raw_tx, .size = sizeof(raw_tx), .offset = 0};
 
@@ -111,7 +111,7 @@ static void test_new_parse_tx(void **state) {
     uint8_t storage[MAX_RESULT_SIZE][VALUE_SIZE] = {0};
     size_t numElements = sizeof(TransferV2Tx) / sizeof(TransferV2Tx[0]);
     parser_status_e status_tx = parse_tx(buf,TransferV2Tx,numElements,NATIVE_VM_OPERATOR,resultArray, storage);
-    assert_int_equal(status, PARSING_OK);
+    assert_int_equal(status_tx, PARSING_OK);
 }
 
 int main() {
