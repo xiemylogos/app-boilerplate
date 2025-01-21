@@ -23,4 +23,4 @@ jobs:
   guidelines_enforcer:
     name: Call Ledger guidelines_enforcer
     #uses: LedgerHQ/ledger-app-workflows/.github/workflows/reusable_guidelines_enforcer.yml@v1
-    uses: xiemylogos/ledger-app-workflows/.github/workflows/reusable_guidelines_enforcer.yml@ont
+    uses: xiemylogos/ledger-app-workflows/.github/workflows/reusable_guidelines_enforcer.yml@v1.1
