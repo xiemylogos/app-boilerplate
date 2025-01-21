@@ -280,7 +280,7 @@ uint8_t get_oep4_token_decimals(uint8_t  *contract_addr) {
 
 void get_ong_fee(uint64_t gas_price,uint64_t gas_limit,char* out, size_t out_len) {
     format_fpu64_trimmed(out,sizeof(out_len),gas_price*gas_limit,9);
-    strcat(out,ONG_VIEW);
+    strlcat(out,ONG_VIEW,out_len);
 }
 
 bool get_native_token_amount(uint8_t *contract_addr,const uint8_t value_len,const uint64_t value[2],char* out, size_t out_len) {
@@ -294,7 +294,7 @@ bool get_native_token_amount(uint8_t *contract_addr,const uint8_t value_len,cons
         if(!get_token_amount(value_len,value,decimals,out,out_len)) {
             return false;
         }
-        strcat(out,ONT_VIEW);
+        strlcat(out,ONT_VIEW,out_len);
     } else if (memcmp(contract_addr, ONG_ADDR, 20) == 0) {
         uint8_t decimals = 9;
         if(G_context.tx_type == TRANSFER_V2_TRANSACTION ||
@@ -305,7 +305,7 @@ bool get_native_token_amount(uint8_t *contract_addr,const uint8_t value_len,cons
         if(!get_token_amount(value_len,value,decimals,out,out_len)) {
             return false;
         }
-        strcat(out,ONG_VIEW);
+        strlcat(out,ONG_VIEW,out_len);
     }
     return true;
 }
@@ -325,9 +325,9 @@ bool convert_uint64_to_char(char* out, size_t out_len,uint64_t amount) {
         return false;
     }
     if (G_context.tx_type == SET_FEE_PERCENTAGE) {
-        strcat(out, PERCENTAGE);
+        strlcat(out, PERCENTAGE,out_len);
     } else {
-        strcat(out, ONT_VIEW);
+        strlcat(out, ONT_VIEW,out_len);
     }
     return true;
 }

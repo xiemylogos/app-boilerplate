@@ -102,7 +102,7 @@ static uint8_t setTagValuePairs(void) {
                 memset(g_title,0,sizeof(g_title));
                 memcpy(g_title,NBGL_PEER_PUBKEY,sizeof(NBGL_PEER_PUBKEY));
                 if (G_context.display_data.pubkey_number >1) {
-                    strcat(g_title, ONE);
+                    strlcat(g_title, ONE,sizeof(g_title));
                 }
                 pairs[nbPairs].item = g_title;
                 pairs[nbPairs].value = G_context.display_data.peer_pubkey;
@@ -111,7 +111,7 @@ static uint8_t setTagValuePairs(void) {
             if (i==1) {
                 memset(g_title_two,0,sizeof(g_title_two));
                 memcpy(g_title_two,NBGL_PEER_PUBKEY,sizeof(NBGL_PEER_PUBKEY));
-                strcat(g_title_two,TWO);
+                strlcat(g_title_two,TWO,sizeof(g_title_two));
                 pairs[nbPairs].item = g_title_two;
                 pairs[nbPairs].value = G_context.display_data.content_three;
                 nbPairs++;
@@ -119,7 +119,7 @@ static uint8_t setTagValuePairs(void) {
             if (i==2) {
                 memset(g_title_three,0,sizeof(g_title_three));
                 memcpy(g_title_three,NBGL_PEER_PUBKEY,sizeof(NBGL_PEER_PUBKEY));
-                strcat(g_title_three,THREE);
+                strlcat(g_title_three,THREE,sizeof(g_title_three));
                 pairs[nbPairs].item = g_title_three;
                 pairs[nbPairs].value = G_context.display_data.content_four;
                 nbPairs++;
