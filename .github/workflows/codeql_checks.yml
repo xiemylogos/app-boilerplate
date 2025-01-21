@@ -8,7 +8,6 @@ on:
       - main
       - develop
       - ont
-      - optimize_comment_action
   pull_request:
     # Excluded path: add the paths you want to ignore instead of deleting the workflow
     paths-ignore:

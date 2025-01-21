@@ -26,7 +26,6 @@ on:
       - main
       - develop
       - ont
-      - optimize_comment_action
   pull_request:
 
 jobs:
