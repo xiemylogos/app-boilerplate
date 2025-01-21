@@ -31,7 +31,7 @@
 #define STAKE_COST          "Fee Sharing Ratio (User)"
 #define POS_LIST            "posList"
 #define ADDRESS             "Address"
-#define BLIND_SIGNING       "blind signing"
+#define BLIND_SIGNING       "Blind signing"
 #define TOTAL_POS           "total pos"
 #define NODE_AMOUNT         "Node amount"
 #define ONE                 "1"
