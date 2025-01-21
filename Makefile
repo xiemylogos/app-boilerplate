@@ -66,7 +66,7 @@ PATH_APP_LOAD_PARAMS := "44'/1024'" "44'/888'"
 #   * It must at least contains one value.
 #   * Values can be the app ticker or anything else but should be unique.
 VARIANT_PARAM = COIN
-VARIANT_VALUES = ONT
+VARIANT_VALUES = ontology
 
 # Enabling DEBUG flag will enable PRINTF and disable optimizations
 #DEBUG = 1
