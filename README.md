@@ -9,7 +9,7 @@ Ledger Blue is not maintained anymore, but the app can still be compiled for thi
 
 Current Features:
 - Parse, display and sign ont/ong transaction and oep4 transaction
-- Sign Person Message
+- Sign Personal Message
 
 ## Quick start guide
 
