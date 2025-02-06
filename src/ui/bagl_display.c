@@ -385,131 +385,119 @@ int ui_display_personal_msg() {
     return ui_display_bagl_personal_msg_choice();
 }
 
+#define IS_NODE_TX(type) \
+    ((type) == REGISTER_CANDIDATE || (type) == QUIT_NODE || \
+     (type) == ADD_INIT_POS || (type) == REDUCE_INIT_POS || \
+     (type) == CHANGE_MAX_AUTHORIZATION || (type) == SET_FEE_PERCENTAGE || \
+     (type) == WITHDRAW_FEE || (type) == WITHDRAW || \
+     (type) == AUTHORIZE_FOR_PEER || (type) == UN_AUTHORIZE_FOR_PEER)
+
+#define IS_AUTH_TX(type) \
+    ((type) == WITHDRAW || (type) == AUTHORIZE_FOR_PEER || \
+     (type) == UN_AUTHORIZE_FOR_PEER)
+
+#define IS_OEP4_TX(type) \
+    ((type) == OEP4_TRANSACTION || (type) == NEO_VM_OEP4_APPROVE || \
+     (type) == WASM_VM_OEP4_APPROVE || (type) == NEO_VM_OEP4_TRANSFER_FROM || \
+     (type) == WASM_VM_OEP4_TRANSFER_FROM)
+
+#define IS_TRANSFER_TX(type) \
+    ((type) == TRANSFER_FROM_V2_TRANSACTION || (type) == TRANSFER_FROM_TRANSACTION || \
+     (type) == TRANSFER_TRANSACTION || (type) == TRANSFER_V2_TRANSACTION || \
+     (type) == APPROVE || (type) == APPROVE_V2)
+
+#define IS_GAS_FEE_TX(type) ((type) == REGISTER_CANDIDATE)
+#define IS_STANDARD_FEE_TX(type) (!IS_GAS_FEE_TX(type))
+
+static void add_step_to_flow(uint8_t *index, const void *step) {
+    if (step != NULL) {
+        ux_display_tx_flow[(*index)++] = step;
+    }
+}
+
+static void handle_node_tx_flow(uint8_t *index) {
+    add_step_to_flow(index, &ux_display_account_step);
+    if(G_context.tx_type != WITHDRAW_FEE) {
+        add_step_to_flow(index, &ux_display_peer_pubkey_step);
+    }
+   if (IS_AUTH_TX(G_context.tx_type) &&
+        G_context.display_data.pubkey_number > 1 &&
+        format_u64(g_content_two, sizeof(g_content_two), G_context.display_data.pubkey_number)) {
+                add_step_to_flow(index, &ux_display_node_amount_step);
+    }
+
+    if(G_context.tx_type != QUIT_NODE && G_context.tx_type != WITHDRAW_FEE) {
+        switch (G_context.tx_type) {
+            case CHANGE_MAX_AUTHORIZATION:
+                add_step_to_flow(index, &ux_display_max_authorize_step);
+                break;
+            case SET_FEE_PERCENTAGE:
+                add_step_to_flow(index, &ux_display_peer_cost_step);
+                add_step_to_flow(index, &ux_display_stake_cost_step);
+                break;
+            case WITHDRAW:
+                add_step_to_flow(index, &ux_display_with_draw_step);
+                break;
+            case AUTHORIZE_FOR_PEER:
+            case UN_AUTHORIZE_FOR_PEER:
+                add_step_to_flow(index, &ux_display_unauth_pos_list_step);
+                break;
+            default:
+                add_step_to_flow(index, &ux_display_pos_step);
+                break;
+        }
+    }
+
+    if (IS_GAS_FEE_TX(G_context.tx_type)) {
+        add_step_to_flow(index, &ux_display_stake_fee_step);
+    }
+}
+
+
+static void handle_oep4_tx_flow(uint8_t *index) {
+    add_step_to_flow(index, &ux_display_amount_step);
+    if (G_context.display_data.decimals == 0) {
+        memset(g_content_two, 0, sizeof(g_content_two));
+        memcpy(g_content_two, DECIMALS_UNKNOWN, sizeof(DECIMALS_UNKNOWN));
+        add_step_to_flow(index, &ux_display_decimals_step);
+    }
+    if (G_context.tx_type == NEO_VM_OEP4_TRANSFER_FROM ||
+        G_context.tx_type == WASM_VM_OEP4_TRANSFER_FROM) {
+        add_step_to_flow(index, &ux_display_sender_address_step);
+    }
+    add_step_to_flow(index, &ux_display_from_address_step);
+    add_step_to_flow(index, &ux_display_to_address_step);
+}
+
+static void handle_transfer_tx_flow(uint8_t *index) {
+    add_step_to_flow(index, &ux_display_amount_step);
+
+    if (G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION ||
+        G_context.tx_type == TRANSFER_FROM_TRANSACTION) {
+        add_step_to_flow(index, &ux_display_sender_address_step);
+    }
+
+    add_step_to_flow(index, &ux_display_from_address_step);
+    add_step_to_flow(index, &ux_display_to_address_step);
+}
+
 static void create_transaction_flow(void) {
-     uint8_t index = 0;
-     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED) {
-         return;
-     }
-     ux_display_tx_flow[index++] = &ux_display_review_step;
+    uint8_t index = 0;
 
-     if (G_context.tx_type == REGISTER_CANDIDATE ||
-         G_context.tx_type == QUIT_NODE ||
-        G_context.tx_type == ADD_INIT_POS ||
-        G_context.tx_type == REDUCE_INIT_POS ||
-        G_context.tx_type == CHANGE_MAX_AUTHORIZATION ||
-        G_context.tx_type == SET_FEE_PERCENTAGE ||
-        G_context.tx_type == WITHDRAW_FEE ||
-        G_context.tx_type == WITHDRAW ||
-        G_context.tx_type == AUTHORIZE_FOR_PEER ||
-        G_context.tx_type == UN_AUTHORIZE_FOR_PEER) {
-        ux_display_tx_flow[index++] = &ux_display_account_step;
+    if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED) {
+        return;
     }
+    add_step_to_flow(&index, &ux_display_review_step);
 
-    if (G_context.tx_type == REGISTER_CANDIDATE ||
-        G_context.tx_type == QUIT_NODE ||
-        G_context.tx_type == ADD_INIT_POS ||
-        G_context.tx_type == REDUCE_INIT_POS ||
-        G_context.tx_type == CHANGE_MAX_AUTHORIZATION ||
-        G_context.tx_type == SET_FEE_PERCENTAGE ||
-        G_context.tx_type == WITHDRAW  ||
-        G_context.tx_type == AUTHORIZE_FOR_PEER ||
-        G_context.tx_type == UN_AUTHORIZE_FOR_PEER) {
-        ux_display_tx_flow[index++] = &ux_display_peer_pubkey_step;
-    }
-    if(G_context.tx_type == WITHDRAW  ||
-        G_context.tx_type == AUTHORIZE_FOR_PEER ||
-        G_context.tx_type == UN_AUTHORIZE_FOR_PEER) {
-        if (G_context.display_data.pubkey_number >1) {
-            memset(g_content_two, 0, sizeof(g_content_two));
-            if (!format_u64(g_content_two,
-                            sizeof(g_content_two),
-                            G_context.display_data.pubkey_number)) {
-                return ;
-            }
-            ux_display_tx_flow[index++] = &ux_display_node_amount_step;
-        }
-    }
+    if (IS_NODE_TX(G_context.tx_type)) handle_node_tx_flow(&index);
+    if (IS_OEP4_TX(G_context.tx_type)) handle_oep4_tx_flow(&index);
+    if (IS_TRANSFER_TX(G_context.tx_type)) handle_transfer_tx_flow(&index);
 
-    if (G_context.tx_type == REGISTER_CANDIDATE ||
-        G_context.tx_type == ADD_INIT_POS ||
-        G_context.tx_type == REDUCE_INIT_POS ||
-        G_context.tx_type == CHANGE_MAX_AUTHORIZATION ||
-        G_context.tx_type == SET_FEE_PERCENTAGE ||
-        G_context.tx_type == WITHDRAW ||
-        G_context.tx_type == AUTHORIZE_FOR_PEER ||
-        G_context.tx_type == UN_AUTHORIZE_FOR_PEER) {
-        if (G_context.tx_type == CHANGE_MAX_AUTHORIZATION) {
-            ux_display_tx_flow[index++] = &ux_display_max_authorize_step;
-        } else if( G_context.tx_type == SET_FEE_PERCENTAGE){
-            ux_display_tx_flow[index++] = &ux_display_peer_cost_step;
-        } else if (G_context.tx_type == WITHDRAW) {
-            ux_display_tx_flow[index++] = &ux_display_with_draw_step;
-        } else if(G_context.tx_type == AUTHORIZE_FOR_PEER) {
-            ux_display_tx_flow[index++] = &ux_display_unauth_pos_list_step;
-        }else if(G_context.tx_type == UN_AUTHORIZE_FOR_PEER){
-            ux_display_tx_flow[index++] = &ux_display_unauth_pos_list_step;
-        }else {
-           ux_display_tx_flow[index++] = &ux_display_pos_step;
-        }
-    }
-    if( G_context.tx_type == SET_FEE_PERCENTAGE) {
-        ux_display_tx_flow[index++] = &ux_display_stake_cost_step;
-    }
-      if (G_context.tx_type == REGISTER_CANDIDATE) {
-         ux_display_tx_flow[index++] = &ux_display_stake_fee_step;
-    }
-
-    if(G_context.tx_type == OEP4_TRANSACTION ||
-         G_context.tx_type == NEO_VM_OEP4_APPROVE ||
-         G_context.tx_type == WASM_VM_OEP4_APPROVE ||
-         G_context.tx_type == NEO_VM_OEP4_TRANSFER_FROM ||
-         G_context.tx_type == WASM_VM_OEP4_TRANSFER_FROM) {
-         memset(g_content_two, 0, sizeof(g_content_two));
-          if (G_context.display_data.decimals ==0) {
-             memcpy(g_content_two,DECIMALS_UNKNOWN,sizeof(DECIMALS_UNKNOWN));
-             ux_display_tx_flow[index++] = &ux_display_decimals_step;
-          }
-     }
-
-     if(G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION ||
-            G_context.tx_type == TRANSFER_FROM_TRANSACTION ||
-            G_context.tx_type == TRANSFER_TRANSACTION ||
-            G_context.tx_type == TRANSFER_V2_TRANSACTION ||
-            G_context.tx_type == APPROVE ||
-            G_context.tx_type == APPROVE_V2 ||
-            G_context.tx_type == OEP4_TRANSACTION ||
-            G_context.tx_type == NEO_VM_OEP4_APPROVE ||
-            G_context.tx_type == WASM_VM_OEP4_APPROVE ||
-            G_context.tx_type == NEO_VM_OEP4_TRANSFER_FROM ||
-            G_context.tx_type == WASM_VM_OEP4_TRANSFER_FROM ||
-            G_context.tx_type == OEP4_TRANSACTION ||
-            G_context.tx_type == NEO_VM_OEP4_APPROVE ||
-            G_context.tx_type == WASM_VM_OEP4_APPROVE ||
-            G_context.tx_type == NEO_VM_OEP4_TRANSFER_FROM ||
-            G_context.tx_type == WASM_VM_OEP4_TRANSFER_FROM) {
-             ux_display_tx_flow[index++] = &ux_display_amount_step;
-
-        if(G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION ||
-            G_context.tx_type == TRANSFER_FROM_TRANSACTION ||
-            G_context.tx_type == NEO_VM_OEP4_TRANSFER_FROM ||
-            G_context.tx_type == WASM_VM_OEP4_TRANSFER_FROM) {
-                ux_display_tx_flow[index++] = &ux_display_sender_address_step;
-        }
-
-        ux_display_tx_flow[index++] = &ux_display_from_address_step;
-        ux_display_tx_flow[index++] = &ux_display_to_address_step;
-    }
-
-
-    if(G_context.tx_type == REGISTER_CANDIDATE) {
-        ux_display_tx_flow[index++] = &ux_display_gas_fee_step;
-    } else {
-     ux_display_tx_flow[index++] = &ux_display_fee_step;
-    }
-     ux_display_tx_flow[index++] = &ux_display_signer_address_step;
-     ux_display_tx_flow[index++] = &ux_display_tx_approve_step;
-     ux_display_tx_flow[index++] = &ux_display_tx_reject_step;
-     ux_display_tx_flow[index++] = FLOW_END_STEP;
+    add_step_to_flow(&index, IS_GAS_FEE_TX(G_context.tx_type) ? &ux_display_gas_fee_step : &ux_display_fee_step);
+    add_step_to_flow(&index, &ux_display_signer_address_step);
+    add_step_to_flow(&index, &ux_display_tx_approve_step);
+    add_step_to_flow(&index, &ux_display_tx_reject_step);
+    add_step_to_flow(&index, FLOW_END_STEP);
 }
 
 int ui_display_transaction() {
