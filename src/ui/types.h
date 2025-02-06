@@ -39,6 +39,7 @@
 #define THREE               "3"
 #define BLIND_SIGN_TX       "Blind signing Transaction"
 #define BLIND_SIGN_TX_MSG   "Accept risk and send"
+#define VERIFY_ONT_ADDRESS      "Verify ONT address"
 
 #define ADD_INIT_POS_TITLE                    "Review transaction to add initial stake"
 #define ADD_INIT_POS_CONTENT                  "Sign transaction to add initial stake?"

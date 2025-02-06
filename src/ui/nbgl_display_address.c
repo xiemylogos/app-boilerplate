@@ -35,6 +35,7 @@
 #include "../transaction/types.h"
 #include "../menu.h"
 #include "../transaction/utils.h"
+#include "types.h"
 
 static char g_address[40];
 
@@ -61,7 +62,7 @@ int ui_display_address() {
     nbgl_useCaseAddressReview(g_address,
                               NULL,
                               &C_icon_ont_64px,
-                              "Verify ONT address",
+                              VERIFY_ONT_ADDRESS,
                               NULL,
                               review_choice);
     return 0;

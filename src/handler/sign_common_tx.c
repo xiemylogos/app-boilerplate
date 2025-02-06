@@ -75,7 +75,6 @@ int handler_sign_common_tx(buffer_t *cdata, uint8_t chunk, bool more) {
             buffer_t buf = {.ptr = G_context.tx_info.raw_tx,
                 .size = G_context.tx_info.raw_tx_len,
                 .offset = 0};
-             //version
             uint8_t version;
             uint8_t tx_type;
             if(!buffer_read_u8(&buf,&version) || version != 0x00 || !buffer_read_u8(&buf,&tx_type)) {
