@@ -65,19 +65,26 @@ static uint8_t setTagValuePairs(void) {
     uint8_t nbPairs = 0;
     explicit_bzero(pairs, sizeof(pairs));
 
-    if (G_context.tx_type == REGISTER_CANDIDATE ||
-         G_context.tx_type == QUIT_NODE ||
-        G_context.tx_type == ADD_INIT_POS ||
-        G_context.tx_type == REDUCE_INIT_POS ||
-        G_context.tx_type == CHANGE_MAX_AUTHORIZATION ||
-        G_context.tx_type == SET_FEE_PERCENTAGE ||
-        G_context.tx_type == WITHDRAW_FEE ||
-        G_context.tx_type == WITHDRAW ||
-        G_context.tx_type == AUTHORIZE_FOR_PEER ||
-        G_context.tx_type == UN_AUTHORIZE_FOR_PEER) {
-        pairs[nbPairs].item = ACCOUNT;
-        pairs[nbPairs].value = G_context.display_data.content;
-        nbPairs++;
+    #define ADD_PAIR(tagName, valueName) \
+        do { \
+            pairs[nbPairs].item = tagName; \
+            pairs[nbPairs].value = valueName; \
+            nbPairs++; \
+        } while (0)
+
+    bool isCommonTx = (G_context.tx_type == REGISTER_CANDIDATE ||
+                       G_context.tx_type == QUIT_NODE ||
+                       G_context.tx_type == ADD_INIT_POS ||
+                       G_context.tx_type == REDUCE_INIT_POS ||
+                       G_context.tx_type == CHANGE_MAX_AUTHORIZATION ||
+                       G_context.tx_type == SET_FEE_PERCENTAGE ||
+                       G_context.tx_type == WITHDRAW_FEE ||
+                       G_context.tx_type == WITHDRAW ||
+                       G_context.tx_type == AUTHORIZE_FOR_PEER ||
+                       G_context.tx_type == UN_AUTHORIZE_FOR_PEER);
+
+    if (isCommonTx) {
+        ADD_PAIR(ACCOUNT, G_context.display_data.content);
     }
 
     if (G_context.tx_type == REGISTER_CANDIDATE ||
@@ -86,9 +93,7 @@ static uint8_t setTagValuePairs(void) {
         G_context.tx_type == REDUCE_INIT_POS ||
         G_context.tx_type == CHANGE_MAX_AUTHORIZATION ||
         G_context.tx_type == SET_FEE_PERCENTAGE) {
-        pairs[nbPairs].item = NBGL_PEER_PUBKEY;
-        pairs[nbPairs].value = G_context.display_data.peer_pubkey;
-        nbPairs++;
+        ADD_PAIR(NBGL_PEER_PUBKEY, G_context.display_data.peer_pubkey);
     }
 
     if (G_context.tx_type == WITHDRAW  ||
@@ -104,25 +109,19 @@ static uint8_t setTagValuePairs(void) {
                 if (G_context.display_data.pubkey_number >1) {
                     strlcat(g_title, ONE,sizeof(g_title));
                 }
-                pairs[nbPairs].item = g_title;
-                pairs[nbPairs].value = G_context.display_data.peer_pubkey;
-                nbPairs++;
+                ADD_PAIR(g_title,G_context.display_data.peer_pubkey);
             }
             if (i==1) {
                 memset(g_title_two,0,sizeof(g_title_two));
                 memcpy(g_title_two,NBGL_PEER_PUBKEY,sizeof(NBGL_PEER_PUBKEY));
                 strlcat(g_title_two,TWO,sizeof(g_title_two));
-                pairs[nbPairs].item = g_title_two;
-                pairs[nbPairs].value = G_context.display_data.content_three;
-                nbPairs++;
+                ADD_PAIR(g_title_two,G_context.display_data.content_three);
             }
             if (i==2) {
                 memset(g_title_three,0,sizeof(g_title_three));
                 memcpy(g_title_three,NBGL_PEER_PUBKEY,sizeof(NBGL_PEER_PUBKEY));
                 strlcat(g_title_three,THREE,sizeof(g_title_three));
-                pairs[nbPairs].item = g_title_three;
-                pairs[nbPairs].value = G_context.display_data.content_four;
-                nbPairs++;
+                ADD_PAIR(g_title_three,G_context.display_data.content_four);
             }
         }
         if (G_context.display_data.pubkey_number >1) {
@@ -130,118 +129,67 @@ static uint8_t setTagValuePairs(void) {
             if (!format_u64(g_pubkey_number, sizeof(g_pubkey_number), G_context.display_data.pubkey_number)) {
                  return io_send_sw(SW_DISPLAY_AMOUNT_FAIL);
             }
-            pairs[nbPairs].item = NODE_AMOUNT;
-            pairs[nbPairs].value = g_pubkey_number;
-            nbPairs++;
+            ADD_PAIR(NODE_AMOUNT,g_pubkey_number);
         }
     }
 
-
-    if (G_context.tx_type == REGISTER_CANDIDATE ||
-        G_context.tx_type == ADD_INIT_POS ||
-        G_context.tx_type == REDUCE_INIT_POS ||
-        G_context.tx_type == CHANGE_MAX_AUTHORIZATION ||
-        G_context.tx_type == SET_FEE_PERCENTAGE ||
-        G_context.tx_type == WITHDRAW ||
-        G_context.tx_type == AUTHORIZE_FOR_PEER ||
-        G_context.tx_type == UN_AUTHORIZE_FOR_PEER) {
-        if (G_context.tx_type == CHANGE_MAX_AUTHORIZATION) {
-            pairs[nbPairs].item = MAX_AUTHORIZE;
-        } else if( G_context.tx_type == SET_FEE_PERCENTAGE){
-            pairs[nbPairs].item = PEER_COST;
-        } else if (G_context.tx_type == WITHDRAW) {
-            if (G_context.display_data.pubkey_number == 1) {
-                pairs[nbPairs].item = AMOUNT;
-            } else {
-                pairs[nbPairs].item = TOTAL_WITHDRAW;
-            }
-        } else if(G_context.tx_type == UN_AUTHORIZE_FOR_PEER){
-            pairs[nbPairs].item = AMOUNT;
-        }else {
-           pairs[nbPairs].item = POS;
+    if (isCommonTx && G_context.tx_type != QUIT_NODE && G_context.tx_type != WITHDRAW_FEE) {
+        const char* item = NULL;
+        switch (G_context.tx_type) {
+            case CHANGE_MAX_AUTHORIZATION: item = MAX_AUTHORIZE; break;
+            case SET_FEE_PERCENTAGE: item = PEER_COST; break;
+            case WITHDRAW: item = (G_context.display_data.pubkey_number == 1) ? AMOUNT : TOTAL_WITHDRAW; break;
+            case UN_AUTHORIZE_FOR_PEER: item = AMOUNT; break;
+            default: item = POS; break;
         }
-        pairs[nbPairs].value = G_context.display_data.amount;
-        nbPairs++;
+        ADD_PAIR(item, G_context.display_data.amount);
     }
-    if( G_context.tx_type == SET_FEE_PERCENTAGE) {
-        pairs[nbPairs].item = STAKE_COST;
-        pairs[nbPairs].value = G_context.display_data.content_two;
-        nbPairs++;
+    if (G_context.tx_type == SET_FEE_PERCENTAGE) {
+        ADD_PAIR(STAKE_COST, G_context.display_data.content_two);
     }
+
     if (G_context.tx_type == REGISTER_CANDIDATE) {
-        pairs[nbPairs].item = STAKE_FEE;
-        pairs[nbPairs].value = STAKE_FEE_ONG;
-        nbPairs++;
+        ADD_PAIR(STAKE_FEE, STAKE_FEE_ONG);
     }
-
-
-    if(G_context.tx_type == OEP4_TRANSACTION ||
+    // OEP4 and related transactions
+    if (G_context.tx_type == OEP4_TRANSACTION ||
         G_context.tx_type == NEO_VM_OEP4_APPROVE ||
         G_context.tx_type == WASM_VM_OEP4_APPROVE ||
         G_context.tx_type == NEO_VM_OEP4_TRANSFER_FROM ||
         G_context.tx_type == WASM_VM_OEP4_TRANSFER_FROM) {
         if (G_context.display_data.decimals == 0) {
-            pairs[nbPairs].item = DECIMALS;
-            pairs[nbPairs].value = DECIMALS_UNKNOWN;
-            nbPairs++;
+            ADD_PAIR(DECIMALS, DECIMALS_UNKNOWN);
         }
     }
+    // Transfer and Approve transactions
+    if (G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION ||
+        G_context.tx_type == TRANSFER_FROM_TRANSACTION ||
+        G_context.tx_type == TRANSFER_TRANSACTION ||
+        G_context.tx_type == TRANSFER_V2_TRANSACTION ||
+        G_context.tx_type == APPROVE ||
+        G_context.tx_type == APPROVE_V2 ||
+        G_context.tx_type == OEP4_TRANSACTION ||
+        G_context.tx_type == NEO_VM_OEP4_APPROVE ||
+        G_context.tx_type == WASM_VM_OEP4_APPROVE ||
+        G_context.tx_type == NEO_VM_OEP4_TRANSFER_FROM ||
+        G_context.tx_type == WASM_VM_OEP4_TRANSFER_FROM) {
+        ADD_PAIR(AMOUNT, G_context.display_data.amount);
 
-     
-
-    if(G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION ||
-            G_context.tx_type == TRANSFER_FROM_TRANSACTION ||
-            G_context.tx_type == TRANSFER_TRANSACTION ||
-            G_context.tx_type == TRANSFER_V2_TRANSACTION ||
-            G_context.tx_type == APPROVE ||
-            G_context.tx_type == APPROVE_V2 ||
-            G_context.tx_type == OEP4_TRANSACTION ||
-            G_context.tx_type == NEO_VM_OEP4_APPROVE ||
-            G_context.tx_type == WASM_VM_OEP4_APPROVE ||
-            G_context.tx_type == NEO_VM_OEP4_TRANSFER_FROM ||
-            G_context.tx_type == WASM_VM_OEP4_TRANSFER_FROM ||
-            G_context.tx_type == OEP4_TRANSACTION ||
-            G_context.tx_type == NEO_VM_OEP4_APPROVE ||
-            G_context.tx_type == WASM_VM_OEP4_APPROVE ||
-            G_context.tx_type == NEO_VM_OEP4_TRANSFER_FROM ||
-            G_context.tx_type == WASM_VM_OEP4_TRANSFER_FROM) {
-
-             pairs[nbPairs].item = AMOUNT;
-             pairs[nbPairs].value = G_context.display_data.amount;
-             nbPairs++;
-
-        if(G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION ||
+        if (G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION ||
             G_context.tx_type == TRANSFER_FROM_TRANSACTION ||
             G_context.tx_type == NEO_VM_OEP4_TRANSFER_FROM ||
             G_context.tx_type == WASM_VM_OEP4_TRANSFER_FROM) {
-                pairs[nbPairs].item = SENDER;
-                pairs[nbPairs].value = G_context.display_data.content;
-                nbPairs++;
+            ADD_PAIR(SENDER, G_context.display_data.content);
         }
 
-             //fromAddr
-             pairs[nbPairs].item = FROM;
-             pairs[nbPairs].value = G_context.display_data.from;
-             nbPairs++;
-             //toAddr
-             pairs[nbPairs].item = TO;
-             pairs[nbPairs].value = G_context.display_data.to;
-             nbPairs++;
+        ADD_PAIR(FROM, G_context.display_data.from);
+        ADD_PAIR(TO, G_context.display_data.to);
     }
+    // Fee
+    ADD_PAIR((G_context.tx_type == REGISTER_CANDIDATE) ? GAS_FEE : FEE_ONG, G_context.display_data.fee);
 
-   //fee
-   if (G_context.tx_type == REGISTER_CANDIDATE) {
-         pairs[nbPairs].item = GAS_FEE;
-   } else { 
-         pairs[nbPairs].item = FEE_ONG;
-   }
-    pairs[nbPairs].value = G_context.display_data.fee;
-    nbPairs++;
-    //
-    pairs[nbPairs].item = SIGNER;
-    pairs[nbPairs].value = G_context.display_data.signer;
-    nbPairs++;
-
+    // Signer
+    ADD_PAIR(SIGNER, G_context.display_data.signer);
     return nbPairs;
 }
 
@@ -277,59 +225,48 @@ int ui_display_blind_signing_transaction() {
     return ui_display_blind_transaction_bs_choice();
 }
 
+typedef struct {
+    tx_type_e tx_type;
+    const char *title;
+    const char *content;
+} tx_display_t;
+
+static const tx_display_t tx_display_map[] = {
+    {ADD_INIT_POS, ADD_INIT_POS_TITLE, ADD_INIT_POS_CONTENT},
+    {APPROVE, SIGN_APPROVE_TX_TITLE, SIGN_APPROVE_TX_CONTENT},
+    {APPROVE_V2, SIGN_APPROVE_TX_TITLE, SIGN_APPROVE_TX_CONTENT},
+    {NEO_VM_OEP4_APPROVE, SIGN_APPROVE_TX_TITLE, SIGN_APPROVE_TX_CONTENT},
+    {WASM_VM_OEP4_APPROVE, SIGN_APPROVE_TX_TITLE, SIGN_APPROVE_TX_CONTENT},
+    {AUTHORIZE_FOR_PEER, AUTHORIZE_FOR_PEER_TITLE, AUTHORIZE_FOR_PEER_CONTENT},
+    {CHANGE_MAX_AUTHORIZATION, CHANGE_MAX_AUTHORIZATION_TITLE, CHANGE_MAX_AUTHORIZATION_CONTENT},
+    {OEP4_TRANSACTION, OEP4_TX_TITLE, OEP4_TX_CONTENT},
+    {QUIT_NODE, QUIT_NODE_TITLE, QUIT_NODE_CONTENT},
+    {REDUCE_INIT_POS, REDUCE_INIT_POS_TITLE, REDUCE_INIT_POS_CONTENT},
+    {REGISTER_CANDIDATE, REGISTER_CANDIDATE_TITLE, REGISTER_CANDIDATE_CONTENT},
+    {SET_FEE_PERCENTAGE, SET_FEE_PERCENTAGE_TITLE, SET_FEE_PERCENTAGE_CONTENT},
+    {TRANSFER_TRANSACTION, NATIVE_ONG_OR_ONT_TRANSFER_TITLE, NATIVE_ONG_OR_ONT_TRANSFER_CONTENT},
+    {TRANSFER_V2_TRANSACTION, NATIVE_ONG_OR_ONT_TRANSFER_TITLE, NATIVE_ONG_OR_ONT_TRANSFER_CONTENT},
+    {TRANSFER_FROM_TRANSACTION, TRANSFER_FROM_TITLE, TRANSFER_FROM_CONTENT},
+    {TRANSFER_FROM_V2_TRANSACTION, TRANSFER_FROM_TITLE, TRANSFER_FROM_CONTENT},
+    {NEO_VM_OEP4_TRANSFER_FROM, TRANSFER_FROM_TITLE, TRANSFER_FROM_CONTENT},
+    {WASM_VM_OEP4_TRANSFER_FROM, TRANSFER_FROM_TITLE, TRANSFER_FROM_CONTENT},
+    {UN_AUTHORIZE_FOR_PEER, UN_AUTHORIZE_FOR_PEER_TITLE, UN_AUTHORIZE_FOR_PEER_CONTENT},
+    {WITHDRAW_FEE, WITHDRAW_FEE_TITLE, WITHDRAW_FEE_CONTENT},
+    {WITHDRAW, WITHDRAW_TITLE, WITHDRAW_CONTENT},
+};
+
+
 static void set_display_title_content(void) {
-    if (G_context.tx_type == ADD_INIT_POS) {
-        review_title = ADD_INIT_POS_TITLE;
-        review_content = ADD_INIT_POS_CONTENT;
-    } else if (G_context.tx_type == APPROVE ||
-               G_context.tx_type == APPROVE_V2 ||
-               G_context.tx_type == NEO_VM_OEP4_APPROVE ||
-               G_context.tx_type == WASM_VM_OEP4_APPROVE) {
-        review_title = SIGN_APPROVE_TX_TITLE;
-        review_content = SIGN_APPROVE_TX_CONTENT;
-    } else if (G_context.tx_type == AUTHORIZE_FOR_PEER) {
-        review_title = AUTHORIZE_FOR_PEER_TITLE;
-        review_content = AUTHORIZE_FOR_PEER_CONTENT;
-    } else if (G_context.tx_type == CHANGE_MAX_AUTHORIZATION) {
-        review_title = CHANGE_MAX_AUTHORIZATION_TITLE;
-        review_content = CHANGE_MAX_AUTHORIZATION_CONTENT;
-    } else if (G_context.tx_type == OEP4_TRANSACTION) {
-        review_title = OEP4_TX_TITLE;
-        review_content = OEP4_TX_CONTENT;
-    } else if (G_context.tx_type == QUIT_NODE) {
-        review_title = QUIT_NODE_TITLE;
-        review_content = QUIT_NODE_CONTENT;
-    } else if (G_context.tx_type == REDUCE_INIT_POS) {
-        review_title = REDUCE_INIT_POS_TITLE;
-        review_content = REDUCE_INIT_POS_CONTENT;
-    } else if (G_context.tx_type == REGISTER_CANDIDATE) {
-        review_title = REGISTER_CANDIDATE_TITLE;
-        review_content = REGISTER_CANDIDATE_CONTENT;
-    } else if (G_context.tx_type == SET_FEE_PERCENTAGE) {
-        review_title = SET_FEE_PERCENTAGE_TITLE;
-        review_content = SET_FEE_PERCENTAGE_CONTENT;
-    } else if (G_context.tx_type == TRANSFER_TRANSACTION ||
-               G_context.tx_type == TRANSFER_V2_TRANSACTION) {
-            review_title = NATIVE_ONG_OR_ONT_TRANSFER_TITLE;
-            review_content = NATIVE_ONG_OR_ONT_TRANSFER_CONTENT;
-    } else if (G_context.tx_type == TRANSFER_FROM_TRANSACTION ||
-               G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION ||
-               G_context.tx_type == NEO_VM_OEP4_TRANSFER_FROM ||
-               G_context.tx_type == WASM_VM_OEP4_TRANSFER_FROM) {
-        review_title = TRANSFER_FROM_TITLE;
-        review_content = TRANSFER_FROM_CONTENT;
-    } else if (G_context.tx_type == UN_AUTHORIZE_FOR_PEER) {
-        review_title = UN_AUTHORIZE_FOR_PEER_TITLE;
-        review_content = UN_AUTHORIZE_FOR_PEER_CONTENT;
-    } else if (G_context.tx_type == WITHDRAW_FEE) {
-        review_title = WITHDRAW_FEE_TITLE;
-        review_content = WITHDRAW_FEE_CONTENT;
-    } else if (G_context.tx_type == WITHDRAW) {
-        review_title = WITHDRAW_TITLE;
-        review_content = WITHDRAW_CONTENT;
-    } else {
-        review_title = TRANSFER_FROM_TITLE;
-        review_content = TRANSFER_FROM_CONTENT;
+    review_title = TRANSFER_FROM_TITLE;
+    review_content = TRANSFER_FROM_CONTENT;
+
+    size_t num_tx_types = sizeof(tx_display_map) / sizeof(tx_display_map[0]);
+    for (size_t i = 0; i < num_tx_types; i++) {
+        if (G_context.tx_type == tx_display_map[i].tx_type) {
+            review_title = tx_display_map[i].title;
+            review_content = tx_display_map[i].content;
+            break;
+        }
     }
 }
 
