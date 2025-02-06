@@ -476,7 +476,6 @@ static void handle_transfer_tx_flow(uint8_t *index) {
         G_context.tx_type == TRANSFER_FROM_TRANSACTION) {
         add_step_to_flow(index, &ux_display_sender_address_step);
     }
-
     add_step_to_flow(index, &ux_display_from_address_step);
     add_step_to_flow(index, &ux_display_to_address_step);
 }
