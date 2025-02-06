@@ -359,25 +359,32 @@ int ui_display_bagl_personal_msg_choice() {
         G_context.state = STATE_NONE;
         return io_send_sw(SW_BAD_STATE);
     }
-    memset(g_personal_msg, 0, sizeof(g_personal_msg));
-    memcpy(g_personal_msg, SIGN_MAGIC, sizeof(SIGN_MAGIC) - 2);
-    int msglen = utf8_strlen(G_context.personal_msg_info.raw_msg);
 
+    memset(g_personal_msg, 0, sizeof(g_personal_msg));
+
+    const size_t sign_magic_len = sizeof(SIGN_MAGIC) - 2;
+    memcpy(g_personal_msg, SIGN_MAGIC, sign_magic_len);
+
+    int msglen = utf8_strlen(G_context.personal_msg_info.raw_msg);
     char lengthStr[10];
     snprintf(lengthStr, sizeof(lengthStr), "%d", msglen);
-    int totalLength = sizeof(SIGN_MAGIC) - 2 + strlen(lengthStr) + G_context.personal_msg_info.raw_msg_len + 1;
-    memcpy(g_personal_msg + sizeof(SIGN_MAGIC) - 2, lengthStr, strlen(lengthStr));
 
-    for (size_t i=0;i< G_context.personal_msg_info.raw_msg_len;i++) {
-        if((sizeof(SIGN_MAGIC) - 2+strlen(lengthStr) + i) > 64) {
-                break;
-            }
-       g_personal_msg[sizeof(SIGN_MAGIC) - 2+strlen(lengthStr) + i] = (char)(G_context.personal_msg_info.msg_info.personal_msg[i]);
-    }
-    g_personal_msg[totalLength-1] = '\0';
+    const size_t lengthStrLen = strlen(lengthStr);
+
+    const size_t maxCopyLen = sizeof(g_personal_msg) - sign_magic_len - lengthStrLen - 1;
+
+    memcpy(g_personal_msg + sign_magic_len, lengthStr, lengthStrLen);
+
+    const size_t copyLen = MIN(G_context.personal_msg_info.raw_msg_len, maxCopyLen);
+    memcpy(g_personal_msg + sign_magic_len + lengthStrLen,
+           G_context.personal_msg_info.msg_info.personal_msg,
+           copyLen);
+
+    g_personal_msg[sign_magic_len + lengthStrLen + copyLen] = '\0';
 
     g_validate_callback = &ui_action_validate_personal_msg;
     ux_flow_init(0, ux_display_personal_msg_flow, NULL);
+
     return 0;
 }
 

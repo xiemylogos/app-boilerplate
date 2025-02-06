@@ -61,40 +61,44 @@ int ui_display_personal_msg_choice() {
     }
 
     explicit_bzero(pairs, sizeof(pairs));
+    explicit_bzero(g_msg, sizeof(g_msg));
 
-    memset(g_msg, 0, sizeof(g_msg));
-    memcpy(g_msg, SIGN_MAGIC, sizeof(SIGN_MAGIC) - 2);
+    const size_t sign_magic_len = sizeof(SIGN_MAGIC) - 2;
+    memcpy(g_msg, SIGN_MAGIC, sign_magic_len);
+
     int msglen = utf8_strlen(G_context.personal_msg_info.raw_msg);
-
     char lengthStr[10];
     snprintf(lengthStr, sizeof(lengthStr), "%d", msglen);
-    int totalLength = sizeof(SIGN_MAGIC) - 2 + strlen(lengthStr) + G_context.personal_msg_info.raw_msg_len + 1;
-    memcpy(g_msg + sizeof(SIGN_MAGIC) - 2, lengthStr, strlen(lengthStr));
+    const size_t lengthStrLen = strlen(lengthStr);
 
-    for (size_t i=0;i< G_context.personal_msg_info.raw_msg_len;i++) {
-       g_msg[sizeof(SIGN_MAGIC) - 2+strlen(lengthStr) + i] = (char)(G_context.personal_msg_info.msg_info.personal_msg[i]);
-    }
-    g_msg[totalLength-1] = '\0';
+    const size_t maxCopyLen = sizeof(g_msg) - sign_magic_len - lengthStrLen - 1;
+
+    memcpy(g_msg + sign_magic_len, lengthStr, lengthStrLen);
+
+    const size_t copyLen = MIN(G_context.personal_msg_info.raw_msg_len, maxCopyLen);
+    memcpy(g_msg + sign_magic_len + lengthStrLen,
+           G_context.personal_msg_info.msg_info.personal_msg,
+           copyLen);
+
+    g_msg[sign_magic_len + lengthStrLen + copyLen] = '\0';
 
     pairs[0].item = NBGL_MSG;
     pairs[0].value = g_msg;
-    // Setup list
+
     pairList.nbMaxLinesForValue = 0;
     pairList.nbPairs = 1;
     pairList.pairs = pairs;
 
-    // Start review flow
     nbgl_useCaseReview(TYPE_MESSAGE,
-                           &pairList,
-                           &C_icon_ont_64px,
-                           PERSONAL_MSG_TITLE,
-                           NULL,
-                           PERSONAL_MSG_CONTENT,
-                           personal_msg_review_choice);
+                       &pairList,
+                       &C_icon_ont_64px,
+                       PERSONAL_MSG_TITLE,
+                       NULL,
+                       PERSONAL_MSG_CONTENT,
+                       personal_msg_review_choice);
+
     return 0;
 }
-
-
 // Flow used to display a clear-signed personal msg
 int ui_display_personal_msg() {
     return ui_display_personal_msg_choice();
