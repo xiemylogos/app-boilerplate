@@ -26,6 +26,7 @@ on:
       - main
       - develop
       - ont
+      - ont_0205
   pull_request:
 
 jobs:
