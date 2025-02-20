@@ -177,6 +177,13 @@ UX_STEP_NOCB(ux_display_unauth_pos_list_step,
                  .text = G_context.display_data.amount,
              });
 
+UX_STEP_NOCB(ux_display_reduce_init_pos_step,
+             bnnn_paging,
+             {
+                 .title = AMOUNT,
+                 .text = G_context.display_data.amount,
+             });
+
 UX_STEP_NOCB(ux_display_peer_cost_step,
              bnnn_paging,
              {
@@ -448,6 +455,9 @@ static void handle_node_tx_flow(uint8_t *index) {
             case AUTHORIZE_FOR_PEER:
             case UN_AUTHORIZE_FOR_PEER:
                 add_step_to_flow(index, &ux_display_unauth_pos_list_step);
+                break;
+            case REDUCE_INIT_POS:
+                add_step_to_flow(index, &ux_display_reduce_init_pos_step);
                 break;
             default:
                 add_step_to_flow(index, &ux_display_pos_step);

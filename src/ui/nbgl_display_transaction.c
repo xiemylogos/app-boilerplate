@@ -139,7 +139,10 @@ static uint8_t setTagValuePairs(void) {
             case CHANGE_MAX_AUTHORIZATION: item = MAX_AUTHORIZE; break;
             case SET_FEE_PERCENTAGE: item = PEER_COST; break;
             case WITHDRAW: item = (G_context.display_data.pubkey_number == 1) ? AMOUNT : TOTAL_WITHDRAW; break;
-            case UN_AUTHORIZE_FOR_PEER: item = AMOUNT; break;
+            case UN_AUTHORIZE_FOR_PEER:
+            case REDUCE_INIT_POS:
+                item = AMOUNT;
+                break;
             default: item = POS; break;
         }
         ADD_PAIR(item, G_context.display_data.amount);

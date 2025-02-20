@@ -66,8 +66,8 @@ typedef enum {
 } request_type_e;
 
 typedef enum {
-    TRANSFER_V2_TRANSACTION,     /// confirm transferv2 transaction information
-    OEP4_TRANSACTION,            /// confirm oep4 transaction information
+    TRANSFER_V2_TRANSACTION,     ///confirm transfer v2 transaction information
+    OEP4_TRANSACTION,            ///confirm oep4 transaction information
     REGISTER_CANDIDATE,          ///confirm registerCandidate
     WITHDRAW,                    ///confirm withdraw
     QUIT_NODE,                   ///confirm quitNode
@@ -83,7 +83,7 @@ typedef enum {
     TRANSFER_FROM_TRANSACTION,   ///confirm transfer from
     TRANSFER_FROM_V2_TRANSACTION,///confirm transfer from v2
     APPROVE_V2,                  ///confirm approve v2
-    NEO_VM_OEP4_APPROVE,        ///confirm oep4 neo vm approve
+    NEO_VM_OEP4_APPROVE,         ///confirm oep4 neo vm approve
     WASM_VM_OEP4_APPROVE,        ///confirm oep4 wasm vm approve
     NEO_VM_OEP4_TRANSFER_FROM,   ///confirm oep4 neo vm transfer from
     WASM_VM_OEP4_TRANSFER_FROM   ///confirm oep4 wasm vm transfer from
@@ -149,5 +149,5 @@ typedef struct {
     request_type_e req_type;                  /// user request
     uint32_t bip32_path[MAX_BIP32_PATH];      /// BIP32 path
     uint8_t bip32_path_len;                   /// length of BIP32 path
-    display_data_t display_data;
+    display_data_t display_data;              ///display data
 } global_ctx_t;

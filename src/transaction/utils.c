@@ -47,9 +47,6 @@
 /** length of the checksum used to convert a script_hash into an Address. */
 #define SCRIPT_HASH_CHECKSUM_LEN 4
 
-/** length of a tx.output Address, after Base58 encoding. */
-#define ADDRESS_BASE58_LEN 34
-
 /** length of a Address before encoding, which is the length of <address_version>+<script_hash>+<checksum> */
 #define ADDRESS_LEN_PRE (1 + SCRIPT_HASH_LEN + SCRIPT_HASH_CHECKSUM_LEN)
 
