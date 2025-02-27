@@ -43,7 +43,7 @@ void app_main() {
 
 	io_init();
 
-	//ui_menu_main();
+	ui_menu_main();
 
 	// Reset context
 	explicit_bzero(&G_context, sizeof(G_context));
@@ -98,68 +98,4 @@ void app_main() {
 			END_TRY;
 		}
 	}
-}
-
-/**
- * Exit the application and go back to the dashboard.
- */
-void app_exit() {
-    BEGIN_TRY_L(exit) {
-        TRY_L(exit) {
-            os_sched_exit(-1);
-        }
-        FINALLY_L(exit) {
-        }
-    }
-    END_TRY_L(exit);
-}
-
-/**
- * Main loop to setup USB, Bluetooth, UI and launch app_main().
- */
-__attribute__((section(".boot"))) int main() {
-    __asm volatile("cpsie i");
-
-    os_boot();
-
-    for (;;) {
-        // Reset UI
-        memset(&G_ux, 0, sizeof(G_ux));
-
-        BEGIN_TRY {
-            TRY {
-                io_seproxyhal_init();
-
-#ifdef HAVE_BLE
-                G_io_app.plane_mode = os_setting_get(OS_SETTING_PLANEMODE, NULL, 0);
-#endif  // HAVE_BLE
-
-                USB_power(0);
-                USB_power(1);
-
-                ui_menu_main();
-
-#ifdef HAVE_BLE
-                BLE_power(0, NULL);
-                BLE_power(1, "Nano X");
-#endif  // HAVE_BLE
-                app_main();
-            }
-            CATCH(EXCEPTION_IO_RESET) {
-                CLOSE_TRY;
-                continue;
-            }
-            CATCH_ALL {
-                CLOSE_TRY;
-                break;
-            }
-            FINALLY {
-            }
-        }
-        END_TRY;
-    }
-
-    app_exit();
-
-    return 0;
 }
