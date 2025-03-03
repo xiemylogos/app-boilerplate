@@ -23,7 +23,6 @@
 #include "lcx_sha256.h"
 #include "lcx_ripemd160.h"
 #include "crypto_helpers.h"
-#include "uint128.h"
 #include "format.h"
 #include "../globals.h"
 #include "../ui/types.h"
@@ -53,6 +52,11 @@
 #define VERIFICATION_SCRIPT_LENGTH 35
 
 #define UINT160_LEN 20
+
+#define MAX_LENGTH 40                //Accommodates 128-bit maximum
+#define BASE 10                      //Decimal
+#define P64_R 6                      //2^64 % 10
+#define P64_Q 1844674407370955161ULL //2^64 / 10
 
 uint64_t getBytesValueByLen(buffer_t *buf,uint8_t len) {
     uint8_t *value;
@@ -243,6 +247,55 @@ bool ont_address_by_pubkey(const uint8_t uncompressed_key[static 65],char* out, 
     script_hash_to_address(out, out_len,ripemd160_hash);
     return true;
 }
+
+void uint128_to_decimal_string(uint64_t high, uint64_t low, char* result, size_t buffer_size) {
+    if (result == NULL) {
+        return;
+    }
+
+    int index = MAX_LENGTH;
+    char buffer[MAX_LENGTH];
+
+    buffer[--index] = '\0';
+
+    if (high == 0 && low == 0) {
+        buffer[--index] = '0';
+    }
+
+    while (high != 0 || low != 0) {
+        uint64_t high_quotient = high / BASE;
+        uint64_t high_remainder = high % BASE;
+        uint64_t low_quotient = low / BASE;
+        uint64_t low_remainder = low % BASE;
+
+        uint64_t high_part_q = high_remainder * P64_Q;
+        uint64_t high_part_r = high_remainder * P64_R;
+
+        uint64_t curr_q = (high_part_r + low_remainder) / BASE;
+        uint64_t curr_r = (high_part_r + low_remainder) % BASE;
+
+	    buffer[--index] = '0' + (char)curr_r;
+ 
+        uint64_t sum_high = 0;
+        uint64_t sum_low = high_part_q;
+
+        sum_low += low_quotient;
+        if (sum_low < low_quotient) sum_high++;
+        sum_low += curr_q;
+        if (sum_low < curr_q) sum_high++;
+
+        high = high_quotient + sum_high;
+        low = sum_low;
+    }
+
+    size_t required_length = MAX_LENGTH - index;
+    if (buffer_size < required_length) {
+        return;
+    }
+
+    memcpy(result, &buffer[index], required_length);
+}
+
 bool get_token_amount(const uint8_t value_len,const uint64_t value[2],const uint8_t decimals,char* amount,size_t amount_len) {
     if (value_len >= 81) {
         return format_fpu64_trimmed(amount,amount_len,value[0],decimals);
@@ -250,14 +303,10 @@ bool get_token_amount(const uint8_t value_len,const uint64_t value[2],const uint
         if (value_len <= 8) {
             return format_fpu64_trimmed(amount,amount_len,value[0],decimals);
         } else {
-            char totalAmount[41];
-            uint128_t values;
-            values.elements[0] = value[1];
-            values.elements[1] = value[0];
-            tostring128(&values,10,totalAmount,sizeof(totalAmount));
+            char totalAmount[MAX_LENGTH];
+            uint128_to_decimal_string(value[1],value[0], totalAmount,sizeof(totalAmount));
             process_precision(totalAmount,decimals,amount,amount_len);
             explicit_bzero(&totalAmount, sizeof(totalAmount));
-            clear128(&values);
             return true;
         }
     }
