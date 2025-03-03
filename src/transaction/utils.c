@@ -158,41 +158,31 @@ size_t utf8_strlen(const uint8_t* str) {
 }
 
 void process_precision(const char *input, int precision, char *output, size_t output_len) {
-    size_t len = 0;
-    while (input[len] != '\0') {
-        len++;
-    }
-    size_t precision_unsigned = (size_t)(precision >= 0 ? precision : 0);
-
-    if (precision_unsigned == 0 || precision_unsigned >= len) {
-        size_t i = 0;
-        while (i < len && i < output_len - 1) {
-            output[i] = input[i];
-            i++;
-        }
-        output[i] = '\0';
+    if (!input || !output || output_len <= 1) {
+        if (output) *output = '\0';
         return;
     }
 
-    size_t integer_part_len = len - precision_unsigned;
-    size_t i = 0, j = 0;
+    size_t len = strlen(input);
+    size_t prec = (precision > 0) ? (size_t)precision : 0;
+    size_t int_len = (prec >= len) ? len : len - prec;
+    size_t req_len = (prec && prec < len) ? int_len + prec + 1 : len;
 
-    for (; i < integer_part_len && i < output_len - 1; i++) {
-        output[i] = input[j++];
+    if (req_len >= output_len) {
+        *output = '\0';
+        return;
     }
-    output[i++] = '.';
-    for (size_t k = 0; k < precision_unsigned && i < output_len - 1; k++) {
-        output[i++] = input[j++];
-    }
-    output[i] = '\0';
-    size_t end = i - 1;
-    while (end > integer_part_len && output[end] == '0') {
-        end--;
-    }
-    if (output[end] == '.') {
-        output[end] = '\0';
+
+    memcpy(output, input, int_len);
+    if (prec >= len || prec == 0) {
+        output[int_len] = '\0';
     } else {
-        output[end + 1] = '\0';
+        output[int_len] = '.';
+        memcpy(output + int_len + 1, input + int_len, prec);
+        size_t i = int_len + prec;
+        output[++i] = '\0';
+        while (i > int_len && output[i - 1] == '0') output[--i] = '\0';
+        if (output[i - 1] == '.') output[i - 1] = '\0';
     }
 }
 
