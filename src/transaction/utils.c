@@ -136,21 +136,35 @@ void script_hash_to_address(char* out, size_t out_len, const unsigned char* scri
     base58_encode(address, sizeof(address), out, out_len);
 }
 
-
 size_t utf8_strlen(const uint8_t* str) {
+    if (!str) return 0;
+
     size_t len = 0;
-    const uint8_t* ptr = str;
-    while (*ptr) {
-        if ((*ptr & 0x80) == 0) {
-            ptr += 1;
-        } else if ((*ptr & 0xE0) == 0xC0) {
-            ptr += 2;
-        } else if ((*ptr & 0xF0) == 0xE0) {
-            ptr += 3;
-        } else if ((*ptr & 0xF8) == 0xF0) {
-            ptr += 4;
+    while (*str) {
+        uint8_t c = *str;
+        uint32_t codepoint;
+
+        if ((c & 0x80) == 0) {  //1-byte (ASCII) character
+            codepoint = c;
+            str += 1;
+        } else if ((c & 0xE0) == 0xC0) {  //2-byte character
+            if (!str[1] || (str[1] & 0xC0) != 0x80) return SIZE_MAX;  //Invalid or incomplete character
+            codepoint = ((c & 0x1F) << 6) | (str[1] & 0x3F);
+            if (codepoint < 0x80) return SIZE_MAX;  //Overlong encoding (invalid)
+            str += 2;
+        } else if ((c & 0xF0) == 0xE0) {  //3-byte character
+            if (!str[1] || !str[2] || (str[1] & 0xC0) != 0x80 || (str[2] & 0xC0) != 0x80) return SIZE_MAX;
+            codepoint = ((c & 0x0F) << 12) | ((str[1] & 0x3F) << 6) | (str[2] & 0x3F);
+            if (codepoint < 0x800 || (codepoint >= 0xD800 && codepoint <= 0xDFFF)) return SIZE_MAX;
+            str += 3;
+        } else if ((c & 0xF8) == 0xF0) {  //4-byte character
+            if (!str[1] || !str[2] || !str[3] || 
+                (str[1] & 0xC0) != 0x80 || (str[2] & 0xC0) != 0x80 || (str[3] & 0xC0) != 0x80) return SIZE_MAX;
+            codepoint = ((c & 0x07) << 18) | ((str[1] & 0x3F) << 12) | ((str[2] & 0x3F) << 6) | (str[3] & 0x3F);
+            if (codepoint > 0x10FFFF) return SIZE_MAX;  //Out of valid Unicode range
+            str += 4;
         } else {
-            ptr += 1;
+            return SIZE_MAX;   //Invalid UTF-8 byte sequence
         }
         len++;
     }
