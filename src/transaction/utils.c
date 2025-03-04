@@ -144,27 +144,27 @@ size_t utf8_strlen(const uint8_t* str) {
         uint8_t c = *str;
         uint32_t codepoint;
 
-        if ((c & 0x80) == 0) {  //1-byte (ASCII) character
-            codepoint = c;
-            str += 1;
-        } else if ((c & 0xE0) == 0xC0) {  //2-byte character
-            if (!str[1] || (str[1] & 0xC0) != 0x80) return SIZE_MAX;  //Invalid or incomplete character
+        if ((c & 0x80) == 0) {  // 1-byte (ASCII) character
+            str += 1;  
+        } else if ((c & 0xE0) == 0xC0) {  // 2-byte character
+            if (!str[1] || (str[1] & 0xC0) != 0x80) return SIZE_MAX;
             codepoint = ((c & 0x1F) << 6) | (str[1] & 0x3F);
-            if (codepoint < 0x80) return SIZE_MAX;  //Overlong encoding (invalid)
+            if (codepoint < 0x80) return SIZE_MAX;  // Overlong encoding
             str += 2;
-        } else if ((c & 0xF0) == 0xE0) {  //3-byte character
+        } else if ((c & 0xF0) == 0xE0) {  // 3-byte character
             if (!str[1] || !str[2] || (str[1] & 0xC0) != 0x80 || (str[2] & 0xC0) != 0x80) return SIZE_MAX;
             codepoint = ((c & 0x0F) << 12) | ((str[1] & 0x3F) << 6) | (str[2] & 0x3F);
             if (codepoint < 0x800 || (codepoint >= 0xD800 && codepoint <= 0xDFFF)) return SIZE_MAX;
             str += 3;
-        } else if ((c & 0xF8) == 0xF0) {  //4-byte character
+        } else if ((c & 0xF8) == 0xF0) {  // 4-byte character
             if (!str[1] || !str[2] || !str[3] || 
                 (str[1] & 0xC0) != 0x80 || (str[2] & 0xC0) != 0x80 || (str[3] & 0xC0) != 0x80) return SIZE_MAX;
-            codepoint = ((c & 0x07) << 18) | ((str[1] & 0x3F) << 12) | ((str[2] & 0x3F) << 6) | (str[3] & 0x3F);
-            if (codepoint > 0x10FFFF) return SIZE_MAX;  //Out of valid Unicode range
+            codepoint = ((c & 0x07) << 18) | ((str[1] & 0x3F) << 12) | 
+                        ((str[2] & 0x3F) << 6) | (str[3] & 0x3F);
+            if (codepoint < 0x10000 || codepoint > 0x10FFFF) return SIZE_MAX; 
             str += 4;
         } else {
-            return SIZE_MAX;   //Invalid UTF-8 byte sequence
+            return SIZE_MAX;  // Invalid UTF-8 byte sequence
         }
         len++;
     }
