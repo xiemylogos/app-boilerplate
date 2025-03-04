@@ -63,9 +63,18 @@ parser_status_e register_candidate_tx_deserialize(buffer_t *buf) {
         },
         {
             .data_type = OP_CODE_DATA_TYPE,
-            .data = (uint8_t []) {0x6a,0x7c,0xc8,0x00,0x6a,0x7c,0xc8},
-            .data_len = 7
+            .data = (uint8_t []) {0x6a,0x7c,0xc8},
+            .data_len = 3
         },
+        {
+            .data_type = ONT_ID_TYPE,
+            .values = {},
+        },
+        {
+            .data_type = OP_CODE_DATA_TYPE,
+            .data = (uint8_t []) {0x6a,0x7c,0xc8},
+            .data_len = 3 
+        }, 
         {
             .data_type = AMOUNT_DATA_TYPE,
             .values = {},

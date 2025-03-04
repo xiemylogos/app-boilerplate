@@ -158,7 +158,15 @@ parser_status_e parse_tx(buffer_t *buf,cfg_t* tx,size_t array_length,vm_operator
                     }
                 }
             }
-        }else {
+        }else if(tx[i].data_type == ONT_ID_TYPE){
+            uint8_t  ont_id_len = 0;
+            if (!buffer_read_u8(buf, &ont_id_len)) {
+                return VALUE_PARSING_ERROR;
+            }
+            if (ont_id_len != 0 && !buffer_seek_cur(buf, ont_id_len)) {
+                return VALUE_PARSING_ERROR;
+            }
+        } else {
             return DATA_PARSING_ERROR;
         }
     }
