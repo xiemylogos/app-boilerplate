@@ -4,17 +4,14 @@
 #include <string.h>
 
 uint64_t  GetBufferData(buffer_t *buf) {
-    uint64_t  value = 0;
-    uint8_t  amount = 0;
+    uint8_t amount;
     if (!buffer_read_u8(buf, &amount)) {
         return 0;
     }
     if (amount >= OPCODE_VALUE) {
-        value = amount - 80;
-    } else {
-        value = getBytesValueByLen(buf, amount);
+        return amount - 80;
     }
-    return value;
+    return (amount > 8) ? 0 : getBytesValueByLen(buf, amount);
 }
 
 
@@ -60,17 +57,11 @@ parser_status_e parse_tx(buffer_t *buf,cfg_t* tx,size_t array_length,vm_operator
             }
         }else if(tx[i].data_type == AMOUNT_DATA_TYPE){
             if (tx[i].data_len == 16) {
-                if (!buffer_read_u64(buf, &tx[i].values[0], LE)) {
-                    return OPCODE_PARSING_ERROR;
-                }
-                if (!buffer_read_u64(buf, &tx[i].values[1], LE)) {
-                    return OPCODE_PARSING_ERROR;
-                }
-                if (tx[i].values[1] != 0 ) {
-                    tx[i].data_len = 16;
-                } else {
-                    tx[i].data_len = 8;
-                }
+                if (!buffer_read_u64(buf, &tx[i].values[0], LE) ||
+                    !buffer_read_u64(buf, &tx[i].values[1], LE)) {
+                        return OPCODE_PARSING_ERROR;
+                    }
+                tx[i].data_len = (tx[i].values[1] != 0) ? 16 : 8;
             } else {
                 if (!buffer_read_u8(buf, &tx[i].data_len)) {
                     return OPCODE_PARSING_ERROR;
@@ -78,16 +69,16 @@ parser_status_e parse_tx(buffer_t *buf,cfg_t* tx,size_t array_length,vm_operator
                 if (tx[i].data_len >= OPCODE_VALUE) {
                     tx[i].values[0] = tx[i].data_len - 80;
                     tx[i].values[1] = 0;
-                } else {
-                    if (tx[i].data_len <= 8) {
-                        tx[i].values[0] = getBytesValueByLen(buf, tx[i].data_len);
-                        tx[i].values[1] = 0;
-                    } else {
-                        if (!buffer_read_u64(buf, &tx[i].values[0], LE)) {
-                            return OPCODE_PARSING_ERROR;
-                        }
-                        tx[i].values[1] = getBytesValueByLen(buf, tx[i].data_len - 8);
+                } else if (tx[i].data_len > 16) {
+                    return VALUE_PARSING_ERROR;
+                } else if (tx[i].data_len <= 8) {
+                    tx[i].values[0] = getBytesValueByLen(buf, tx[i].data_len);
+                    tx[i].values[1] = 0;
+                } else {  
+                    if (!buffer_read_u64(buf, &tx[i].values[0], LE)) {
+                        return OPCODE_PARSING_ERROR;
                     }
+                    tx[i].values[1] = getBytesValueByLen(buf, tx[i].data_len - 8);
                 }
             }
         } else if (tx[i].data_type == PUBKEY_DATA_TYPE){
