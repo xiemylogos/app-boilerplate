@@ -19,39 +19,21 @@ parser_status_e parse_tx(buffer_t *buf,cfg_t* tx,size_t array_length,vm_operator
     uint64_t result_length = 0;
     for(size_t i=0;i<array_length;i++) {
         if (tx[i].data_type == OP_CODE_DATA_TYPE) {
-            if (!buffer_can_read(buf, tx[i].data_len)) {
-                return DATA_END_PARSING_ERROR;
-            }
-            if (memcmp(buf->ptr + buf->offset, tx[i].data, tx[i].data_len) != 0) {
-                return DATA_END_PARSING_ERROR;
-            }
+            if (!buffer_can_read(buf, tx[i].data_len) || 
+                    memcmp(buf->ptr + buf->offset, tx[i].data, tx[i].data_len) != 0) {
+                    return DATA_END_PARSING_ERROR;
+                }
             buffer_seek_cur(buf, tx[i].data_len);
-        } else if (tx[i].data_type== ADDRESS_DATA_TYPE) {
-            if(vm_type != OEP4_WASM_VM_OPERATOR) {
+        } else if (tx[i].data_type == ADDRESS_DATA_TYPE || tx[i].data_type == CONTRACT_ADDRESS_DATA_TYPE) {
+            bool check_length = (tx[i].data_type == ADDRESS_DATA_TYPE && vm_type != OEP4_WASM_VM_OPERATOR) ||
+                        (tx[i].data_type == CONTRACT_ADDRESS_DATA_TYPE && vm_type != OEP4_WASM_VM_OPERATOR && vm_type != OEP4_NEO_VM_OPERATOR);
+            if (check_length) {
                 uint8_t address_len;
-                if (!buffer_read_u8(buf, &address_len)) {
-                    return OPCODE_PARSING_ERROR;
-                }
-                if (address_len != ADDRESS_LEN) {
+                if (!buffer_read_u8(buf, &address_len) || address_len != ADDRESS_LEN) {
                     return OPCODE_PARSING_ERROR;
                 }
             }
-            tx[i].data = (uint8_t*)(buf->ptr+buf->offset);
-            if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
-                return FROM_PARSING_ERROR;
-            }
-        } else if(tx[i].data_type== CONTRACT_ADDRESS_DATA_TYPE){
-            if(vm_type != OEP4_WASM_VM_OPERATOR &&
-               vm_type != OEP4_NEO_VM_OPERATOR) {
-                uint8_t address_len;
-                if (!buffer_read_u8(buf, &address_len)) {
-                    return OPCODE_PARSING_ERROR;
-                }
-                if (address_len != ADDRESS_LEN) {
-                    return OPCODE_PARSING_ERROR;
-                }
-            }
-            tx[i].data = (uint8_t*)(buf->ptr+buf->offset);
+            tx[i].data = (uint8_t *)(buf->ptr + buf->offset);
             if (!buffer_seek_cur(buf, ADDRESS_LEN)) {
                 return FROM_PARSING_ERROR;
             }
@@ -88,46 +70,32 @@ parser_status_e parse_tx(buffer_t *buf,cfg_t* tx,size_t array_length,vm_operator
             }
         } else if(tx[i].data_type == MULTIPLE_PUBKEY_DATA_TYPE) {
             uint64_t peer_pubkey_number = GetBufferData(buf);
-            if (peer_pubkey_number == 0) {
+            if (peer_pubkey_number == 0 || getBytesValueByLen(buf, 3) != 13139050) { // 6a7cc8
                 return VALUE_PARSING_ERROR;
             }
             tx[i].data_info.pos_start = result_length;
             tx[i].data_info.data_number = peer_pubkey_number;
-
-            if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
-                return VALUE_PARSING_ERROR;
-            }
             for(size_t len=0;len< peer_pubkey_number;len++) {
-                uint8_t peer_pubkey_length  = 0;
-                if (!buffer_read_u8(buf, &peer_pubkey_length)) {
+                uint8_t peer_pubkey_length = 0;
+                if (!buffer_read_u8(buf, &peer_pubkey_length) || peer_pubkey_length != PEER_PUBKEY_LEN) {
                     return VALUE_PARSING_ERROR;
                 }
-                if (peer_pubkey_length != PEER_PUBKEY_LEN) {
-                    return VALUE_PARSING_ERROR;
-                }
-                if (result_length < MAX_RESULT_SIZE) {
-                    resultArray[result_length] = (uint8_t *) (buf->ptr + buf->offset);
-                    if (!buffer_seek_cur(buf, PEER_PUBKEY_LEN)) {
-                        return PEER_PUBKEY_PARSING_ERROR;
-                    }
-                    result_length ++;
-                } else {
+                if (result_length >= MAX_RESULT_SIZE) {
                     return PEER_PUBKEY_PARSING_ERROR;
-                }
-                if (getBytesValueByLen(buf, 3) != 13139050) {  // 6a7cc8
+                } 
+                resultArray[result_length++] = (uint8_t *) (buf->ptr + buf->offset);
+                if (!buffer_seek_cur(buf, PEER_PUBKEY_LEN) || getBytesValueByLen(buf, 3) != 13139050) {
                     return VALUE_PARSING_ERROR;
                 }
             }
         }else if(tx[i].data_type == MULTIPLE_AMOUNT_DATA_TYPE) {
             uint64_t amount_number= GetBufferData(buf);
-            if (amount_number == 0) {
+            if (amount_number == 0 || getBytesValueByLen(buf, 3) != 13139050) { // 6a7cc8
                 return VALUE_PARSING_ERROR;
             }
             tx[i].data_info.pos_start = result_length;
             tx[i].data_info.data_number = amount_number;
-            if(getBytesValueByLen(buf,3) != 13139050) { //6a7cc8
-                return VALUE_PARSING_ERROR;
-            }
+
             for(size_t num=0; num<amount_number;num++) {
                 uint64_t value = GetBufferData(buf);
                 if (value == 0) {
@@ -151,10 +119,7 @@ parser_status_e parse_tx(buffer_t *buf,cfg_t* tx,size_t array_length,vm_operator
             }
         }else if(tx[i].data_type == ONT_ID_TYPE){
             uint8_t  ont_id_len = 0;
-            if (!buffer_read_u8(buf, &ont_id_len)) {
-                return VALUE_PARSING_ERROR;
-            }
-            if (ont_id_len != 0 && !buffer_seek_cur(buf, ont_id_len)) {
+            if (!buffer_read_u8(buf, &ont_id_len) || (ont_id_len != 0 && !buffer_seek_cur(buf, ont_id_len))) {
                 return VALUE_PARSING_ERROR;
             }
         } else {
