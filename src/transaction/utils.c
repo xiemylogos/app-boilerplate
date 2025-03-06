@@ -329,7 +329,7 @@ uint8_t get_oep4_token_decimals(uint8_t  *contract_addr) {
 }
 
 void get_ong_fee(uint64_t gas_price,uint64_t gas_limit,char* out, size_t out_len) {
-    format_fpu64_trimmed(out,sizeof(out_len),gas_price*gas_limit,9);
+    format_fpu64_trimmed(out,out_len,gas_price*gas_limit,9);
     strlcat(out,ONG_VIEW,out_len);
 }
 
