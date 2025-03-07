@@ -9,6 +9,37 @@
 #define PAYLOAD_TRANSFER_LEN  54
 #define PAYLOAD_TRANSFER_FROM_LEN  58
 
+#define MAX_RESULT_SIZE 20
+#define VALUE_SIZE 8
+#define OPCODE_VALUE  81
+#define OPCODE_OPERATION_CODE  13139050 //6a7cc8
+#define UINT64_T_BYTE_LEN 8
+#define TWO_UINT64_T_BYTE_LEN 16
+
+/** the length of a SHA256 hash */
+#define SHA256_HASH_LEN 32
+
+/** the current version of the address field */
+#define ADDRESS_VERSION 23
+
+/** length of tx.output.script_hash */
+#define SCRIPT_HASH_LEN 20
+
+/** length of the checksum used to convert a script_hash into an Address. */
+#define SCRIPT_HASH_CHECKSUM_LEN 4
+
+/** length of a Address before encoding, which is the length of <address_version>+<script_hash>+<checksum> */
+#define ADDRESS_LEN_PRE (1 + SCRIPT_HASH_LEN + SCRIPT_HASH_CHECKSUM_LEN)
+
+#define VERIFICATION_SCRIPT_LENGTH 35
+
+#define UINT160_LEN 20
+
+#define MAX_LENGTH 40                //Accommodates 128-bit maximum
+#define BASE 10                      //Decimal
+#define P64_R 6                      //2^64 % 10
+#define P64_Q 1844674407370955161ULL //2^64 / 10
+
 #define ONG_ADDR ("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02")
 #define ONT_ADDR ("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01")
 #define WTK_ADDR ("\x77\xF1\xFF\xE3\xAD\xA5\xDD\x78\x62\xF9\x60\x1F\x5A\x0A\x05\x8A\x6B\xD8\x27\x43")

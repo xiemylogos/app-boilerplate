@@ -34,29 +34,6 @@
 #include "ledger_assert.h"
 #endif
 
-/** the length of a SHA256 hash */
-#define SHA256_HASH_LEN 32
-
-/** the current version of the address field */
-#define ADDRESS_VERSION 23
-
-/** length of tx.output.script_hash */
-#define SCRIPT_HASH_LEN 20
-
-/** length of the checksum used to convert a script_hash into an Address. */
-#define SCRIPT_HASH_CHECKSUM_LEN 4
-
-/** length of a Address before encoding, which is the length of <address_version>+<script_hash>+<checksum> */
-#define ADDRESS_LEN_PRE (1 + SCRIPT_HASH_LEN + SCRIPT_HASH_CHECKSUM_LEN)
-
-#define VERIFICATION_SCRIPT_LENGTH 35
-
-#define UINT160_LEN 20
-
-#define MAX_LENGTH 40                //Accommodates 128-bit maximum
-#define BASE 10                      //Decimal
-#define P64_R 6                      //2^64 % 10
-#define P64_Q 1844674407370955161ULL //2^64 / 10
 
 uint64_t getBytesValueByLen(buffer_t *buf,uint8_t len) {
     uint8_t *value;
@@ -301,12 +278,14 @@ void uint128_to_decimal_string(uint64_t high, uint64_t low, char* result, size_t
 }
 
 bool get_token_amount(const uint8_t value_len,const uint64_t value[2],const uint8_t decimals,char* amount,size_t amount_len) {
-    if (value_len >= 81) {
+    if (value_len >= OPCODE_VALUE) {
         return format_fpu64_trimmed(amount,amount_len,value[0],decimals);
     } else {
-        if (value_len <= 8) {
+        if (value_len <= UINT64_T_BYTE_LEN) {
             return format_fpu64_trimmed(amount,amount_len,value[0],decimals);
-        } else {
+        } else if(value_len > TWO_UINT64_T_BYTE_LEN) {
+            return false;
+        }else {
             char totalAmount[MAX_LENGTH];
             uint128_to_decimal_string(value[1],value[0], totalAmount,sizeof(totalAmount));
             process_precision(totalAmount,decimals,amount,amount_len);
@@ -317,15 +296,14 @@ bool get_token_amount(const uint8_t value_len,const uint64_t value[2],const uint
 }
 
 uint8_t get_oep4_token_decimals(uint8_t  *contract_addr) {
-    uint8_t decimals = 0;
-    if (memcmp(contract_addr,WTK_ADDR,ADDRESS_LEN) == 0) {
-        decimals = 9;
-    } else if (memcmp(contract_addr,MYT_ADDR,ADDRESS_LEN) == 0 ) {
-        decimals = 18;
-    } else if (memcmp(contract_addr,WING_ADDR,ADDRESS_LEN) == 0 ) {
-        decimals = 9;
+    if (memcmp(contract_addr, WTK_ADDR, ADDRESS_LEN) == 0 || 
+        memcmp(contract_addr, WING_ADDR, ADDRESS_LEN) == 0) {
+        return 9;
     }
-    return decimals;
+    if (memcmp(contract_addr, MYT_ADDR, ADDRESS_LEN) == 0) {
+        return 18;
+    }
+    return 0;
 }
 
 void get_ong_fee(uint64_t gas_price,uint64_t gas_limit,char* out, size_t out_len) {
@@ -334,41 +312,36 @@ void get_ong_fee(uint64_t gas_price,uint64_t gas_limit,char* out, size_t out_len
 }
 
 bool get_native_token_amount(uint8_t *contract_addr,const uint8_t value_len,const uint64_t value[2],char* out, size_t out_len) {
+    uint8_t decimals = 0;
     if (memcmp(contract_addr, ONT_ADDR, 20) == 0) {
-        uint8_t decimals = 0;
-        if(G_context.tx_type == TRANSFER_V2_TRANSACTION ||
-           G_context.tx_type == APPROVE_V2 ||
-           G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION) {
-            decimals = 9;
-        }
-        if(!get_token_amount(value_len,value,decimals,out,out_len)) {
+        decimals = (G_context.tx_type == TRANSFER_V2_TRANSACTION || 
+                    G_context.tx_type == APPROVE_V2 ||
+                    G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION) ? 9 : 0;
+        
+        if (!get_token_amount(value_len, value, decimals, out, out_len)) {
             return false;
         }
-        strlcat(out,ONT_VIEW,out_len);
+        strlcat(out, ONT_VIEW, out_len);
     } else if (memcmp(contract_addr, ONG_ADDR, 20) == 0) {
-        uint8_t decimals = 9;
-        if(G_context.tx_type == TRANSFER_V2_TRANSACTION ||
-           G_context.tx_type == APPROVE_V2 ||
-           G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION) {
-            decimals = 18;
-        }
-        if(!get_token_amount(value_len,value,decimals,out,out_len)) {
+        decimals = (G_context.tx_type == TRANSFER_V2_TRANSACTION || 
+                    G_context.tx_type == APPROVE_V2 ||
+                    G_context.tx_type == TRANSFER_FROM_V2_TRANSACTION) ? 18 : 9;
+        
+        if (!get_token_amount(value_len, value, decimals, out, out_len)) {
             return false;
         }
-        strlcat(out,ONG_VIEW,out_len);
+        strlcat(out, ONG_VIEW, out_len);
+    } else {
+        return false;
     }
     return true;
 }
 
 bool get_oep4_token_amount(uint8_t *contract_addr,const uint8_t value_len,const uint64_t value[2],char* out, size_t out_len) {
-    uint8_t decimals = 0;
-    decimals = get_oep4_token_decimals(contract_addr);
+    uint8_t decimals = get_oep4_token_decimals(contract_addr);
     G_context.display_data.decimals = decimals;
-    if(!get_token_amount(value_len,value,decimals,out,out_len)) {
-        return false;
-    }
-    return true;
-}
+    return get_token_amount(value_len, value, decimals, out, out_len);
+}    
 
 bool convert_uint64_to_char(char* out, size_t out_len,uint64_t amount) {
     if(!format_u64(out,out_len,amount)) {

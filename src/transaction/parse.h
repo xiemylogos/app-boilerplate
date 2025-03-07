@@ -4,13 +4,6 @@
 #include "buffer.h"
 #include "../types.h"
 
-#define MAX_RESULT_SIZE 20
-#define VALUE_SIZE 8
-#define OPCODE_VALUE  81
-#define OPCODE_OPERATION_CODE  13139050 //6a7cc8
-#define UINT64_T_BYTE_LEN 8
-#define TWO_UINT64_T_BYTE_LEN 16
-
 typedef enum {
     OP_CODE_DATA_TYPE = 0x01,
     ADDRESS_DATA_TYPE = 0x02,
