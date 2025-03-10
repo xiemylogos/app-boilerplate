@@ -39,7 +39,6 @@ typedef struct {
 
 
 
-uint64_t  GetBufferData(buffer_t *buf);
 parser_status_e parse_tx(buffer_t *buf,cfg_t* txArray,size_t array_length,vm_operator_t vm_type,uint8_t *resultArray[MAX_RESULT_SIZE],uint8_t storage[][VALUE_SIZE]);
 
 

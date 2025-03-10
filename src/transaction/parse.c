@@ -3,18 +3,6 @@
 #include "utils.h"
 #include <string.h>
 
-uint64_t  GetBufferData(buffer_t *buf) {
-    uint8_t amount;
-    if (!buffer_read_u8(buf, &amount)) {
-        return 0;
-    }
-    if (amount >= OPCODE_VALUE) {
-        return amount - OPCODE_VALUE +1;
-    }
-    return (amount > UINT64_T_BYTE_LEN) ? 0 : getBytesValueByLen(buf, amount);
-}
-
-
 parser_status_e parse_tx(buffer_t *buf,cfg_t* tx,size_t array_length,vm_operator_t vm_type,uint8_t *resultArray[MAX_RESULT_SIZE],uint8_t storage[][VALUE_SIZE]) {
     uint64_t result_length = 0;
     for(size_t i=0;i<array_length;i++) {
@@ -107,13 +95,13 @@ parser_status_e parse_tx(buffer_t *buf,cfg_t* tx,size_t array_length,vm_operator
             }
             tx[i].data_info.pos_start = result_length;
             tx[i].data_info.data_number = amount_number;
-
+            
+            size_t byte_count = sizeof(uint64_t);
             for(size_t num=0; num<amount_number;num++) {
                 uint64_t value = GetBufferData(buf);
                 if (value == 0) {
                     return VALUE_PARSING_ERROR;
                 }
-                size_t byte_count = sizeof(value);
                 if (result_length >= MAX_RESULT_SIZE) {
                     return DATA_PARSING_ERROR;
                 }

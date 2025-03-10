@@ -13,6 +13,7 @@ uint64_t getBytesValueByLen(buffer_t *buf,uint8_t len);
 
 uint64_t getValueByLen(uint8_t *value,uint8_t len);
 
+uint64_t  GetBufferData(buffer_t *buf);
 
 parser_status_e transaction_deserialize_header(buffer_t *buf,transaction_header_t *tx);
 

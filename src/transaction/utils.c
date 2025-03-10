@@ -52,6 +52,18 @@ uint64_t getValueByLen(uint8_t *value,uint8_t len) {
     return pre_value;
 }
 
+uint64_t  GetBufferData(buffer_t *buf) {
+    uint8_t amount;
+    if (!buffer_read_u8(buf, &amount)) {
+        return 0;
+    }
+    if (amount >= OPCODE_VALUE) {
+        return amount - OPCODE_VALUE +1;
+    }
+    return (amount > UINT64_T_BYTE_LEN) ? 0 : getBytesValueByLen(buf, amount);
+}
+
+
 parser_status_e transaction_deserialize_header(buffer_t *buf,transaction_header_t *tx) {
     if (buf->size > MAX_TRANSACTION_LEN) {
         return WRONG_LENGTH_ERROR;
