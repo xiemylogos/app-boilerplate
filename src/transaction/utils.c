@@ -161,31 +161,54 @@ size_t utf8_strlen(const uint8_t* str) {
 }
 
 void process_precision(const char *input, int precision, char *output, size_t output_len) {
-    if (!input || !output || output_len <= 1) {
-        if (output) *output = '\0';
+    // Input validation
+    if (!input || !output || output_len == 0 || precision < 0) {
+        if (output_len > 0) output[0] = '\0';
         return;
     }
 
     size_t len = strlen(input);
-    size_t prec = (precision > 0) ? (size_t)precision : 0;
-    size_t int_len = (prec >= len) ? len : len - prec;
-    size_t req_len = (prec && prec < len) ? int_len + prec + 1 : len;
-
-    if (req_len >= output_len) {
-        *output = '\0';
+    if (len == 0) { // Handle empty string
+        if (output_len > 1) strcpy(output, "0");
+        else if (output_len > 0) output[0] = '\0';
         return;
     }
 
-    memcpy(output, input, int_len);
-    if (prec >= len || prec == 0) {
-        output[int_len] = '\0';
+    // Pre-check if output buffer is sufficient
+    size_t max_len = len + (precision > (int)len ? precision - len + 2 : 1);
+    if (max_len + 1 > output_len) {
+        output[0] = '\0';
+        return;
+    }
+
+    char *ptr = output;
+    if ((size_t)precision >= len) {
+        // Precision >= input length: prepend "0." and pad with zeros
+        *ptr++ = '0';
+        *ptr++ = '.';
+        size_t zeros = precision - len;
+        memset(ptr, '0', zeros); // Use memset instead of loop
+        ptr += zeros;
+        memcpy(ptr, input, len);
+        ptr[len] = '\0';
+    } else if (precision == 0) {
+        memcpy(ptr, input, len + 1); // Directly copy with null terminator
     } else {
-        output[int_len] = '.';
-        memcpy(output + int_len + 1, input + int_len, prec);
-        size_t i = int_len + prec;
-        output[++i] = '\0';
-        while (i > int_len && output[i - 1] == '0') output[--i] = '\0';
-        if (output[i - 1] == '.') output[i - 1] = '\0';
+        // Normal case: insert decimal point
+        size_t int_len = len - precision;
+        memcpy(ptr, input, int_len);
+        ptr += int_len;
+        *ptr++ = '.';
+        memcpy(ptr, input + int_len, precision);
+        ptr[precision] = '\0';
+    }
+
+    // Remove trailing zeros after decimal point
+    ptr = strchr(output, '.');
+    if (ptr) {
+        char *end = output + strlen(output);
+        while (end > ptr + 1 && *(end - 1) == '0') *(--end) = '\0';
+        if (end > output && *(end - 1) == '.') *(--end) = '\0';
     }
 }
 
