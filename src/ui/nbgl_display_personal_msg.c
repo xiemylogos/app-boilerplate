@@ -66,7 +66,7 @@ int ui_display_personal_msg_choice() {
     const size_t sign_magic_len = sizeof(SIGN_MAGIC) - 2;
     memcpy(g_msg, SIGN_MAGIC, sign_magic_len);
 
-    int msglen = utf8_strlen(G_context.personal_msg_info.raw_msg);
+    int msglen = G_context.personal_msg_info.raw_msg_len;
     char lengthStr[10];
     snprintf(lengthStr, sizeof(lengthStr), "%d", msglen);
     const size_t lengthStrLen = strlen(lengthStr);

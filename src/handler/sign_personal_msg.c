@@ -117,7 +117,7 @@ int handler_sign_personal_msg(buffer_t *cdata, uint8_t chunk, bool more) {
             snprintf(strings.tmp.tmp2,
                      sizeof(strings.tmp.tmp2),
                      "%u",
-                     utf8_strlen(G_context.personal_msg_info.raw_msg));
+                     G_context.personal_msg_info.raw_msg_len); 
 
             CX_CHECK(cx_hash_no_throw((cx_hash_t *) &global_sha256,
                                       0,
